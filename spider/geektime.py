@@ -89,6 +89,42 @@ def get_cookies():
     return cookies
 
 
+def save_column_info(column_id, column_title, column_subtitle, author_name, author_intro,
+                     had_sub, update_frequency, author_header, column_unit, column_cover, column_begin_time):
+
+    conn = sqlite3.connect(os.path.join(output_dir, 'sqlite3.db'))
+
+    cur = conn.cursor()
+    try:
+        cur.execute('CREATE TABLE columns ('
+                    'id INTEGER PRIMARY KEY,'
+                    'column_id INTEGER, '
+                    'column_title TEXT,'
+                    'column_subtitle TEXT,'
+                    'author_name TEXT,'
+                    'author_intro TEXT,'
+                    'had_sub INT,'
+                    'update_frequency TEXT,'
+                    'author_header TEXT,'
+                    'column_unit TEXT,'
+                    'column_cover TEXT,'
+                    'column_begin_time TEXT,'
+                    'create_at TEXT NOT NULL )'
+                    )
+    except sqlite3.OperationalError:  # exist
+        pass
+
+    cur.execute('INSERT INTO columns (column_id, column_title, column_subtitle, author_name, author_intro, had_sub, '
+                'update_frequency, author_header, column_unit, column_cover, column_begin_time, create_at) '
+                'VALUES (?, ?,?,?, ?,?,?, ?,?,?, ?,?)',
+                (column_id, column_title, column_subtitle, author_name, author_intro,
+                 had_sub, update_frequency, author_header, column_unit, column_cover, column_begin_time,
+                 datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+    cur.close()
+    conn.commit()
+    conn.close()
+
+
 def parse(url, html_content):
     new_url_list = []
     parsed_content = None
@@ -115,6 +151,22 @@ def parse(url, html_content):
 
 
 def save(url, content):
-    pass
+    # 专栏列表
+    if url.endswith('/column/all'):
+        column_list = json.loads(content)
+        for column in column_list:
+            save_column_info(
+                column_id=column.get('id'),
+                column_title=column.get('column_title'),
+                column_subtitle=column.get('column_subtitle'),
+                author_name=column.get('author_name'),
+                author_intro=column.get('author_intro'),
+                had_sub=column.get('had_sub'),
+                update_frequency=column.get('update_frequency'),
+                author_header=column.get('author_header'),
+                column_unit=column.get('column_unit'),
+                column_cover=column.get('column_cover'),
+                column_begin_time=column.get('column_begin_time'),
+            )
 
 # system("%s -rf %s" % ('rm', output_dir))
