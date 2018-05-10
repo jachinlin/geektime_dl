@@ -59,7 +59,6 @@ def _save_cookies_2_db(cookies):
 
 
 def _get_cookies_from_db():
-
     os.system("%s -p %s" % ('mkdir', output_dir))
     conn = sqlite3.connect(os.path.join(output_dir, 'sqlite3.db'))
 
@@ -91,11 +90,31 @@ def get_cookies():
 
 
 def parse(url, html_content):
-    pass
+    new_url_list = []
+    parsed_content = None
+
+    # 专栏列表
+    if url.endswith('/column/all'):
+        column_list = json.loads(html_content)['data']['1']['list']
+        parsed_content = json.dumps(column_list)
+
+        for column in column_list:
+            new_url_list.append((
+                'https://time.geekbang.org/serv/v1/column/articles',
+                {
+                    'json': {"cid": str(column['id']), "size": 1000, "prev": 0, "order": "newest"},
+                    'cookies': get_cookies(),
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Referer': 'https://time.geekbang.org/column/{}'.format(column['id'])
+                    }
+                }
+            ))
+
+    return new_url_list, parsed_content
 
 
 def save(url, content):
     pass
-
 
 # system("%s -rf %s" % ('rm', output_dir))
