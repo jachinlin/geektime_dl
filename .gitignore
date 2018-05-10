@@ -1,3 +1,5 @@
 .idea
 .venv
 .venv3
+
+spider/output/*
