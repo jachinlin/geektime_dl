@@ -1,6 +1,8 @@
 # coding=utf8
 
+import os
 from threading import Thread
+
 try:
     from queue import Queue, Empty as QueueEmpty
 except ImportError:
@@ -8,11 +10,28 @@ except ImportError:
 
 import requests
 
-#
-# try:
-#     from queue import Empty as QueueEmpty                    # python3
-# except ImportError:
-#     from multiprocessing.queues import Empty as QueueEmpty   # python2
+import logging
+import traceback
+
+error_logger = logging.getLogger('error')
+error_logger.setLevel(logging.ERROR)
+file_handler = logging.FileHandler(filename=os.path.join(os.path.abspath(os.path.dirname(__file__)), '../error.log'))
+file_handler.setFormatter(logging.Formatter('log_time=%(asctime)s\tlocation=%(pathname)s:%(lineno)d\n%(message)s\n'))
+error_logger.addHandler(file_handler)
+
+ERROR_STATUS = -1
+
+
+def error_catch(func):
+    def wrap(*args, **kwargs):
+        try:
+            result = func(*args, **kwargs)
+            return result
+        except:
+            error_logger.error(traceback.format_exc())
+            return ERROR_STATUS
+
+    return wrap
 
 
 def fetch(url, method='GET', **kwargs):
@@ -34,8 +53,9 @@ def fetch(url, method='GET', **kwargs):
     :param verify: (optional) if ``True``, the SSL cert will be verified. A CA_BUNDLE path can also be provided.
     :param stream: (optional) if ``False``, the response content will be immediately downloaded.
     :param cert: (optional) if String, path to ssl client cert file (.pem). If Tuple, ('cert', 'key') pair.
-    :return: str (or unicode in python2) for the http response body
-
+    :return: str (or unicode in python2) or ERROR_STATUS
+                str for the http response body
+                ERROR_STATUS means fetch error
     """
 
     resp = requests.request(method, url, **kwargs)
@@ -48,13 +68,13 @@ class Spider(object):
 
     def __init__(self, parse_func, save_func):
 
-        self.q_fetch = Queue()   # element (url, request_params_dict) content_dict is request_params
-        self.q_parse = Queue()   # element (url, request_params_dict, content_dict) content_dict is {'content': response.content}
-        self.q_save = Queue()    # element (url, request_params_dict, content_dict) content_dict is key_value_pair to save
+        self.q_fetch = Queue()  # element (url, request_params_dict) content_dict is request_params
+        self.q_parse = Queue()  # element (url, request_params_dict, content_dict) content_dict is {'content': response.content}
+        self.q_save = Queue()  # element (url, request_params_dict, content_dict) content_dict is key_value_pair to save
 
-        self._fetch = fetch
-        self._parse = parse_func
-        self._save = save_func
+        self._fetch = error_catch(fetch)
+        self._parse = error_catch(parse_func)
+        self._save = error_catch(save_func)
 
     def set_start_url(self, url, **kw):
         """
@@ -71,7 +91,10 @@ class Spider(object):
                 url, params = self.q_fetch.get(block=True, timeout=5)
 
                 print('----- fetch start: url={} -----\n'.format(url))
-                html_content = self._fetch(url, **params)
+                result = self._fetch(url, **params)
+                if result == ERROR_STATUS:
+                    continue
+                html_content = result
                 print('----- fetch end: url={} -----\n'.format(url))
 
                 self.q_parse.put_nowait((url, params, {'html_content': html_content}))
@@ -85,7 +108,10 @@ class Spider(object):
                 url, params, content = self.q_parse.get(block=True, timeout=5)
 
                 print('----- parse start: url={} -----\n'.format(url))
-                url_to_fetch_list, content_to_save = self._parse(url, params, html_content=content['html_content'])
+                result = self._parse(url, params, html_content=content['html_content'])
+                if result == ERROR_STATUS:
+                    continue
+                url_to_fetch_list, content_to_save = result
                 print('----- parse end: url={} -----\n'.format(url))
 
                 # put new url to q_fetch
@@ -105,11 +131,14 @@ class Spider(object):
 
                 print('----- save start: url={} -----\n'.format(url))
                 result = self._save(url, params, content=content['content_to_save'])
+                if result == ERROR_STATUS:
+                    continue
                 print('----- save end: url={} -----\n'.format(url))
 
             except QueueEmpty:
                 break
 
+    @error_catch
     def start_crawl(self):
 
         thread_pool_fetch = [Thread(target=self.start_fetch, args=()) for i in range(5)]
@@ -139,7 +168,9 @@ def parse(url, request_params, html_content):
     parse content in html_content based on url
     :param url:
     :param html_content: http response body of url
-    :return:
+    :return: tuple or ERROR_STATUS
+            tuple (new_url_to_fetch_list, parsed_content_to_save)
+            ERROR_STATUS means parse failed
     """
     raise NotImplemented
 
@@ -149,7 +180,8 @@ def save(url, request_params, content):
     save content based on url
     :param url:
     :param content:
-    :return:
+    :return: anything or ERROR_STATUS
+            ERROR_STATUS means save failed
     """
     raise NotImplemented
 
@@ -176,7 +208,7 @@ if __name__ == '__main__':
     def save(url, request_params, content):
         print(content)
 
+
     spider = Spider(parse, save)
     spider.set_start_url('http://www.baidu.com')
     spider.start_crawl()
-
