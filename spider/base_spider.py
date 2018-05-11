@@ -1,13 +1,18 @@
 # coding=utf8
 
-from multiprocessing import Queue, Process
+from threading import Thread
+try:
+    from queue import Queue, Empty as QueueEmpty
+except ImportError:
+    from Queue import Queue, Empty as QueueEmpty
+
 import requests
 
-
-try:
-    from queue import Empty as QueueEmpty                    # python3
-except ImportError:
-    from multiprocessing.queues import Empty as QueueEmpty   # python2
+#
+# try:
+#     from queue import Empty as QueueEmpty                    # python3
+# except ImportError:
+#     from multiprocessing.queues import Empty as QueueEmpty   # python2
 
 
 def fetch(url, method='GET', **kwargs):
@@ -106,17 +111,27 @@ class Spider(object):
                 break
 
     def start_crawl(self):
-        p_fetch = Process(target=self.start_fetch, args=())
-        p_parse = Process(target=self.start_parse, args=())
-        p_save = Process(target=self.start_save, args=())
 
-        p_fetch.start()
-        p_parse.start()
-        p_save.start()
+        thread_pool_fetch = [Thread(target=self.start_fetch, args=()) for i in range(5)]
+        thread_pool_parse = [Thread(target=self.start_parse, args=()) for i in range(5)]
+        thread_pool_save = [Thread(target=self.start_save, args=()) for i in range(5)]
 
-        p_fetch.join()
-        p_parse.join()
-        p_save.join()
+        for td in thread_pool_fetch:
+            td.start()
+        for td in thread_pool_parse:
+            td.start()
+        for td in thread_pool_save:
+            td.start()
+
+        for td in thread_pool_fetch:
+            if td.is_alive():
+                td.join()
+        for td in thread_pool_parse:
+            if td.is_alive():
+                td.join()
+        for td in thread_pool_save:
+            if td.is_alive():
+                td.join()
 
 
 def parse(url, request_params, html_content):

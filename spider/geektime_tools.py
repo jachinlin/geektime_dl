@@ -91,7 +91,6 @@ def get_cookies():
 
 def save_column_info(column_id, column_title, column_subtitle, author_name, author_intro,
                      had_sub, update_frequency, author_header, column_unit, column_cover, column_begin_time):
-
     conn = sqlite3.connect(os.path.join(output_dir, 'sqlite3.db'))
 
     cur = conn.cursor()
@@ -127,7 +126,6 @@ def save_column_info(column_id, column_title, column_subtitle, author_name, auth
 
 def save_article_info(column_id, article_id, article_title, article_subtitle, article_ctime,
                       article_cover, article_summary):
-
     conn = sqlite3.connect(os.path.join(output_dir, 'sqlite3.db'))
 
     cur = conn.cursor()
@@ -139,7 +137,7 @@ def save_article_info(column_id, article_id, article_title, article_subtitle, ar
                     'article_title TEXT,'
                     'article_subtitle TEXT,'
                     'article_ctime TEXT,'
-                    'article_cover INT,'
+                    'article_cover TEXT,'
                     'article_summary TEXT,'
                     'create_at TEXT NOT NULL )'
                     )
@@ -156,6 +154,44 @@ def save_article_info(column_id, article_id, article_title, article_subtitle, ar
     conn.close()
 
 
+def save_article_detail(article_content, column_id, article_id, article_title, article_subtitle, article_ctime,
+                        article_cover, article_summary, audio_download_url, audio_url, audio_time, author_name,
+                        column_cover, article_poster_wxlite):
+    conn = sqlite3.connect(os.path.join(output_dir, 'sqlite3.db'))
+
+    cur = conn.cursor()
+    try:
+        cur.execute('CREATE TABLE article_details ('
+                    'id INTEGER PRIMARY KEY,'
+                    'article_content TEXT,'
+                    'column_id INTEGER, '
+                    'article_id INTEGER,'
+                    'article_title TEXT,'
+                    'article_subtitle TEXT,'
+                    'article_ctime TEXT,'
+                    'article_cover TEXT,'
+                    'article_summary TEXT,'
+                    'audio_download_url TEXT,'
+                    'audio_url TEXT,'
+                    'audio_time TEXT,'
+                    'author_name TEXT,'
+                    'column_cover TEXT,'
+                    'article_poster_wxlite TEXT,'
+
+                    'create_at TEXT NOT NULL )'
+                    )
+    except sqlite3.OperationalError:  # exist
+        pass
+
+    cur.execute('INSERT INTO article_details (article_content, column_id, article_id, article_title, article_subtitle, '
+                'article_ctime, article_cover, article_summary, audio_download_url, audio_url, audio_time,'
+                'author_name, column_cover, article_poster_wxlite, create_at) '
+                'VALUES (?, ?, ?,?, ?, ?, ?, ?,?,?,?,?,?,?,?)',
+                (article_content, column_id, article_id, article_title, article_subtitle, article_ctime,
+                 article_cover, article_summary, audio_download_url, audio_url, audio_time, author_name, column_cover,
+                 article_poster_wxlite, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+    cur.close()
+    conn.commit()
+    conn.close()
 
 
-# system("%s -rf %s" % ('rm', output_dir))

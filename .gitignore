@@ -3,6 +3,7 @@ spider/output/*
 
 
 *.py[cod]
+*.log
 
 # C extensions
 *.so

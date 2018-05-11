@@ -48,6 +48,10 @@ def parse(url, request_params, html_content):
                     }
                 }
             ))
+    # 文章详情
+    if url.endswith('/serv/v1/article'):
+        article_detail = json.loads(html_content)
+        parsed_content = json.dumps(article_detail['data'])
 
     return new_url_list, parsed_content
 
@@ -84,6 +88,25 @@ def save(url, request_params, content):
                 article_title=article.get('article_title'),
                 article_summary=article.get('article_summary'),
             )
+
+    if url.endswith('/serv/v1/article'):
+        detail = json.loads(content)
+        geektime_tools.save_article_detail(
+            article_content=detail['article_content'],
+            article_subtitle=detail['article_subtitle'],
+            audio_download_url=detail['audio_download_url'],
+            audio_time=detail['audio_time'],
+            author_name=detail['author_name'],
+            article_ctime=detail['article_ctime'],
+            article_id=detail['id'],
+            article_cover=detail['article_cover'],
+            audio_url=detail['audio_url'],
+            column_cover=detail.get('column_cover'),
+            article_title=detail['article_title'],
+            column_id=detail.get('column_id'),
+            article_summary=detail['article_summary'],
+            article_poster_wxlite=detail['article_poster_wxlite'],
+        )
 
 
 start_url = 'https://time.geekbang.org/serv/v1/column/all'
