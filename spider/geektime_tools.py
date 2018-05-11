@@ -125,6 +125,37 @@ def save_column_info(column_id, column_title, column_subtitle, author_name, auth
     conn.close()
 
 
+def save_article_info(column_id, article_id, article_title, article_subtitle, article_ctime,
+                      article_cover, article_summary):
+
+    conn = sqlite3.connect(os.path.join(output_dir, 'sqlite3.db'))
+
+    cur = conn.cursor()
+    try:
+        cur.execute('CREATE TABLE articles ('
+                    'id INTEGER PRIMARY KEY,'
+                    'column_id INTEGER, '
+                    'article_id INTEGER,'
+                    'article_title TEXT,'
+                    'article_subtitle TEXT,'
+                    'article_ctime TEXT,'
+                    'article_cover INT,'
+                    'article_summary TEXT,'
+                    'create_at TEXT NOT NULL )'
+                    )
+    except sqlite3.OperationalError:  # exist
+        pass
+
+    cur.execute('INSERT INTO articles (column_id, article_id, article_title, article_subtitle, article_ctime, '
+                'article_cover, article_summary, create_at) '
+                'VALUES (?, ?, ?,?, ?, ?, ?, ?)',
+                (column_id, article_id, article_title, article_subtitle, article_ctime,
+                 article_cover, article_summary, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+    cur.close()
+    conn.commit()
+    conn.close()
+
+
 
 
 # system("%s -rf %s" % ('rm', output_dir))

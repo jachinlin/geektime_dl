@@ -6,7 +6,7 @@ from .base_spider import Spider
 from . import geektime_tools
 
 
-def parse(url, html_content):
+def parse(url, request_params, html_content):
     new_url_list = []
     parsed_content = None
 
@@ -19,6 +19,7 @@ def parse(url, html_content):
             new_url_list.append((
                 'https://time.geekbang.org/serv/v1/column/articles',
                 {
+                    'method': 'post',
                     'json': {"cid": str(column['id']), "size": 1000, "prev": 0, "order": "newest"},
                     'cookies': geektime_tools.get_cookies(),
                     'headers': {
@@ -28,10 +29,30 @@ def parse(url, html_content):
                 }
             ))
 
+    # 专栏文章
+    if url.endswith('/column/articles'):
+        column_id = request_params['json']['cid']
+        article_list = json.loads(html_content)['data']['list']
+        parsed_content = json.dumps({'column_id': column_id, 'article_list': article_list})
+
+        for article in article_list:
+            new_url_list.append((
+                'https://time.geekbang.org/serv/v1/article',
+                {
+                    'method': 'post',
+                    'json': {'id': str(article['id'])},
+                    'cookies': geektime_tools.get_cookies(),
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Referer': 'https://time.geekbang.org/column/article/{}'.format(article['id'])
+                    }
+                }
+            ))
+
     return new_url_list, parsed_content
 
 
-def save(url, content):
+def save(url, request_params, content):
     # 专栏列表
     if url.endswith('/column/all'):
         column_list = json.loads(content)
@@ -49,6 +70,20 @@ def save(url, content):
                 column_cover=column.get('column_cover'),
                 column_begin_time=column.get('column_begin_time'),
             )
+    # save 专栏文章
+    if url.endswith('/column/articles'):
+        column_id = json.loads(content)['column_id']
+        article_list = json.loads(content)['article_list']
+        for article in article_list:
+            geektime_tools.save_article_info(
+                column_id=column_id,
+                article_subtitle=article.get('article_subtitle'),
+                article_ctime=article.get('article_ctime'),
+                article_id=article.get('id'),
+                article_cover=article.get('article_cover'),
+                article_title=article.get('article_title'),
+                article_summary=article.get('article_summary'),
+            )
 
 
 start_url = 'https://time.geekbang.org/serv/v1/column/all'
@@ -57,4 +92,4 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:59.0) Gecko/20100101 Firefox/59.0'
 }
 spider = Spider(parse_func=parse, save_func=save)
-spider.set_start_url(start_url, headers=headers, cookies=geektime_tools.get_cookies())
+spider.set_start_url(start_url, method='post', headers=headers, cookies=geektime_tools.get_cookies())

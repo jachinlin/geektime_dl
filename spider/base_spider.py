@@ -43,9 +43,9 @@ class Spider(object):
 
     def __init__(self, parse_func, save_func):
 
-        self.q_fetch = Queue()   # element (url, content_dict) content_dict is request_params
-        self.q_parse = Queue()   # element (url, content_dict) content_dict is {'content': response.content}
-        self.q_save = Queue()    # element (url, content_dict) content_dict is key_value_pair to save
+        self.q_fetch = Queue()   # element (url, request_params_dict) content_dict is request_params
+        self.q_parse = Queue()   # element (url, request_params_dict, content_dict) content_dict is {'content': response.content}
+        self.q_save = Queue()    # element (url, request_params_dict, content_dict) content_dict is key_value_pair to save
 
         self._fetch = fetch
         self._parse = parse_func
@@ -69,7 +69,7 @@ class Spider(object):
                 html_content = self._fetch(url, **params)
                 print('----- fetch end: url={} -----\n'.format(url))
 
-                self.q_parse.put_nowait((url, {'html_content': html_content}))
+                self.q_parse.put_nowait((url, params, {'html_content': html_content}))
 
             except QueueEmpty:
                 break
@@ -77,10 +77,10 @@ class Spider(object):
     def start_parse(self):
         while True:
             try:
-                url, content = self.q_parse.get(block=True, timeout=5)
+                url, params, content = self.q_parse.get(block=True, timeout=5)
 
                 print('----- parse start: url={} -----\n'.format(url))
-                url_to_fetch_list, content_to_save = self._parse(url, html_content=content['html_content'])
+                url_to_fetch_list, content_to_save = self._parse(url, params, html_content=content['html_content'])
                 print('----- parse end: url={} -----\n'.format(url))
 
                 # put new url to q_fetch
@@ -88,7 +88,7 @@ class Spider(object):
                     self.q_fetch.put_nowait(item)
 
                 # put to q_save
-                self.q_save.put_nowait((url, {'content_to_save': content_to_save}))
+                self.q_save.put_nowait((url, params, {'content_to_save': content_to_save}))
 
             except QueueEmpty:
                 break
@@ -96,10 +96,10 @@ class Spider(object):
     def start_save(self):
         while True:
             try:
-                url, content = self.q_save.get(block=True, timeout=5)
+                url, params, content = self.q_save.get(block=True, timeout=5)
 
                 print('----- save start: url={} -----\n'.format(url))
-                result = self._save(url, content=content['content_to_save'])
+                result = self._save(url, params, content=content['content_to_save'])
                 print('----- save end: url={} -----\n'.format(url))
 
             except QueueEmpty:
@@ -119,7 +119,7 @@ class Spider(object):
         p_save.join()
 
 
-def parse(url, html_content):
+def parse(url, request_params, html_content):
     """
     parse content in html_content based on url
     :param url:
@@ -129,7 +129,7 @@ def parse(url, html_content):
     raise NotImplemented
 
 
-def save(url, content):
+def save(url, request_params, content):
     """
     save content based on url
     :param url:
@@ -141,7 +141,7 @@ def save(url, content):
 
 if __name__ == '__main__':
 
-    def parse(url, html_content):
+    def parse(url, request_params, html_content):
         print(html_content)
 
         result = ([], '')
@@ -158,7 +158,7 @@ if __name__ == '__main__':
         return result
 
 
-    def save(url, content):
+    def save(url, request_params, content):
         print(content)
 
     spider = Spider(parse, save)
