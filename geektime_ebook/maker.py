@@ -1,9 +1,12 @@
 # coding=utf8
 
 import os
+import uuid
 import sqlite3
+import requests
 from jinja2 import Environment, FileSystemLoader
 
+import re
 templates_env = Environment(loader=FileSystemLoader('%s/templates/' % os.path.dirname(__file__)))
 _output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../output/ebook_source')
 
@@ -29,6 +32,24 @@ def format_file_name(name):
     return name.replace('/', '').replace(' ', '').replace('+', 'more').replace('"', '_')
 
 
+def _parse_image(content, output_dir):
+
+    p = r'<img src=".+" '
+    img_url_list = re.findall(p, content)
+    for url in img_url_list:
+        print('---fetch image: {} ----'.format(url[10:-2]))
+        try:
+            url_local = str(uuid.uuid4()) + '.jpg'
+            r = requests.get(url[10:-2])
+            with open(os.path.join(output_dir, url_local), 'wb') as f:
+                f.write(r.content)
+            content = content.replace(url, '<img src="{}" '.format(url_local))
+        except:
+            # todo logging
+            pass
+    return content
+
+
 def render_column_source_files(column_id, column_title, output_dir):
     os.system("rm -rf {}".format(output_dir))
     os.system("mkdir -p {}".format(output_dir))
@@ -44,7 +65,7 @@ def render_column_source_files(column_id, column_title, output_dir):
         cur.execute('SELECT article_content FROM article_details WHERE article_id=?', (article[0],))
         content = cur.fetchone()[0]
         title = format_file_name(article[1])
-        render_article_html(title, content, output_dir)
+        render_article_html(title, _parse_image(content, output_dir), output_dir)
 
     cur.close()
     conn.close()
