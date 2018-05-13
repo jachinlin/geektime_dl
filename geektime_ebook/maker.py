@@ -5,7 +5,7 @@ import sqlite3
 from jinja2 import Environment, FileSystemLoader
 
 templates_env = Environment(loader=FileSystemLoader('%s/templates/' % os.path.dirname(__file__)))
-_output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../output/ebook')
+_output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../output/ebook_source')
 
 db_url = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../spider/output/sqlite3.db')
 
