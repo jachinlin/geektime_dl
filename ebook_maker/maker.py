@@ -21,8 +21,8 @@ def render_toc_html(first_level_post_list, output_dir):
     render_file('toc.html', {'first_level_post_list': first_level_post_list}, 'toc.html', output_dir)
 
 
-def render_opf(first_level_post_list, title, output_dir):
-    render_file('opf.xml', {'first_level_post_list': first_level_post_list}, '{}.opf'.format(title), output_dir)
+def render_opf(first_level_post_list, title, output_dir, author=None):
+    render_file('opf.xml', {'first_level_post_list': first_level_post_list, 'title': title, 'author': author or 'jachinlin.github.io'}, '{}.opf'.format(title), output_dir)
 
 
 def parse_headers(toc_file_name):

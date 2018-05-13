@@ -16,6 +16,11 @@ def render_file(template_name, context, output_name, output_dir):
         f.write(template.render(**context))
 
 
+def render_toc_md(title, headers,  output_dir):
+    with open(os.path.join(output_dir, 'toc.md'), "w") as f:
+        f.writelines([title] + headers)
+
+
 def render_article_html(title, content, output_dir):
     render_file('article.html', {'title': title, 'content': content}, '{}.html'.format(title), output_dir)
 
@@ -24,25 +29,43 @@ def format_file_name(name):
     return name.replace('/', '').replace(' ', '')
 
 
-def test():
-    os.system("rm -rf {}".format(_output_dir))
-    os.system("mkdir -p {}".format(_output_dir))
+def render_column_source_files(column_id, column_title, output_dir):
+    os.system("rm -rf {}".format(output_dir))
+    os.system("mkdir -p {}".format(output_dir))
     conn = sqlite3.connect(db_url)
 
     cur = conn.cursor()
-    column_id = 49
-    print('朱赟的技术管理课')
-    cur.execute('select article_id from articles where column_id=?', (column_id,))
+    column_id = column_id
+    cur.execute('SELECT article_id, article_title FROM articles WHERE column_id=? ORDER BY article_id', (column_id,))
 
-    id_list = cur.fetchall()
-    for article_id in id_list:
-        cur.execute('select article_title, article_content from article_details where article_id=?', (article_id[0],))
-        title, content = cur.fetchone()
-        title = format_file_name(title)
-        render_article_html(title, content, _output_dir)
-        print('# ' + title)
+    articles = cur.fetchall()
+    render_toc_md(column_title+'\n', ['# ' + format_file_name(t[1]) + '\n' for t in articles], output_dir)
+    for article in articles:
+        cur.execute('SELECT article_content FROM article_details WHERE article_id=?', (article[0],))
+        content = cur.fetchone()[0]
+        title = format_file_name(article[1])
+        render_article_html(title, content, output_dir)
+
     cur.close()
     conn.close()
+
+
+def render_all_source_files():
+    conn = sqlite3.connect(db_url)
+
+    cur = conn.cursor()
+    cur.execute('SELECT column_id, column_title FROM columns ORDER BY column_id')
+
+    columns = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    for column_id, column_title in columns:
+        output_dir = os.path.join(_output_dir, str(column_id))
+
+        render_column_source_files(column_id, column_title, output_dir)
+
+
 
 
 

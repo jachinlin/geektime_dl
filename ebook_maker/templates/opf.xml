@@ -2,9 +2,9 @@
 <package xmlns="http://www.idpf.org/2007/opf" version="2.0" unique-identifier="BookId">
 
     <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
-        <dc:title>DailyKindle {{date}}</dc:title>
-        <dc:language>en-us</dc:language>
-        <dc:creator>DailyKindle</dc:creator>
+        <dc:title>{{ title }}</dc:title>
+        <dc:language>zh-cn</dc:language>
+        <dc:creator>{{ author }}</dc:creator>
     </metadata>
 
     <manifest>
