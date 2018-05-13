@@ -86,6 +86,7 @@ def make_ebook(source_dir, output_dir=None):
     mobi_file = os.path.join(tmp_dir, title + '.mobi')
     os.system("%s %s" % ('kindlegen', opf_file))
     os.system("cp %s %s" % (mobi_file, output_dir))
+    os.system("rm -rf %s" % tmp_dir)
 
 
 if __name__ == '__main__':

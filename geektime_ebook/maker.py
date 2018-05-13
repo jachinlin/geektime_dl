@@ -26,7 +26,7 @@ def render_article_html(title, content, output_dir):
 
 
 def format_file_name(name):
-    return name.replace('/', '').replace(' ', '')
+    return name.replace('/', '').replace(' ', '').replace('+', 'more').replace('"', '_')
 
 
 def render_column_source_files(column_id, column_title, output_dir):

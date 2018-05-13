@@ -9,7 +9,7 @@ db_url = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'spider/output
 source_base_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output/ebook_source')
 output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output/ebook')
 
-# render_all_source_files()
+render_all_source_files()
 
 
 def make_book():
