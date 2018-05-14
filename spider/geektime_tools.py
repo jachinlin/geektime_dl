@@ -9,7 +9,7 @@ import datetime
 account = 'put your register phone here'
 password = 'password here'
 
-output_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'output')
+output_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../output')
 
 
 def _get_cookies():

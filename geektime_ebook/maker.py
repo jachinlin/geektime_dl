@@ -8,27 +8,24 @@ from jinja2 import Environment, FileSystemLoader
 
 import re
 templates_env = Environment(loader=FileSystemLoader('%s/templates/' % os.path.dirname(__file__)))
-_output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../output/ebook_source')
-
-db_url = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../spider/output/sqlite3.db')
 
 
-def render_file(template_name, context, output_name, output_dir):
+def _render_file(template_name, context, output_name, output_dir):
     template = templates_env.get_template(template_name)
     with open(os.path.join(output_dir, output_name), "w") as f:
         f.write(template.render(**context))
 
 
-def render_toc_md(title, headers,  output_dir):
+def _render_toc_md(title, headers,  output_dir):
     with open(os.path.join(output_dir, 'toc.md'), "w") as f:
         f.writelines([title] + headers)
 
 
-def render_article_html(title, content, output_dir):
-    render_file('article.html', {'title': title, 'content': content}, '{}.html'.format(title), output_dir)
+def _render_article_html(title, content, output_dir):
+    _render_file('article.html', {'title': title, 'content': content}, '{}.html'.format(title), output_dir)
 
 
-def format_file_name(name):
+def _format_file_name(name):
     return name.replace('/', '').replace(' ', '').replace('+', 'more').replace('"', '_')
 
 
@@ -50,37 +47,53 @@ def _parse_image(content, output_dir):
     return content
 
 
-def render_column_source_files(column_id, column_title, output_dir):
+def render_column_source_files(column_id, column_title, output_dir, source_db_path):
+    """
+    render all source files of `column_id`, and put the source files to `output_dir`
+    source data are stored in `source_path` sqlite3 db
+    :param column_id: column id
+    :param column_title: column title
+    :param output_dir:  output directory of the source files
+    :param source_db_path: db url
+    :return:
+    """
     os.system("rm -rf {}".format(output_dir))
     os.system("mkdir -p {}".format(output_dir))
-    conn = sqlite3.connect(db_url)
+    conn = sqlite3.connect(source_db_path)
 
     cur = conn.cursor()
     column_id = column_id
     cur.execute('SELECT article_id, article_title FROM articles WHERE column_id=? ORDER BY article_id', (column_id,))
 
     articles = cur.fetchall()
-    render_toc_md(column_title+'\n', ['# ' + format_file_name(t[1]) + '\n' for t in articles], output_dir)
+    _render_toc_md(column_title+'\n', ['# ' + _format_file_name(t[1]) + '\n' for t in articles], output_dir)
     for article in articles:
         cur.execute('SELECT article_content FROM article_details WHERE article_id=?', (article[0],))
         content = cur.fetchone()[0]
-        title = format_file_name(article[1])
-        render_article_html(title, _parse_image(content, output_dir), output_dir)
+        title = _format_file_name(article[1])
+        _render_article_html(title, _parse_image(content, output_dir), output_dir)
 
     cur.close()
     conn.close()
 
 
-def render_all_source_files():
-    conn = sqlite3.connect(db_url)
+def render_all_source_files(source_db_path, output_dir):
+    """
 
+    :param source_db_path: sqlite db url
+    :param output_dir: output directory of the source files
+    :return:
+    """
+
+    # get all column info from sqlite3.db `source_path`
+    conn = sqlite3.connect(source_db_path)
     cur = conn.cursor()
     cur.execute('SELECT column_id, column_title, had_sub, update_frequency FROM columns ORDER BY column_id')
-
     columns = cur.fetchall()
     cur.close()
     conn.close()
 
+    # format column title
     def _title(c):
         if not c[2]:
             title = c[1] + '[免费试读]'
@@ -90,10 +103,12 @@ def render_all_source_files():
             title = c[1] + '[未完待续]'
         return title
     columns = [(c[0], _title(c)) for c in columns]
-    for column_id, column_title in columns:
-        output_dir = os.path.join(_output_dir, str(column_id))
 
-        render_column_source_files(column_id, column_title, output_dir)
+    # for each column, render source files which are needed to make ebook
+    for column_id, column_title in columns:
+        _output_dir = os.path.join(output_dir, str(column_id))
+
+        render_column_source_files(column_id, column_title, _output_dir, source_db_path)
 
 
 
