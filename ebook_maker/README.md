@@ -1,8 +1,12 @@
 a tool to make mobi-format file wich could be load into Kindle
 
-input:
-- a plain text file with toc information
-- html files for chapter
+## public api:
 
-output
-- a mobi file
+maker.make_book(source_dir, output_dir)
+
+input args:
+- source_dir : directory contains all source files, which includes:
+    - a plain text file named `toc.md` with toc information
+    - html files for chapter
+
+- output: output directory of the ebook

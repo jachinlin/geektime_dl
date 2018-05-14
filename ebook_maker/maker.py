@@ -65,12 +65,22 @@ def parse_headers(toc_file_name):
 
 
 def make_ebook(source_dir, output_dir=None):
+    """
+    make ebook with the files in source_dir and put the ebook made in output_dir
+    :param source_dir:
+    :param output_dir:
+    :return:
+    """
     output_dir = output_dir or _output_dir
 
+    # make a tmp dir in output_dir
     tmp_dir = os.path.join(output_dir, str(uuid.uuid4()))
     os.system("mkdir -p {}".format(tmp_dir))
+
+    # copy source files to tmp dir
     os.system("cp -rf {}/* {}".format(source_dir, tmp_dir))
 
+    # parse toc.md file
     toc_file_name = os.path.join(tmp_dir, 'toc.md')
     if not os.path.exists(toc_file_name):
         raise ValueError('not exists toc md file')
@@ -78,14 +88,20 @@ def make_ebook(source_dir, output_dir=None):
     if not title:
         raise ValueError('invalid toc md file')
 
+    # render toc.ncx file
     render_toc_ncx(first_level_post_list, tmp_dir)
+    # render toc.html file
     render_toc_html(first_level_post_list, tmp_dir)
+    # render opf file
     render_opf(first_level_post_list, title, tmp_dir)
 
+    # make mobi ebook in tmp dir
     opf_file = os.path.join(tmp_dir, title + '.opf')
     mobi_file = os.path.join(tmp_dir, title + '.mobi')
     os.system("%s %s" % ('kindlegen', opf_file))
+    # copy mobi file to output dir
     os.system("cp %s %s" % (mobi_file, output_dir))
+    # remove tmp dir
     os.system("rm -rf %s" % tmp_dir)
 
 
