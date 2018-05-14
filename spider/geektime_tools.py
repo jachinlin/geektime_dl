@@ -36,8 +36,7 @@ def _get_cookies():
 
     resp = requests.post(url, headers=headers, json=data)
 
-    assert resp.status_code == 200 and resp.json().get('code') == 0, 'login fail:' + resp.json()['error']['msg'].encode(
-        'utf-8')
+    assert resp.status_code == 200 and resp.json().get('code') == 0, 'login fail:' + resp.json()['error']['msg']
 
     return dict(resp.cookies.items())
 

@@ -2,7 +2,7 @@
 
 import json
 
-from .base_spider import Spider
+from .mini_spider import Spider
 from . import geektime_tools
 
 
