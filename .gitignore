@@ -1,7 +1,3 @@
-
-spider/output/*
-output
-
 *.py[cod]
 *.log
 
