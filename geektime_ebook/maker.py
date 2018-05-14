@@ -75,12 +75,21 @@ def render_all_source_files():
     conn = sqlite3.connect(db_url)
 
     cur = conn.cursor()
-    cur.execute('SELECT column_id, column_title FROM columns ORDER BY column_id')
+    cur.execute('SELECT column_id, column_title, had_sub, update_frequency FROM columns ORDER BY column_id')
 
     columns = cur.fetchall()
     cur.close()
     conn.close()
 
+    def _title(c):
+        if not c[2]:
+            title = c[1] + '[免费试读]'
+        elif c[3] == '更新完毕':
+            title = c[1] + '[更新完毕]'
+        else:
+            title = c[1] + '[未完待续]'
+        return title
+    columns = [(c[0], _title(c)) for c in columns]
     for column_id, column_title in columns:
         output_dir = os.path.join(_output_dir, str(column_id))
 
