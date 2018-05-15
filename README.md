@@ -17,8 +17,9 @@ ebook_maker是一个mobi电子书制作工具。用户只需要提供制作电�
 
 这两部分已拎出来放在单独的两个项目里，具体使用方式见各自文档。
 
->[mini_spider](https://github.com/jachinlin/mini_spider)
->[ebook_maker](https://github.com/jachinlin/ebook_maker)
+[mini_spider](https://github.com/jachinlin/mini_spider)
+
+[ebook_maker](https://github.com/jachinlin/ebook_maker)
 
 geektime_spider则负责抓取极客时间的专栏文章，并保存到sqlite3中，使用的工具就是上面的mini_spider。
 
@@ -30,7 +31,9 @@ geektime_ebook主要将geektime_ebook抓取到数据转化为ebook_maker需要�
 ### 依赖
 
 [requests](http://www.python-requests.org/en/master/)
+
 [Jinja2](http://jinja.pocoo.org/)
+
 [Kindlegen](https://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000765211)
 
 ### 安装
