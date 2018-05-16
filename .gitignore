@@ -1,6 +1,9 @@
 *.py[cod]
 *.log
 
+.cache
+.pytest_cache
+
 # C extensions
 *.so
 
