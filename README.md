@@ -1,5 +1,7 @@
 # 把极客时间专栏装进Kindle
 
+[![travis](https://travis-ci.org/jachinlin/geektime_ebook_maker.svg?branch=master)](https://travis-ci.org/jachinlin/geektime_ebook_maker)
+
 极客时间专栏文章的质量都是非常高的，比如耗子哥的《左耳听风》、朱赟的《朱赟的技术管理课》和王天一的《人工智能基础课》，都是我非常喜欢的专栏。这些专栏深入浅出，将知识和经验传授于读者，都是值得多次阅读的。
 
 然而，每当空闲时间时，都需要掏出手机才能阅读专栏文章，这在某种情况下是很不便的，尤其坐地铁且没有网络时。作为一个kindle党，最好的解决方案就是kindle电子书。于是有了这个项目
