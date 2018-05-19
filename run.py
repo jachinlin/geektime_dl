@@ -3,8 +3,8 @@ import os
 import time
 from multiprocessing import Pool
 import sqlite3
+from kindle_maker import make_mobi
 from geektime_ebook.maker import render_all_source_files
-from ebook_maker import maker as ebook_maker
 from spider import spider as geektime_spider
 
 
@@ -21,7 +21,7 @@ def _make_column_to_ebook(source_dir, output_dir):
     :return:
     """
 
-    ebook_maker.make_ebook(source_dir=source_dir, output_dir=output_dir)
+    make_mobi.make_ebook(source_dir=source_dir, output_dir=output_dir)
 
 
 def make_book(db_url, source_base_dir, output_dir):

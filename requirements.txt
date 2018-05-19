@@ -1,3 +1,4 @@
+git+https://github.com/jachinlin/kindle_maker.git
 requests==2.18.4
 Jinja2==2.10
 pytest==3.5.1
