@@ -229,3 +229,36 @@ def get_column_list():
     return column_list
 
 
+def valid_account(acc=None, psd=None):
+
+    url = 'https://account.geekbang.org/account/ticket/login'
+
+    headers = {
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+        'Content-Type': 'application/json',
+        'Host': 'account.geekbang.org',
+        'Referer': 'https://account.geekbang.org/signin?redirect=https%3A%2F%2Fwww.geekbang.org%2F',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:59.0) Gecko/20100101 Firefox/59.0'
+    }
+
+    data = {
+        "country": 86,
+        "cellphone": os.getenv('ACCOUNT') or acc,
+        "password": os.getenv('PASSWORD') or psd,
+        "captcha": "",
+        "remember": 1,
+        "platform": 3,
+        "appid": 1
+    }
+
+    try:
+        resp = requests.post(url, headers=headers, json=data)
+
+        assert resp.status_code == 200 and resp.json().get('code') == 0, 'login fail:' + resp.json()['error']['msg']
+
+        return True, None
+    except Exception as e:
+        return False, str(e)
+
+
