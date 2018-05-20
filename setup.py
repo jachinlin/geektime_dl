@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='geektime_ebook_maker',
@@ -12,7 +12,7 @@ setup(
     description='把极客时间装进Kindle',
     license='MIT',
     keywords='kindle ebook mobi geektime',
-    packages=['geektime_ebook_maker'],
+    packages=find_packages(exclude=['examples', 'tests']),
     package_data={'geektime_ebook_maker': ['geektime_ebook/templates/*']},
     install_requires=[
         'Jinja2==2.10',
