@@ -32,6 +32,11 @@ def get_spider(backend_db_url, start_url=None, **kwargs):
                     }
                 ))
 
+        # 专栏信息
+        if url.endswith('/column/intro'):
+            column_intro = json.loads(html_content)
+            parsed_content = json.dumps(column_intro['data'])
+
         # 专栏文章
         if url.endswith('/column/articles'):
             column_id = request_params['json']['cid']
@@ -59,23 +64,26 @@ def get_spider(backend_db_url, start_url=None, **kwargs):
         return new_url_list, parsed_content
 
     def save(url, request_params, content):
-        # 专栏列表
-        if url.endswith('/column/all'):
-            column_list = json.loads(content)
-            for column in column_list:
-                geektime_data.save_column_info(
-                    column_id=column.get('id'),
-                    column_title=column.get('column_title'),
-                    column_subtitle=column.get('column_subtitle'),
-                    author_name=column.get('author_name'),
-                    author_intro=column.get('author_intro'),
-                    had_sub=column.get('had_sub'),
-                    update_frequency=column.get('update_frequency'),
-                    author_header=column.get('author_header'),
-                    column_unit=column.get('column_unit'),
-                    column_cover=column.get('column_cover'),
-                    column_begin_time=column.get('column_begin_time'),
-                )
+
+        # 专栏信息
+        if url.endswith('/column/intro'):
+            intro = json.loads(content)
+            cid = request_params['json']['cid']
+            geektime_data.save_column_info(
+                column_id=cid,
+                column_title=intro.get('column_title'),
+                column_subtitle=intro.get('column_subtitle'),
+                author_name=intro.get('author_name'),
+                author_intro=intro.get('author_intro'),
+                had_sub=intro.get('had_sub'),
+                update_frequency=intro.get('update_frequency'),
+                author_header=intro.get('author_header'),
+                column_unit=intro.get('column_unit'),
+                column_cover=intro.get('column_cover'),
+                column_begin_time=intro.get('column_begin_time'),
+                column_intro=intro['column_intro']
+            )
+
         # save 专栏文章
         if url.endswith('/column/articles'):
             column_id = json.loads(content)['column_id']

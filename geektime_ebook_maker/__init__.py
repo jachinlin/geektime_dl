@@ -23,6 +23,7 @@ def make_column_ebook(column_id, column_title, output_dir):
     }
 
     geektime_spider = spider.get_spider(backend_db_url=db_url, start_url=start_url, headers=headers, json=json)
+    geektime_spider.add_url(url='https://time.geekbang.org/serv/v1/column/intro', headers=headers, json={'cid': str(column_id)})
     geektime_spider.start_crawl()
 
     # generate source files

@@ -85,6 +85,9 @@ class Spider(object):
         """
         self.q_fetch.put_nowait((url, kw))
 
+    def add_url(self, url, **kw):
+        self.q_fetch.put_nowait((url, kw))
+
     def start_fetch(self):
         while True:
             try:

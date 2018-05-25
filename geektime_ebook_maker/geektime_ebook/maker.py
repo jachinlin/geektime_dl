@@ -29,6 +29,17 @@ def _format_file_name(name):
     return name.replace('/', '').replace(' ', '').replace('+', 'more').replace('"', '_')
 
 
+def _generate_cover_img(url, output_dir):
+    print('---fetch cover image: {} ----'.format(url[10:-2]))
+    try:
+        r = requests.get(url)
+        with open(os.path.join(output_dir, 'cover.jpg'), 'wb') as f:
+            f.write(r.content)
+    except:
+        # todo logging
+        pass
+
+
 def _parse_image(content, output_dir):
 
     p = r'<img src=".+" '
@@ -63,10 +74,17 @@ def render_column_source_files(column_id, column_title, output_dir, source_db_pa
 
     cur = conn.cursor()
     column_id = column_id
+
+    # cover and introduction
+    cur.execute('SELECT column_cover, column_intro FROM columns WHERE column_id=? LIMIT 1', (column_id,))
+    column_info = cur.fetchone()
+    _render_article_html('简介', _parse_image(column_info[1], output_dir), output_dir)
+    _generate_cover_img(column_info[0], output_dir)
+
     cur.execute('SELECT article_id, article_title FROM articles WHERE column_id=? ORDER BY article_id', (column_id,))
 
     articles = cur.fetchall()
-    _render_toc_md(column_title+'\n', ['# ' + _format_file_name(t[1]) + '\n' for t in articles], output_dir)
+    _render_toc_md(column_title+'\n', ['# 简介\n'] + ['# ' + _format_file_name(t[1]) + '\n' for t in articles], output_dir)
     for article in articles:
         cur.execute('SELECT article_content FROM article_details WHERE article_id=?', (article[0],))
         content = cur.fetchone()[0]

@@ -91,7 +91,7 @@ class GeektimeData(object):
         return cookies
 
     def save_column_info(self, column_id, column_title, column_subtitle, author_name, author_intro,
-                         had_sub, update_frequency, author_header, column_unit, column_cover, column_begin_time):
+                         had_sub, update_frequency, author_header, column_unit, column_cover, column_begin_time, column_intro):
         conn = sqlite3.connect(self._db_url)
 
         cur = conn.cursor()
@@ -109,6 +109,7 @@ class GeektimeData(object):
                         'column_unit TEXT,'
                         'column_cover TEXT,'
                         'column_begin_time TEXT,'
+                        'column_intro TEXT,'
                         'create_at TEXT NOT NULL )'
                         )
         except sqlite3.OperationalError:  # exist
@@ -116,10 +117,10 @@ class GeektimeData(object):
 
         cur.execute(
             'INSERT INTO columns (column_id, column_title, column_subtitle, author_name, author_intro, had_sub, '
-            'update_frequency, author_header, column_unit, column_cover, column_begin_time, create_at) '
-            'VALUES (?, ?,?,?, ?,?,?, ?,?,?, ?,?)',
+            'update_frequency, author_header, column_unit, column_cover, column_begin_time, column_intro, create_at)'
+            'VALUES (?, ?,?,?, ?,?,?, ?,?,?, ?,?, ?)',
             (column_id, column_title, column_subtitle, author_name, author_intro,
-             had_sub, update_frequency, author_header, column_unit, column_cover, column_begin_time,
+             had_sub, update_frequency, author_header, column_unit, column_cover, column_begin_time, column_intro,
              datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
         cur.close()
         conn.commit()
