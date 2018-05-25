@@ -15,9 +15,6 @@ import traceback
 
 error_logger = logging.getLogger('error')
 error_logger.setLevel(logging.ERROR)
-file_handler = logging.FileHandler(filename=os.path.join(os.path.abspath(os.path.dirname(__file__)), '../error.log'))
-file_handler.setFormatter(logging.Formatter('log_time=%(asctime)s\tlocation=%(pathname)s:%(lineno)d\n%(message)s\n'))
-error_logger.addHandler(file_handler)
 
 ERROR_STATUS = -1
 

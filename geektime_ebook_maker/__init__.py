@@ -102,6 +102,15 @@ def geektime():
     if len(args) == 0 or args[0] not in ('query', 'usage', 'ebook'):
         return usage()
 
+    options, _ = getopt.getopt(args[1:], "h?u:p:o:c:")
+    opt_dict = dict(options)
+    account = opt_dict.get('-u')
+    password = opt_dict.get('-p')
+    output_dir = opt_dict.get('-o')
+    column_id = opt_dict.get('-c')
+
+    os.environ["ACCOUNT"] = str(account)
+    os.environ["PASSWORD"] = str(password)
     action = args[0]
 
     if action == 'query':
@@ -111,17 +120,6 @@ def geektime():
         return usage()
 
     if action == 'ebook':
-        options, _ = getopt.getopt(args[1:], "h?u:p:o:c:")
-
-        opt_dict = dict(options)
-        print(opt_dict)
-        account = opt_dict.get('-u')
-        password = opt_dict.get('-p')
-        output_dir = opt_dict.get('-o')
-        column_id = opt_dict.get('-c')
-
-        os.environ["ACCOUNT"] = str(account)
-        os.environ["PASSWORD"] = str(password)
 
         return mobi(column_id, output_dir)
 
