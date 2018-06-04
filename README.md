@@ -91,5 +91,13 @@ geektime ebook -c <column_id> -u <your register phone> -p <password>
 
 把![query](./docs/ebook49.png)导入Kindle，就可以阅读了
 
+
+### Todo list
+
+- [ ] support mathjax
+- [ ] MP3 and MP4
+- [ ] ...
+
+
 -----
 注意：请保护版权，不传播该电子书！
