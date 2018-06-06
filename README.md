@@ -59,6 +59,8 @@ pip install -U git+https://github.com/jachinlin/geektime_ebook_maker.git
 
 #### 安装kindlegen
 
+* For Linux:
+
 ```
 cd ~
 mkdir kindlegen
@@ -67,6 +69,13 @@ wget http://kindlegen.s3.amazonaws.com/kindlegen_linux_2.6_i386_v2_9.tar.gz
 tar xvfz kindlegen_linux_2.6_i386_v2_9.tar.gz
 cp ~/kindlegen/kindlegen ~/py3-venv/bin/
 ```
+
+* For macOS:
+
+```
+brew install homebrew/cask/kindlegen
+```
+
 
 #### 运行
 
