@@ -96,6 +96,7 @@ geektime ebook -c <column_id> -u <your register phone> -p <password>
 ```
 
 `-c`后为专栏ID，可以从上面的操作中获得；`-u` 后边为你在极客时间上的注册手机号；`-p` 后为密码。
+对于非中国的手机号, 可以通过 `--area` 指定国家区号, 如 `--area 1` 表明是美国手机号. 
 
 
 把![query](./docs/ebook49.png)导入Kindle，就可以阅读了
