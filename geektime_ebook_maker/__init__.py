@@ -69,6 +69,7 @@ positional arguments:
 short options:
       -u            account
       -p            password
+      -a            area/country code
       -c            output directory of the ebook""")
 
 
@@ -102,15 +103,17 @@ def geektime():
     if len(args) == 0 or args[0] not in ('query', 'usage', 'ebook'):
         return usage()
 
-    options, _ = getopt.getopt(args[1:], "h?u:p:o:c:")
+    options, _ = getopt.getopt(args[1:], "h?u:p:o:c:a:")
     opt_dict = dict(options)
     account = opt_dict.get('-u')
     password = opt_dict.get('-p')
     output_dir = opt_dict.get('-o')
     column_id = opt_dict.get('-c')
+    area_code = opt_dict.get('-a')
 
     os.environ["ACCOUNT"] = str(account)
     os.environ["PASSWORD"] = str(password)
+    os.environ["AREA"] = str(area_code or '86')
     action = args[0]
 
     if action == 'query':

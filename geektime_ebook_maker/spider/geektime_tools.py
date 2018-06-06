@@ -30,7 +30,7 @@ class GeektimeData(object):
         }
 
         data = {
-            "country": 86,
+            "country": os.getenv('AREA'),
             "cellphone": os.getenv('ACCOUNT') or account,
             "password": os.getenv('PASSWORD') or password,
             "captcha": "",
@@ -244,7 +244,7 @@ def valid_account(acc=None, psd=None):
     }
 
     data = {
-        "country": 86,
+        "country": os.getenv('AREA'),
         "cellphone": os.getenv('ACCOUNT') or acc,
         "password": os.getenv('PASSWORD') or psd,
         "captcha": "",
