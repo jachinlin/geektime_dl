@@ -77,9 +77,9 @@ brew install homebrew/cask/kindlegen
 ```
 
 
-#### 运行
+### 运行
 
-##### 查看专栏列表
+#### 查看专栏列表
 
 ```
 geektime query -u <your register phone> -p <password>
@@ -89,17 +89,19 @@ geektime query -u <your register phone> -p <password>
 
 ![query](./docs/query.png)
 
-##### 制作电子书
+#### 制作电子书
 
 ```
 geektime ebook -c <column_id> -u <your register phone> -p <password>
 ```
 
 `-c`后为专栏ID，可以从上面的操作中获得；`-u` 后边为你在极客时间上的注册手机号；`-p` 后为密码。
-对于非中国的手机号, 可以通过 `--area` 指定国家区号, 如 `--area 1` 表明是美国手机号. 
+对于非中国的手机号, 可以通过 `--area` 指定国家区号, 如 `--area 1` 表明是美国手机号。
 
 
-把![query](./docs/ebook49.png)导入Kindle，就可以阅读了
+### 效果
+
+![左耳听风](https://github.com/jachinlin/jachinlin.github.io/blob/master/img/左耳听风.gif?raw=true)
 
 
 ### Todo list
