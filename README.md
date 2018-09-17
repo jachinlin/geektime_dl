@@ -113,5 +113,3 @@ geektime ebook -c <column_id> -u <your register phone> -p <password>
 - [ ] ...
 
 
------
-注意：请保护版权，不传播该电子书！
