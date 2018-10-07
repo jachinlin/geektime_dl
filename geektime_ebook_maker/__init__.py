@@ -127,5 +127,10 @@ def geektime():
         return mobi(column_id, output_dir)
 
 
+def main():
+    from geektime_ebook_maker import cli
+    cli.main()
+
+
 if __name__ == '__main__':
     make_book(column_id_list=geektime_tools.get_column_list())
