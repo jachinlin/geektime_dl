@@ -23,4 +23,4 @@ def test_api_get_course_content():
 
 
 def test_api_get_post_content():
-    gk.get_post_content('6605')
+    gk.get_post_content('333')
