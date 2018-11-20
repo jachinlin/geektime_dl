@@ -15,6 +15,7 @@ class DbClient(object):
             'CREATE TABLE columns ('
                      'id INTEGER PRIMARY KEY,'
                      'column_id INTEGER UNIQUE, '
+                     'column_type TEXT,'
                      'column_title TEXT,'
                      'column_subtitle TEXT,'
                      'author_name TEXT,'
@@ -72,11 +73,11 @@ class StoreClient(object):
     def save_column_info(self, **kwargs):
         self._db_conn.execute(
             'INSERT INTO columns ('
-                'column_id, column_title, column_subtitle, author_name, author_intro, had_sub, '
+                'column_id, column_type, column_title, column_subtitle, author_name, author_intro, had_sub, '
                 'update_frequency, author_header, column_unit, column_cover, column_begin_time, column_intro, create_at'
             ')'
-            'VALUES (?, ?,?,?, ?,?,?, ?,?,?, ?,?, ?)', (
-                kwargs['id'], kwargs['column_title'], kwargs['column_subtitle'], kwargs['author_name'],
+            'VALUES (?, ?,?,?, ?,?,?, ?,?,?, ?,?,?, ?)', (
+                kwargs['id'], kwargs['column_type'], kwargs['column_title'], kwargs['column_subtitle'], kwargs['author_name'],
                 kwargs['author_intro'], kwargs['had_sub'], kwargs['update_frequency'], kwargs['author_header'],
                 kwargs['column_unit'], kwargs['column_cover'], kwargs['column_begin_time'], kwargs['column_intro'],
                 datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -94,7 +95,7 @@ class StoreClient(object):
                 kwargs['article_content'], kwargs['column_id'], kwargs['id'], kwargs['article_title'],
                 kwargs['article_subtitle'], kwargs['article_ctime'], kwargs['article_cover'],  kwargs['article_summary'],
                 kwargs['audio_download_url'], kwargs['video_cover'],
-                kwargs['video_media'], kwargs['audio_url'], kwargs['audio_time'], kwargs['author_name'],
+                kwargs.get('video_media'), kwargs['audio_url'], kwargs['audio_time'], kwargs['author_name'],
                 kwargs['article_poster_wxlite'], datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             )
         )

@@ -17,7 +17,8 @@ setup(
     install_requires=[
         'Jinja2',
         'kindle_maker',
-        'requests'
+        'requests',
+        'gevent'
     ],
     entry_points={
         'console_scripts': [

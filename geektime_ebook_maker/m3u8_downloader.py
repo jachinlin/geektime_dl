@@ -12,7 +12,7 @@ import time
 
 
 class Downloader:
-    def __init__(self, pool_size, retry=3):
+    def __init__(self, pool_size=3, retry=3):
         self.pool = Pool(pool_size)
         self.session = self._get_http_session(pool_size, pool_size, retry)
         self.retry = retry
