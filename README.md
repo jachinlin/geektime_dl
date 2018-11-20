@@ -1,7 +1,7 @@
 # 把极客时间专栏装进Kindle
 
-[![travis](https://travis-ci.org/jachinlin/geektime_ebook_maker.svg?branch=master)](https://travis-ci.org/jachinlin/geektime_ebook_maker)
-[![codecov](https://codecov.io/gh/jachinlin/geektime_ebook_maker/branch/master/graph/badge.svg)](https://codecov.io/gh/jachinlin/geektime_ebook_maker)
+[![travis](https://travis-ci.org/jachinlin/geektime_ebook_maker.svg?branch=dev)](https://travis-ci.org/jachinlin/geektime_ebook_maker)
+[![codecov](https://codecov.io/gh/jachinlin/geektime_ebook_maker/branch/dev/graph/badge.svg)](https://codecov.io/gh/jachinlin/geektime_ebook_maker)
 
 极客时间专栏文章的质量都是非常高的，比如耗子哥的《左耳听风》、朱赟的《朱赟的技术管理课》和王天一的《人工智能基础课》，都是我非常喜欢的专栏。这些专栏深入浅出，将知识和经验传授于读者，都是值得多次阅读的。
 
