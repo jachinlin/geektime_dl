@@ -15,9 +15,9 @@ setup(
     packages=find_packages(exclude=['examples', 'tests']),
     package_data={'geektime_ebook_maker': ['geektime_ebook/templates/*']},
     install_requires=[
-        'Jinja2==2.10',
+        'Jinja2',
         'kindle_maker',
-        'requests==2.18.4'
+        'requests'
     ],
     entry_points={
         'console_scripts': [
