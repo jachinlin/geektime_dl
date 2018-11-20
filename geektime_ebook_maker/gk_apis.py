@@ -122,8 +122,10 @@ class GkApiClient(object):
 
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
             raise Exception('course query fail:' + resp.json()['error']['msg'])
-
-        return resp.json()['data']
+        data = resp.json()['data']
+        if not data:
+            raise Exception('course not exists:%s' % course_id)
+        return data
 
     def get_post_content(self, post_id):
         """课程章节详情"""
