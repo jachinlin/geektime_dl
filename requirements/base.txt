@@ -1,4 +1,4 @@
 git+https://github.com/jachinlin/kindle_maker.git
-requests==2.18.4
+requests
 Jinja2==2.10
 
