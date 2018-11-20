@@ -16,8 +16,9 @@ class Login(Command):
             account = input("enter your registered account(phone): ")
         if not password:
             password = input("enter password: ")
-        try:
-            gk.login(account, password, area)
-            print('登录成功')
-        except Exception as e:
-            print(e.message)
+
+        gk.login(account, password, area)
+        print('登录成功')
+
+
+

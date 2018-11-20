@@ -1,4 +1,4 @@
 # coding=utf8
 
 from .command import Command, main
-from . import login
+from . import login, query

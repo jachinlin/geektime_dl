@@ -41,14 +41,14 @@ class GkApiClient(object):
     __metaclass__ = Singleton
 
     def __init__(self):
-        self._cookies = None
+        self.cookies = None
         self._cookie_file = os.path.join('.', 'cookie.json')
         self._lock = threading.Lock()
 
         if os.path.exists(self._cookie_file):
             with open(self._cookie_file) as f:
                 cookies = f.read()
-                self._cookies = json.loads(cookies) if cookies else None
+                self.cookies = json.loads(cookies) if cookies else None
 
     @synchronized()
     def login(self, acc, psd, area='86'):
@@ -78,9 +78,9 @@ class GkApiClient(object):
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
             raise Exception('login fail:' + resp.json()['error']['msg'])
 
-        self._cookies = dict(resp.cookies.items())
+        self.cookies = dict(resp.cookies.items())
         with open(self._cookie_file, 'w') as f:
-            f.write(json.dumps(self._cookies))
+            f.write(json.dumps(self.cookies))
 
     def get_course_list(self):
         """获取课程列表"""
@@ -90,7 +90,7 @@ class GkApiClient(object):
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:59.0) Gecko/20100101 Firefox/59.0'
         }
 
-        resp = requests.get(url, headers=headers, cookies=self._cookies)
+        resp = requests.get(url, headers=headers, cookies=self.cookies)
 
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
             raise Exception('course query fail:' + resp.json()['error']['msg'])
@@ -104,7 +104,7 @@ class GkApiClient(object):
             'Referer': 'https://time.geekbang.org/column/{}'.format(str(course_id))
         }
 
-        resp = requests.post(url, json=data, headers=headers, cookies=self._cookies, timeout=10)
+        resp = requests.post(url, json=data, headers=headers, cookies=self.cookies, timeout=10)
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
             raise Exception('course query fail:' + resp.json()['error']['msg'])
 
@@ -118,7 +118,7 @@ class GkApiClient(object):
             'Referer': 'https://time.geekbang.org/column/{}'.format(course_id)
         }
 
-        resp = requests.post(url, headers=headers, cookies=self._cookies, json={'cid': str(course_id)}, timeout=10)
+        resp = requests.post(url, headers=headers, cookies=self.cookies, json={'cid': str(course_id)}, timeout=10)
 
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
             raise Exception('course query fail:' + resp.json()['error']['msg'])
@@ -133,7 +133,7 @@ class GkApiClient(object):
             'Referer': 'https://time.geekbang.org/column/article/{}'.format(str(article_id))
         }
 
-        resp = requests.post(url, headers=headers, cookies=self._cookies, json={'id': str(article_id)}, timeout=10)
+        resp = requests.post(url, headers=headers, cookies=self.cookies, json={'id': str(article_id)}, timeout=10)
 
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
             raise Exception('course query fail:' + resp.json()['error']['msg'])

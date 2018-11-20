@@ -49,6 +49,9 @@ def main():
 
     if command in commands:
         o = commands[command]()
-        o.run(args)
+        try:
+            o.run(args)
+        except Exception as e:
+            print(e)
     else:
         print('Unknow command %r\n\n' % (command,))
