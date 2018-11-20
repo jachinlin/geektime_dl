@@ -125,15 +125,15 @@ class GkApiClient(object):
 
         return resp.json()['data']
 
-    def get_post_content(self, article_id):
+    def get_post_content(self, post_id):
         """课程章节详情"""
         url = 'https://time.geekbang.org/serv/v1/article'
         headers = {
             'Content-Type': 'application/json',
-            'Referer': 'https://time.geekbang.org/column/article/{}'.format(str(article_id))
+            'Referer': 'https://time.geekbang.org/column/article/{}'.format(str(post_id))
         }
 
-        resp = requests.post(url, headers=headers, cookies=self.cookies, json={'id': str(article_id)}, timeout=10)
+        resp = requests.post(url, headers=headers, cookies=self.cookies, json={'id': str(post_id)}, timeout=10)
 
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
             raise Exception('course query fail:' + resp.json()['error']['msg'])
