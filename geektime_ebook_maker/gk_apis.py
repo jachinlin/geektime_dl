@@ -1,6 +1,35 @@
 # coding=utf8
 
 import requests
+import os
+import json
+from functools import wraps
+import threading
+
+
+class Singleton(type):
+    def __new__(cls, name, bases, attrs):
+        cls.__instance = None
+        return super(Singleton, cls).__new__(cls, name, bases, attrs)
+
+    def __call__(self, *args, **kwargs):
+        if self.__instance is None:
+            self.__instance = super(Singleton, self).__call__(*args, **kwargs)
+        return self.__instance
+
+
+def synchronized(lock_attr='_lock'):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            lock = getattr(self, lock_attr)
+            try:
+                lock.acquire()
+                return func(self, *args, **kwargs)
+            finally:
+                lock.release()
+        return wrapper
+    return decorator
 
 
 class GkApiClient(object):
@@ -8,10 +37,21 @@ class GkApiClient(object):
     一个课程，包括专栏、视频、微课等，称作 `course`
     课程下的章节，包括文章、者视频等，称作 `post`
     """
-    cookies = None
 
-    @classmethod
-    def login(cls, acc, psd, area='86'):
+    __metaclass__ = Singleton
+
+    def __init__(self):
+        self._cookies = None
+        self._cookie_file = os.path.join('.', 'cookie.json')
+        self._lock = threading.Lock()
+
+        if os.path.exists(self._cookie_file):
+            with open(self._cookie_file) as f:
+                cookies = f.read()
+                self._cookies = json.loads(cookies) if cookies else None
+
+    @synchronized()
+    def login(self, acc, psd, area='86'):
         """登录"""
         url = 'https://account.geekbang.org/account/ticket/login'
 
@@ -37,7 +77,10 @@ class GkApiClient(object):
 
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
             raise Exception('login fail:' + resp.json()['error']['msg'])
-        cls.cookies = dict(resp.cookies.items())
+
+        self._cookies = dict(resp.cookies.items())
+        with open(self._cookie_file, 'w') as f:
+            f.write(json.dumps(self._cookies))
 
     def get_course_list(self):
         """获取课程列表"""
@@ -47,7 +90,7 @@ class GkApiClient(object):
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:59.0) Gecko/20100101 Firefox/59.0'
         }
 
-        resp = requests.get(url, headers=headers, cookies=self.cookies)
+        resp = requests.get(url, headers=headers, cookies=self._cookies)
 
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
             raise Exception('course query fail:' + resp.json()['error']['msg'])
@@ -61,7 +104,7 @@ class GkApiClient(object):
             'Referer': 'https://time.geekbang.org/column/{}'.format(str(course_id))
         }
 
-        resp = requests.post(url, json=data, headers=headers, cookies=self.cookies, timeout=10)
+        resp = requests.post(url, json=data, headers=headers, cookies=self._cookies, timeout=10)
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
             raise Exception('course query fail:' + resp.json()['error']['msg'])
 
@@ -75,7 +118,7 @@ class GkApiClient(object):
             'Referer': 'https://time.geekbang.org/column/{}'.format(course_id)
         }
 
-        resp = requests.post(url, headers=headers, cookies=self.cookies, json={'cid': str(course_id)}, timeout=10)
+        resp = requests.post(url, headers=headers, cookies=self._cookies, json={'cid': str(course_id)}, timeout=10)
 
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
             raise Exception('course query fail:' + resp.json()['error']['msg'])
@@ -90,7 +133,7 @@ class GkApiClient(object):
             'Referer': 'https://time.geekbang.org/column/article/{}'.format(str(article_id))
         }
 
-        resp = requests.post(url, headers=headers, cookies=self.cookies, json={'id': str(article_id)}, timeout=10)
+        resp = requests.post(url, headers=headers, cookies=self._cookies, json={'id': str(article_id)}, timeout=10)
 
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
             raise Exception('course query fail:' + resp.json()['error']['msg'])
