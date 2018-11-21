@@ -4,6 +4,7 @@ from ..gk_apis import *
 from ..store_client import StoreClient
 from . import Command
 from ..geektime_ebook import maker
+from kindle_maker import make_mobi
 
 
 class EBook(Command):
@@ -73,6 +74,9 @@ class EBook(Command):
 
         # source file
         self.render_column_source_files(course_data, data, out_dir)
+
+        # ebook
+        make_mobi(source_dir=os.path.join(out_dir, course_data['column_title']), output_dir=out_dir)
 
 
 
