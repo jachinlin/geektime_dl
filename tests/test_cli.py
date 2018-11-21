@@ -1,6 +1,6 @@
 # coding=utf8
 
-from geektime_ebook_maker.cli import command
+from geektime_dl.cli import command
 
 
 def test_command_metaclass1():
