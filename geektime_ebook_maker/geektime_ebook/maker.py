@@ -41,15 +41,15 @@ def _generate_cover_img(url, output_dir):
 
 def _parse_image(content, output_dir):
 
-    p = r'<img src=".+" '
-    img_url_list = re.findall(p, content)
+    p = r'img src="(.*?)"'
+    img_url_list = re.findall(p, content, re.S)
     for url in img_url_list:
         try:
             url_local = str(uuid.uuid4()) + '.jpg'
-            r = requests.get(url[10:-2])
+            r = requests.get(url)
             with open(os.path.join(output_dir, url_local), 'wb') as f:
                 f.write(r.content)
-            content = content.replace(url, '<img src="{}" '.format(url_local))
+            content = content.replace(url, url_local)
         except:
             # todo logging
             pass
