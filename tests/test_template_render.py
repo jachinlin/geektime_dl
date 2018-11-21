@@ -1,6 +1,6 @@
 # coding=utf8
 
-from geektime_ebook_maker.geektime_ebook import maker
+from geektime_dl.geektime_ebook import maker
 import os
 
 

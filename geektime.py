@@ -1,4 +1,4 @@
-from geektime_ebook_maker import main
+from geektime_dl import main
 
 if __name__ == '__main__':
     main()

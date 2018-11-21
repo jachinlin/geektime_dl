@@ -2,7 +2,7 @@
 
 
 def main():
-    from geektime_ebook_maker import cli
+    from geektime_dl import cli
     cli.main()
 
 

@@ -3,7 +3,7 @@ import sqlite3
 import datetime
 import os
 import traceback
-from .utils.logging import logger
+from .utils._logging import logger
 
 
 class DbClient(object):

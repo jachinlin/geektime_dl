@@ -3,7 +3,7 @@
 import sys
 import os
 import traceback
-from ..utils.logging import logger
+from ..utils._logging import logger
 
 
 commands = {}
