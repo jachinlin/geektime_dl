@@ -45,7 +45,6 @@ class Downloader:
                 ts_list = list(zip(ts_list, [n for n in range(len(ts_list))]))
                 if ts_list:
                     self.ts_total = len(ts_list)
-                    print(self.ts_total)
                     g1 = gevent.spawn(self._join_file)
                     self._download(ts_list)
                     g1.join()
@@ -68,14 +67,12 @@ class Downloader:
                 r = self.session.get(url, timeout=20)
                 if r.ok:
                     file_name = url.split('/')[-1].split('?')[0]
-                    print(file_name)
                     with open(os.path.join(self.dir, file_name), 'wb') as f:
                         f.write(r.content)
                     self.succed[index] = file_name
                     return
             except:
                 retry -= 1
-        print('[FAIL]%s' % url)
         self.failed.append((url, index))
 
     def _join_file(self):

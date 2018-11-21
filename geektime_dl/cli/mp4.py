@@ -71,6 +71,7 @@ class Mp4(Command):
             url = json.loads(post['video_media'])['hd']['url'] if hd_only else json.loads(post['video_media'])['sd']['url']
             dl = Downloader(1)
             dl.run(url, dir=out_dir, file_name=file_name)
+            print('download mp4 done: ' + file_name)
 
 
 
