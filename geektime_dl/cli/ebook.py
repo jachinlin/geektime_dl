@@ -38,8 +38,18 @@ class EBook(Command):
         maker._generate_cover_img(course_intro['column_cover'], output_dir)
         print('下载' + column_title + '封面' + ' done')
 
+        def _title(c):
+            if not c['had_sub']:
+                t = c['column_title'] + '[免费试读]'
+            elif c['update_frequency'] == '全集':
+                t = c['column_title'] + '[更新完毕]'
+            else:
+                t = c['column_title'] + '[未完待续]'
+            return t
+
+        ebook_name = _title(course_intro)
         maker._render_toc_md(
-            column_title + '\n',
+            ebook_name + '\n',
             ['# 简介\n'] + ['# ' + maker._format_file_name(t['article_title']) + '\n' for t in articles],
             output_dir
         )
