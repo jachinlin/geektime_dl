@@ -8,6 +8,16 @@ from kindle_maker import make_mobi
 
 
 class EBook(Command):
+    """将专栏文章制作成电子书
+
+    geektime ebook <course_id> [--out-dir=xxx]
+
+    course_id: 课程ID，可以从 query subcmd 查看
+    --out_dir: 电子书存放目录，默认当前目录
+
+    notice: 此 subcmd 需要先执行 login subcmd
+    e.g.: geektime ebook 48 --out-dir=~/geektime-ebook
+    """
 
     @staticmethod
     def render_column_source_files(course_intro, course_content, out_dir):

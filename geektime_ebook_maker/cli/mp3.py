@@ -7,6 +7,16 @@ from . import Command
 
 
 class Mp3(Command):
+    """保存专栏音频
+    eektime mp3 <course_id> [--url-only] [--out-dir=xxx]
+
+    course_id: 课程ID，可以从 query subcmd 查看
+    --url-only: 只保存音频url
+    --out_dir: 音频存放目录，默认当前目录
+
+    notice: 此 subcmd 需要先执行 login subcmd
+    e.g.: geektime mp3 48 --out-dir=~/geektime-ebook
+    """
     def run(self, args):
 
         course_id = args[0]

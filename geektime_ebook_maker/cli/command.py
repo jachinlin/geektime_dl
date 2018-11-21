@@ -18,7 +18,15 @@ class CommandType(type):
             commands[name] = cls
 
 
-Command = CommandType('Command', (object,), {'run': lambda self, args: None})
+def work(self, args):
+    if '--help' in args:
+        result = (self.__doc__ or '').strip()
+        print(result)
+        return
+    return self.run(args)
+
+
+Command = CommandType('Command', (object,), {'run': lambda self, args: None, 'work': work})
 
 
 class Help(Command):
@@ -29,7 +37,7 @@ class Help(Command):
         padding = max([len(k) for k in names]) + 2
         for k in sorted(names):
             name = k.ljust(padding, ' ')
-            doc = (commands[k].__doc__ or '').strip()
+            doc = (commands[k].__doc__ or '').split('\n')[0]
             result.append("    %s%s" % (name, doc))
         result.append("\nUse '%s <command> --help' for individual command help." % sys.argv[0].split(os.path.sep)[-1])
 
@@ -52,7 +60,7 @@ def main():
     if command in commands:
         o = commands[command]()
         try:
-            o.run(args)
+            o.work(args)
         except Exception as e:
             print(e)
             logger.error('exception=%s' % traceback.format_exc())

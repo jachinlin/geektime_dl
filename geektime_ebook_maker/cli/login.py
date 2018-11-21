@@ -3,13 +3,24 @@
 from ..gk_apis import *
 from . import Command
 
-output_dir = None
-
 
 class Login(Command):
+    """登录极客时间，保存登录token
+    geektime login [--area=xxx]
+
+    --area: 注册手机号所属地区，默认86
+
+    notice: 登录后，token会保存至 cookie.json
+    e.g.: geektime login
+    """
     def run(self, args):
-        gk = GkApiClient()
-        area = '86'
+
+        for arg in args:
+            if '--area=' in arg:
+                area = arg.split('--area=')[1] or '86'
+                break
+        else:
+            area = '86'
         account = None
         password = None
         if not account:
@@ -17,6 +28,7 @@ class Login(Command):
         if not password:
             password = input("enter password: ")
 
+        gk = GkApiClient()
         gk.login(account, password, area)
         print('登录成功')
 

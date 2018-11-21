@@ -7,6 +7,17 @@ from ..utils.m3u8_downloader import Downloader
 
 
 class Mp4(Command):
+    """保存视频课程视频
+    geektime mp4 <course_id> [--url-only] [--hd-only] [--out-dir=xxx]
+
+    course_id: 课程ID，可以从 query subcmd 查看
+    --url-only: 只保存视频url
+    --hd-only：下载高清视频，默认下载标清视频
+    --out_dir: 视频存放目录，默认当前目录
+
+    notice: 此 subcmd 需要先执行 login subcmd
+    e.g.: geektime mp4 66 --out-dir=~/geektime-ebook
+    """
     def run(self, args):
 
         course_id = args[0]

@@ -38,3 +38,7 @@ nosetests.xml
 
 # Environment files
 .idea
+
+# tmp files
+cookie.json
+sqlite3.db
