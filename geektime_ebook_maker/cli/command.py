@@ -3,6 +3,8 @@
 import sys
 import os
 import traceback
+from ..utils.logging import logger
+
 
 commands = {}
 
@@ -53,6 +55,6 @@ def main():
             o.run(args)
         except Exception as e:
             print(e)
-            # todo log traceback.format_exc()
+            logger.error('exception=%s' % traceback.format_exc())
     else:
         print('Unknow command %r\n\n' % (command,))

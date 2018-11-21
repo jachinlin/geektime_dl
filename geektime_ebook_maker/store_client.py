@@ -2,6 +2,8 @@
 import sqlite3
 import datetime
 import os
+import traceback
+from .utils.logging import logger
 
 
 class DbClient(object):
@@ -59,8 +61,8 @@ class DbClient(object):
         try:
             cur.execute(*args, **kwargs)
         except (sqlite3.IntegrityError, sqlite3.OperationalError) as e:
-            # todo log here
-            pass
+            logger.warn('exception=%s' % traceback.format_exc())
+
         self._db_client.commit()
 
         cur.close()
