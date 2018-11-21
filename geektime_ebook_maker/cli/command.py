@@ -53,6 +53,6 @@ def main():
             o.run(args)
         except Exception as e:
             print(e)
-            print(traceback.format_exc())
+            # todo log traceback.format_exc()
     else:
         print('Unknow command %r\n\n' % (command,))

@@ -59,7 +59,7 @@ class DbClient(object):
         try:
             cur.execute(*args, **kwargs)
         except (sqlite3.IntegrityError, sqlite3.OperationalError) as e:
-            print(e)
+            # todo log here
             pass
         self._db_client.commit()
 

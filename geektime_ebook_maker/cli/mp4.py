@@ -31,6 +31,10 @@ class Mp4(Command):
         if int(course_data['column_type']) != 3:
             raise Exception('该课程不是视频课程:%s' % course_data['column_title'])
 
+        out_dir = os.path.join(out_dir, course_data['column_title'])
+        if not os.path.isdir(out_dir):
+            os.makedirs(out_dir)
+
         data = gk.get_course_content(course_id)
 
         for post in data:

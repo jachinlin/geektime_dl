@@ -30,6 +30,10 @@ class Mp3(Command):
         if int(course_data['column_type']) != 1:
             raise Exception('该课程不提供音频:%s' % course_data['column_title'])
 
+        out_dir = os.path.join(out_dir, course_data['column_title'])
+        if not os.path.isdir(out_dir):
+            os.makedirs(out_dir)
+
         data = []
         _data = gk.get_course_content(course_id)
 
