@@ -65,6 +65,14 @@ class DbClient(object):
 
         cur.close()
 
+    def select(self, *args, **kwargs):
+
+        cur = self._db_client.cursor()
+        cur.execute(*args, **kwargs)
+        result = cur.fetchall()
+        cur.close()
+        return result
+
 
 class StoreClient(object):
     def __init__(self, **kwargs):
@@ -99,3 +107,9 @@ class StoreClient(object):
                 kwargs['article_poster_wxlite'], datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             )
         )
+
+    def get_course_content(self, course_id):
+        data = self._db_conn.select(
+            'SELECT * FROM posts WHERE column_id=? ORDER BY article_id', (str(course_id),)
+        )
+        return data

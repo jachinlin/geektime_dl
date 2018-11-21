@@ -3,7 +3,7 @@
 from ..gk_apis import *
 from ..store_client import StoreClient
 from . import Command
-from ..m3u8_downloader import Downloader
+from ..utils.m3u8_downloader import Downloader
 
 
 class Mp4(Command):

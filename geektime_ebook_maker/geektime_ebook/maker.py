@@ -30,7 +30,6 @@ def _format_file_name(name):
 
 
 def _generate_cover_img(url, output_dir):
-    print('---fetch cover image: {} ----'.format(url[10:-2]))
     try:
         r = requests.get(url)
         with open(os.path.join(output_dir, 'cover.jpg'), 'wb') as f:
@@ -45,7 +44,6 @@ def _parse_image(content, output_dir):
     p = r'<img src=".+" '
     img_url_list = re.findall(p, content)
     for url in img_url_list:
-        print('---fetch image: {} ----'.format(url[10:-2]))
         try:
             url_local = str(uuid.uuid4()) + '.jpg'
             r = requests.get(url[10:-2])

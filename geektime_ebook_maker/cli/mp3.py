@@ -2,7 +2,7 @@
 
 from ..gk_apis import *
 from ..store_client import StoreClient
-from ..mp3_downloader import Downloader
+from ..utils.mp3_downloader import Downloader
 from . import Command
 
 
