@@ -9,6 +9,8 @@ class Login(Command):
     geektime login [--area=xxx]
 
     --area: 注册手机号所属地区，默认86
+    --account: 手机账号，不提供可稍后手动输入
+    --password: 账号密码，不提供可稍后手动输入
 
     notice: 登录后，token会保存至 cookie.json
     e.g.: geektime login
@@ -21,8 +23,21 @@ class Login(Command):
                 break
         else:
             area = '86'
-        account = None
-        password = None
+
+        for arg in args:
+            if '--account=' in arg:
+                account = arg.split('--account=')[1] or ''
+                break
+        else:
+            account = None
+
+        for arg in args:
+            if '--password=' in arg:
+                password = arg.split('--password=')[1] or ''
+                break
+        else:
+            password = None
+
         if not account:
             account = input("enter your registered account(phone): ")
         if not password:

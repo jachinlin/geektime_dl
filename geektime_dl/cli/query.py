@@ -15,14 +15,7 @@ class Query(Command):
     def run(self, args):
         gk = GkApiClient()
         if not gk.cookies:
-            login_now = input("尚未登录，是否现在登录(Y/N): ")
-            if login_now.strip().upper() == 'Y':
-                area = '86'
-                account = input("enter your registered account(phone): ")
-                password = input("enter password: ")
-
-                gk.login(account, password, area)
-                print('登录成功')
+            print("尚未登录, 可以先 geektime login 以便查看更详细的信息")
 
         data = gk.get_course_list()
 

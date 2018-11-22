@@ -97,7 +97,7 @@ brew install homebrew/cask/kindlegen
 ##### Windows:
 
 ```
-doming soon ~~
+coming soon ~~
 or pr is welcome
 ```
 
