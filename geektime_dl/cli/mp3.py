@@ -4,6 +4,7 @@ from ..gk_apis import *
 from ..store_client import StoreClient
 from ..utils.mp3_downloader import Downloader
 from . import Command
+from ..utils import format_path
 
 
 class Mp3(Command):
@@ -61,7 +62,7 @@ class Mp3(Command):
 
         dl = Downloader()
         for post in data:
-            file_name = post['article_title'] + '.mp3'
+            file_name = format_path(post['article_title'] + '.mp3')
             if os.path.isfile(os.path.join(out_dir, file_name)):
                 print(file_name + ' exists')
                 continue

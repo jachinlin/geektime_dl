@@ -4,6 +4,7 @@ from ..gk_apis import *
 from ..store_client import StoreClient
 from . import Command
 from ..utils.m3u8_downloader import Downloader
+from ..utils import format_path
 
 
 class Mp4(Command):
@@ -64,7 +65,7 @@ class Mp4(Command):
             return
 
         for post in data:
-            file_name = post['article_title'] + ('.hd' if hd_only else '.sd')
+            file_name = format_path(post['article_title'] + ('.hd' if hd_only else '.sd'))
             if os.path.isfile(os.path.join(out_dir, file_name) + '.ts'):
                 print(file_name + ' exists')
                 continue
