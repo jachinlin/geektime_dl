@@ -3,42 +3,15 @@
 import requests
 import os
 import json
-from functools import wraps
 import threading
+from .utils import Singleton, synchronized
 
 
-class Singleton(type):
-    def __new__(cls, name, bases, attrs):
-        cls.__instance = None
-        return super(Singleton, cls).__new__(cls, name, bases, attrs)
-
-    def __call__(self, *args, **kwargs):
-        if self.__instance is None:
-            self.__instance = super(Singleton, self).__call__(*args, **kwargs)
-        return self.__instance
-
-
-def synchronized(lock_attr='_lock'):
-    def decorator(func):
-        @wraps(func)
-        def wrapper(self, *args, **kwargs):
-            lock = getattr(self, lock_attr)
-            try:
-                lock.acquire()
-                return func(self, *args, **kwargs)
-            finally:
-                lock.release()
-        return wrapper
-    return decorator
-
-
-class GkApiClient(object):
+class GkApiClient(metaclass=Singleton):
     """
     一个课程，包括专栏、视频、微课等，称作 `course`
     课程下的章节，包括文章、者视频等，称作 `post`
     """
-
-    __metaclass__ = Singleton
 
     def __init__(self):
         self.cookies = None
