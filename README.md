@@ -26,25 +26,12 @@
 
 这个项目主要包括下边这几个部分
 
-1. kindle_maker
-4. geektime_ebook
-4. utils
-5. gk_apis
-6. store_client
-2. cli
-
-
-`kindle_maker`是一个mobi电子书制作工具。用户只需要提供制作电子书的html文件，和一个包含目录信息的toc.md文件，kindle_maker即可制作出一本精美的kindle电子书。这部分已拎出来放在单独的项目里，具体使用方式见该项目文档。
-
-[kindle_maker](https://github.com/jachinlin/kindle_maker)
-
-`utils`提供了mp3和mp4下载器等工具。
-
-`gk_apis`封装了极客时间的若干api。
-
-`geektime_ebook`主要将抓取到的数据转化为 kindle_maker 需要的源文件。
-
-`cli`则提供若干cmd命令(subcmd)，将上面这个部分连接在一起，最后使用 kindle_maker 制作电子书，或者使用下载器下载相关音视频。
+- kindle_maker: 一个mobi电子书制作工具。用户只需要提供制作电子书的html文件，和一个包含目录信息的toc.md文件，kindle_maker即可制作出一本精美的kindle电子书。这部分已拎出来放在单独的项目里，具体使用方式见该项目文档[kindle_maker](https://github.com/jachinlin/kindle_maker)
+- geektime_ebook: 主要将抓取到的数据转化为 kindle_maker 需要的源文件
+- utils: 提供了mp3和mp4下载器等工具
+- gk_apis: `gk_apis`封装了极客时间的若干api
+- store_client: 存储相关数据至sqlite3
+- cli: 提供若干cmd命令(subcmd)，将上面这个部分连接在一起，最后使用 kindle_maker 制作电子书，或者使用下载器下载相关音视频
 
 
 
@@ -66,9 +53,7 @@
 
 #### 虚拟环境 virtualenv
 ```
-cd ~
-virtualenv -p python3 venv3
-source venv3/bin/activate
+cd ~ && virtualenv -p python3 venv3 && source venv3/bin/activate
 ```
 
 #### 代码
@@ -82,12 +67,7 @@ pip install -U git+https://github.com/jachinlin/geektime_dl.git
 1. Linux:
 
 ```
-cd ~
-mkdir kindlegen
-cd kindlegen
-wget http://kindlegen.s3.amazonaws.com/kindlegen_linux_2.6_i386_v2_9.tar.gz
-tar xvfz kindlegen_linux_2.6_i386_v2_9.tar.gz
-cp ~/kindlegen/kindlegen ~/venv3/bin/
+wget http://kindlegen.s3.amazonaws.com/kindlegen_linux_2.6_i386_v2_9.tar.gz -O - | tar -xzf - -C ~/venv3/bin
 ```
 
 2. macOS:
@@ -108,7 +88,7 @@ or pr is welcome
 
 #### 查看帮助信息
 
-查看 cli subcmd
+1、查看 cli subcmd
 
 ```
 geektime help
@@ -117,7 +97,7 @@ geektime help
 ![gk-help](https://github.com/jachinlin/jachinlin.github.io/blob/master/img/gk-help.png?raw=true)
 
 
-查看具体 cli subcmd 帮助信息
+2、查看具体 cli subcmd 帮助信息
 
 ```
 geektime ebook --help
