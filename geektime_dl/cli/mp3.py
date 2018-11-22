@@ -9,7 +9,9 @@ from ..utils import format_path
 
 class Mp3(Command):
     """保存专栏音频
-    eektime mp3 <course_id> [--url-only] [--out-dir=xxx]
+    eektime mp3 <course_id> [--url-only] [--out-dir=<out_dir>]
+
+    `[]`表示可选，`<>`表示相应变量值
 
     course_id: 课程ID，可以从 query subcmd 查看
     --url-only: 只保存音频url

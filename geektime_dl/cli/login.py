@@ -6,7 +6,9 @@ from . import Command
 
 class Login(Command):
     """登录极客时间，保存登录token
-    geektime login [--area=xxx]
+    geektime login  [--account=<account>] [--password=<password>] [--area=<area>]
+
+    `[]`表示可选，`<>`表示相应变量值
 
     --area: 注册手机号所属地区，默认86
     --account: 手机账号，不提供可稍后手动输入

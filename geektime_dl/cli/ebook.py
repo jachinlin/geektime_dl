@@ -10,7 +10,9 @@ from kindle_maker import make_mobi
 class EBook(Command):
     """将专栏文章制作成电子书
 
-    geektime ebook <course_id> [--out-dir=xxx]
+    geektime ebook <course_id> [--out-dir=<out_dir>]
+
+    `[]`表示可选，`<>`表示相应变量值
 
     course_id: 课程ID，可以从 query subcmd 查看
     --out_dir: 电子书存放目录，默认当前目录

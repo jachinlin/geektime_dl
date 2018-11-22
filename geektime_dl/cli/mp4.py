@@ -9,7 +9,9 @@ from ..utils import format_path
 
 class Mp4(Command):
     """保存视频课程视频
-    geektime mp4 <course_id> [--url-only] [--hd-only] [--out-dir=xxx]
+    geektime mp4 <course_id> [--url-only] [--hd-only] [--out-dir=<out_dir>]
+
+    `[]`表示可选，`<>`表示相应变量值
 
     course_id: 课程ID，可以从 query subcmd 查看
     --url-only: 只保存视频url
