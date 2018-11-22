@@ -1,7 +1,12 @@
+<p align="center">
+    <img src="https://raw.githubusercontent.com/jachinlin/jachinlin.github.io/master/img/gk-mp4.gif" alt="左耳听风">
+</p>
+
+
 # 把极客时间专栏装进Kindle
 
-[![travis](https://travis-ci.org/jachinlin/geektime_ebook_maker.svg?branch=dev)](https://travis-ci.org/jachinlin/geektime_ebook_maker)
-[![codecov](https://codecov.io/gh/jachinlin/geektime_ebook_maker/branch/dev/graph/badge.svg)](https://codecov.io/gh/jachinlin/geektime_ebook_maker)
+[![travis](https://travis-ci.org/jachinlin/geektime_dl.svg?branch=master)](https://travis-ci.org/jachinlin/geektime_dl)
+[![codecov](https://codecov.io/gh/jachinlin/geektime_dl/branch/master/graph/badge.svg)](https://codecov.io/gh/jachinlin/geektime_dl)
 
 极客时间专栏文章的质量都是非常高的，比如耗子哥的《左耳听风》、朱赟的《朱赟的技术管理课》和王天一的《人工智能基础课》，都是我非常喜欢的专栏。这些专栏深入浅出，将知识和经验传授于读者，都是值得多次阅读的。
 
@@ -9,57 +14,65 @@
 
 >[把极客时间装进Kindle](https://github.com/jachinlin/geektime_ebook_maker)
 
-这个项目包括四个部分
+现在，这个工具除了将专栏制作成`kindle`电子书，还提供了下载`mp3`和`mp4`等功能，具体见下使用方法。
+
+
+## 项目结构
+
+这个项目主要包括下边这几个部分
 
 1. kindle_maker
-2. mini_spider
-3. geektime_spider
 4. geektime_ebook
+4. utils
+5. gk_apis
+6. store_client
+2. cli
 
 
-`kindle_maker`是一个mobi电子书制作工具。用户只需要提供制作电子书的html文件，和一个包含目录信息的toc.md文件，kindle_maker即可制作出一本精美的kindle电子书。
-
-这部分已拎出来放在单独的项目里，具体使用方式见该项目文档。
-
-[kindle_maker](https://github.com/jachinlin/kindle_maker)
-
-`mini_spider`是一个小型多线程爬虫框架，用户只需要为每个`url pattern`写一个`parse`解析函数和一个`save`存储函数就可以了。
-
-`geektime_spider`则负责抓取极客时间的专栏文章，并保存到sqlite3中，使用的工具就是上面的mini_spider。
-
-`geektime_ebook`主要将 geektime_spider 抓取到数据转化为 kindle_maker 需要的源文件。
-
-最后，我们使用 kindle_maker 将上面的源文件生成电子书。
-
-
-### 依赖
-
-[requests](http://www.python-requests.org/en/master/)
-
-[Jinja2](http://jinja.pocoo.org/)
+`kindle_maker`是一个mobi电子书制作工具。用户只需要提供制作电子书的html文件，和一个包含目录信息的toc.md文件，kindle_maker即可制作出一本精美的kindle电子书。这部分已拎出来放在单独的项目里，具体使用方式见该项目文档。
 
 [kindle_maker](https://github.com/jachinlin/kindle_maker)
 
-[Kindlegen](https://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000765211)
+`utils`提供了mp3和mp4下载器等工具。
 
-### 安装
+`gk_apis`封装了极客时间的若干api。
+
+`geektime_ebook`主要将抓取到的数据转化为 kindle_maker 需要的源文件。
+
+`cli`则提供若干cmd命令(subcmd)，将上面这个部分连接在一起，最后使用 kindle_maker 制作电子书，或者使用下载器下载相关音视频。
+
+
+
+## 依赖
+
+- [requests](http://www.python-requests.org/en/master/): 网络请求
+
+- [Jinja2](http://jinja.pocoo.org/): html模板引擎
+
+- [kindle_maker](https://github.com/jachinlin/kindle_maker): 制作kindle电子书
+
+- [Kindlegen](https://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000765211): kindle_maker核心依赖
+
+
+
+## 安装
 
 #### 虚拟环境 virtualenv
 ```
 cd ~
-virtualenv -p python3 py3-venv
-source py3-venv/bin/activate
+virtualenv -p python3 venv3
+source venv3/bin/activate
 ```
 
 #### 代码
 
 ```
-pip install -U git+https://github.com/jachinlin/geektime_ebook_maker.git
+pip install -U git+https://github.com/jachinlin/geektime_dl.git
 ```
 
 #### 安装kindlegen
 
-* For Linux:
+##### Linux:
 
 ```
 cd ~
@@ -67,49 +80,82 @@ mkdir kindlegen
 cd kindlegen
 wget http://kindlegen.s3.amazonaws.com/kindlegen_linux_2.6_i386_v2_9.tar.gz
 tar xvfz kindlegen_linux_2.6_i386_v2_9.tar.gz
-cp ~/kindlegen/kindlegen ~/py3-venv/bin/
+cp ~/kindlegen/kindlegen ~/venv3/bin/
 ```
 
-* For macOS:
+##### macOS:
 
 ```
 brew install homebrew/cask/kindlegen
 ```
 
-
-### 运行
-
-#### 查看专栏列表
+##### Windows:
 
 ```
-geektime query -u <your register phone> -p <password>
+doming soon ~~
+or pr is welcome
 ```
 
-`-u` 后边为你在极客时间上的注册手机号，`-p` 后为密码。
 
-![query](./docs/query.png)
+
+## 运行
+
+#### 查看帮助信息
+
+查看 cli subcmd
+
+```
+geektime help
+```
+
+![gk-help](https://github.com/jachinlin/jachinlin.github.io/blob/master/img/gk-help.png?raw=true)
+
+查看具体 cli subcmd 帮助信息
+
+```
+geektime ebook --help
+```
+
+![gk-ebook-help](https://github.com/jachinlin/jachinlin.github.io/blob/master/img/gk-ebook-help.png?raw=true)
+
+#### 登录保存登录token
+
+```
+geektime login
+```
+
+按照相关提示输入账号、密码即可
+
+#### 查看极客时间课程列表
+
+```
+geektime query
+```
+
+![gk-query](https://github.com/jachinlin/jachinlin.github.io/blob/master/img/gk-query.png?raw=true)
 
 #### 制作电子书
 
-```
-geektime ebook -c <column_id> -u <your register phone> -p <password>
-```
+![gk-ebook](https://github.com/jachinlin/jachinlin.github.io/blob/master/img/gk-ebook.png?raw=true)
 
-`-c`后为专栏ID，可以从上面的操作中获得；`-u` 后边为你在极客时间上的注册手机号；`-p` 后为密码。
-对于非中国的手机号, 可以通过 `--area` 指定国家区号, 如 `--area 1` 表明是美国手机号。
+#### 下载mp3
 
+![gk-mp3](https://github.com/jachinlin/jachinlin.github.io/blob/master/img/gk-mp3.png?raw=true)
+
+#### 下载mp4
+
+![gk-mp4](https://github.com/jachinlin/jachinlin.github.io/blob/master/img/gk-mp4.png?raw=true)
 
 ### 效果
 
-#### 左耳听风
 
-![左耳听风](https://github.com/jachinlin/jachinlin.github.io/blob/master/img/左耳听风.gif?raw=true)
 
 
 ### Todo list
 
 - [ ] support mathjax
-- [ ] MP3 and MP4
+- [X] MP3 and MP4
+- [ ] support windows
 - [ ] ...
 
 
