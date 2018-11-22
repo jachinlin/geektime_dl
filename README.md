@@ -1,4 +1,4 @@
-<p align="center">
+<p align="center" style="padding:10%">
     <img src="https://raw.githubusercontent.com/jachinlin/jachinlin.github.io/master/img/gk-mp4.gif" alt="左耳听风">
 </p>
 
@@ -17,7 +17,7 @@
 现在，这个工具除了将专栏制作成`kindle`电子书，还提供了下载`mp3`和`mp4`等功能，具体见下使用方法。
 
 
-## 项目结构
+## 一、项目结构
 
 <p align="center">
     <img src="https://github.com/jachinlin/jachinlin.github.io/blob/master/img/gk-chart.png?raw=true" alt="流程图">
@@ -48,7 +48,7 @@
 
 
 
-## 依赖
+## 二、依赖
 
 - [requests](http://www.python-requests.org/en/master/): 网络请求
 
@@ -60,7 +60,9 @@
 
 
 
-## 安装
+## 三、使用
+
+### 安装
 
 #### 虚拟环境 virtualenv
 ```
@@ -77,7 +79,7 @@ pip install -U git+https://github.com/jachinlin/geektime_dl.git
 
 #### 安装kindlegen
 
-##### Linux:
+1. Linux:
 
 ```
 cd ~
@@ -88,13 +90,13 @@ tar xvfz kindlegen_linux_2.6_i386_v2_9.tar.gz
 cp ~/kindlegen/kindlegen ~/venv3/bin/
 ```
 
-##### macOS:
+2. macOS:
 
 ```
 brew install homebrew/cask/kindlegen
 ```
 
-##### Windows:
+3. Windows:
 
 ```
 coming soon ~~
@@ -102,8 +104,7 @@ or pr is welcome
 ```
 
 
-
-## 运行
+### 运行
 
 #### 查看帮助信息
 
@@ -115,6 +116,7 @@ geektime help
 
 ![gk-help](https://github.com/jachinlin/jachinlin.github.io/blob/master/img/gk-help.png?raw=true)
 
+
 查看具体 cli subcmd 帮助信息
 
 ```
@@ -122,6 +124,7 @@ geektime ebook --help
 ```
 
 ![gk-ebook-help](https://github.com/jachinlin/jachinlin.github.io/blob/master/img/gk-ebook-help.png?raw=true)
+
 
 #### 登录保存登录token
 
@@ -131,6 +134,7 @@ geektime login
 
 按照相关提示输入账号、密码即可
 
+
 #### 查看极客时间课程列表
 
 ```
@@ -139,19 +143,29 @@ geektime query
 
 ![gk-query](https://github.com/jachinlin/jachinlin.github.io/blob/master/img/gk-query.png?raw=true)
 
+
 #### 制作电子书
 
 ![gk-ebook](https://github.com/jachinlin/jachinlin.github.io/blob/master/img/gk-ebook.png?raw=true)
+
 
 #### 下载mp3
 
 ![gk-mp3](https://github.com/jachinlin/jachinlin.github.io/blob/master/img/gk-mp3.png?raw=true)
 
+
 #### 下载mp4
 
 ![gk-mp4](https://github.com/jachinlin/jachinlin.github.io/blob/master/img/gk-mp4.png?raw=true)
 
-### 效果
+
+
+## 四、Docker
+
+see [Dockerfile for 把极客时间专栏装进Kindle](https://hub.docker.com/r/jostyee/docker_geektime_ebook_maker/)
+
+
+## 五、效果
 
 
 
