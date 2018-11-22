@@ -19,6 +19,11 @@
 
 ## 项目结构
 
+<p align="center">
+    <img src="https://github.com/jachinlin/jachinlin.github.io/blob/master/img/gk-chart.png?raw=true" alt="流程图">
+</p>
+
+
 这个项目主要包括下边这几个部分
 
 1. kindle_maker
