@@ -62,7 +62,15 @@ def main():
         try:
             o.work(args)
         except Exception as e:
-            print(e)
-            logger.error('exception=%s' % traceback.format_exc())
+            tb = traceback.format_exc()
+            if isinstance(e, IndexError) and 'args' in tb:
+                # 这个定位有点广了，可能会误杀
+                # 当然，我对自己代码比较有信心，其他地方都不会出现index越界的情况
+                # 笔芯
+                print("参数出错，具体使用方法见下\n")
+                print(o.__doc__)
+            else:
+                print(e)
+            logger.error('exception=%s' % tb)
     else:
         print('Unknow command %r\n\n' % (command,))
