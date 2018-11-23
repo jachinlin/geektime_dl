@@ -3,6 +3,7 @@ import sqlite3
 import datetime
 import os
 import traceback
+import json
 from .utils._logging import logger
 
 
@@ -51,6 +52,20 @@ class DbClient(object):
                 'audio_time TEXT,'
                 'author_name TEXT,'
                 'article_poster_wxlite TEXT,'
+                'create_at TEXT NOT NULL '
+            ')'
+        )
+
+        self.execute(
+            'CREATE TABLE comments ('
+                'id INTEGER PRIMARY KEY,'
+                'user_name TEXT,'
+                'like_count INTEGER, '
+                'comment_id INTEGER UNIQUE,'
+                'article_id INTEGER, '
+                'comment_content TEXT,'
+                'comment_ctime TEXT,'
+                'replies TEXT,'
                 'create_at TEXT NOT NULL '
             ')'
         )
@@ -107,6 +122,18 @@ class StoreClient(object):
                 kwargs['audio_download_url'], kwargs['video_cover'],
                 kwargs.get('video_media'), kwargs['audio_url'], kwargs['audio_time'], kwargs['author_name'],
                 kwargs['article_poster_wxlite'], datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            )
+        )
+
+    def save_post_comment(self, **kwargs):
+
+        self._db_conn.execute(
+            'INSERT INTO comments (user_name, like_count, comment_id, article_id, '
+                'comment_content, comment_ctime, replies, create_at) '
+            'VALUES (?, ?, ?,?, ?,?, ?, ?)', (
+                kwargs['user_name'], kwargs['like_count'], kwargs['id'], kwargs['article_id'],
+                kwargs['comment_content'], kwargs['comment_ctime'], json.dumps(kwargs.get('replies', [])),
+                datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             )
         )
 

@@ -97,9 +97,6 @@ or pr is welcome
 geektime help
 ```
 
-![gk-help](https://github.com/jachinlin/jachinlin.github.io/blob/master/img/gk-help.png?raw=true)
-
-
 2、查看具体 cli subcmd 帮助信息
 
 ```
@@ -107,8 +104,6 @@ geektime <subcmd> --help
 ```
 
 `<subcmd>` 为具体的子命令名，可以从 help 子命令查看。
-
-![gk-ebook-help](https://github.com/jachinlin/jachinlin.github.io/blob/master/img/gk-ebook-help.png?raw=true)
 
 
 #### 登录保存登录token
@@ -130,17 +125,38 @@ geektime login  [--account=<account>] [--password=<password>] [--area=<area>]
 geektime query
 ```
 
-![gk-query](https://github.com/jachinlin/jachinlin.github.io/blob/master/img/gk-query.png?raw=true)
+执行该命令后，我们可以看到专栏、视频、微课等课程的课程标题、订阅情况、更新频率还有课程ID，这个**课程ID**很重要，咱们下边的操作就是基于这个ID进行的。
 
+>专栏
+>        课程ID        已订阅       课程标题             更新频率/课时·时长
+>        49             否         朱赟的技术管理课      (全集)
+>        48             是         左耳听风      (全集)
+>        ......
+>微课
+>        课程ID        已订阅       课程标题             更新频率/课时·时长
+>        75             是         深入浅出gRPC  (全集)
+>        73             否         Service Mesh实践指南  (全集)
+>        ......
+>视频
+>        课程ID        已订阅       课程标题             更新频率/课时·时长
+>        138            是         Nginx核心知识100讲    (100课时，约600分钟)
+>        130            否         算法面试通关40讲      (40课时·约500分钟)
+>        ......
+>其他
+>        课程ID        已订阅       课程标题             更新频率/课时·时长
+>        69             否         零基础入门 Python 机器学习    (None)
+>        70             否         零基础入门 TensorFlow (None)
 
 #### 制作电子书
 
 ```
-geektime ebook <course_id> [--out-dir=<out_dir>]
+geektime ebook <course_id> [--out-dir=<out_dir>] [--enable-comments] [--comment-count=<comment_count>]
 ```
 
 - course_id: 课程ID，可以从 query subcmd 查看
 - --out_dir: 电子书存放目录，默认当前目录
+- --enable-comments: 启动评论下载，默认不下载评论
+- --comment-count: 在启动评论下载时，设置评论条数，默认10条
 
 notice: 此 subcmd 需要先执行 login subcmd
 
@@ -182,8 +198,9 @@ see [Dockerfile for 把极客时间专栏装进Kindle](https://hub.docker.com/r/
 
 ## 六、Todo list
 
-- [ ] support mathjax
 - [X] MP3 and MP4
+- [X] comments
+- [ ] support mathjax
 - [ ] support windows
 - [ ] ...
 

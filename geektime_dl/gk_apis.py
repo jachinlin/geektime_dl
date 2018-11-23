@@ -114,3 +114,18 @@ class GkApiClient(metaclass=Singleton):
             raise Exception('course query fail:' + resp.json()['error']['msg'])
 
         return resp.json()['data']
+
+    def get_post_comments(self, post_id):
+        """课程章节评论"""
+        url = 'https://time.geekbang.org/serv/v1/comments'
+        headers = {
+            'Content-Type': 'application/json',
+            'Referer': 'https://time.geekbang.org/column/article/{}'.format(str(post_id))
+        }
+
+        resp = requests.post(url, headers=headers, cookies=self.cookies, json={"aid": str(post_id), "prev": 0}, timeout=10)
+
+        if not (resp.status_code == 200 and resp.json().get('code') == 0):
+            raise Exception('course query fail:' + resp.json()['error']['msg'])
+
+        return resp.json()['data']['list']
