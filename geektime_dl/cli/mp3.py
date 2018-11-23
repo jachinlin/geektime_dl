@@ -78,8 +78,18 @@ class Mp3Batch(Mp3):
     懒， 不想写参数了
     """
     def run(self, args):
-        course_ids = args[0]
-        cid_list = course_ids.split(',')
+        if '--all' in args[1:]:
+            gk = GkApiClient()
+            data = gk.get_course_list()
+            cid_list = []
+            for c in data['1']['list']:
+                if c['had_sub']:
+                    cid_list.append(str(c['id']))
+
+        else:
+            course_ids = args[0]
+            cid_list = course_ids.split(',')
+
         for cid in cid_list:
-            super(Mp3Batch, self).run([cid.strip()] + args[1:])
+            super(Mp3Batch, self).run([cid.strip()] + args)
 

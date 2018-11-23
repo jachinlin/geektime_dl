@@ -100,7 +100,7 @@ class EBook(Command):
 
         store_client.save_column_info(**course_data)
 
-        if int(course_data['column_type']) != 1:
+        if int(course_data['column_type']) not in (1, 2):
             raise Exception('该课程不提供文本:%s' % course_data['column_title'])
 
         # data
@@ -181,9 +181,20 @@ class EbookBatch(EBook):
     懒， 不想写参数了
     """
     def run(self, args):
-        course_ids = args[0]
-        cid_list = course_ids.split(',')
+        if '--all' in args[1:]:
+            gk = GkApiClient()
+            data = gk.get_course_list()
+            cid_list = []
+            for c in data['1']['list'] + data['2']['list']:
+                if c['had_sub'] and c['update_frequency'] == '全集':
+                    cid_list.append(str(c['id']))
+
+        else:
+            course_ids = args[0]
+            cid_list = course_ids.split(',')
+
         for cid in cid_list:
-            super(EbookBatch, self).run([cid.strip()] + args[1:])
+            super(EbookBatch, self).run([cid.strip()] + args)
+
 
 
