@@ -38,9 +38,9 @@ class EBook(Command):
             os.makedirs(output_dir)
             print('mkdir ' + output_dir)
 
-        maker._render_article_html('简介', maker._parse_image(course_intro['column_intro'], output_dir), output_dir)
+        maker.render_article_html('简介', maker.parse_image(course_intro['column_intro'], output_dir), output_dir)
         print('下载' + column_title + '简介' + ' done')
-        maker._generate_cover_img(course_intro['column_cover'], output_dir)
+        maker.generate_cover_img(course_intro['column_cover'], output_dir)
         print('下载' + column_title + '封面' + ' done')
 
         def _title(c):
@@ -53,17 +53,17 @@ class EBook(Command):
             return t
 
         ebook_name = _title(course_intro)
-        maker._render_toc_md(
+        maker.render_toc_md(
             ebook_name + '\n',
-            ['# 简介\n'] + ['# ' + maker._format_file_name(t['article_title']) + '\n' for t in articles],
+            ['# 简介\n'] + ['# ' + maker.format_file_name(t['article_title']) + '\n' for t in articles],
             output_dir
         )
         print('下载' + column_title + '目录' + ' done')
 
         for article in articles:
 
-            title = maker._format_file_name(article['article_title'])
-            maker._render_article_html(title, maker._parse_image(article['article_content'], output_dir), output_dir)
+            title = maker.format_file_name(article['article_title'])
+            maker.render_article_html(title, maker.parse_image(article['article_content'], output_dir), output_dir)
             print('下载' + column_title + '：' + article['article_title'] + ' done')
 
     def run(self, args):
@@ -120,6 +120,7 @@ class EBook(Command):
                 store_client.save_post_comment(article_id=post['id'], **c)
 
         # source file
+        course_data['column_title'] = maker.format_file_name(course_data['column_title'])
         self.render_column_source_files(course_data, data, out_dir)
 
         # ebook
@@ -147,12 +148,13 @@ class EBook(Command):
             {user_name}  {comment_time}
         </div>
         <div style="color:#353535;font-size:15.25px;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6">
-            {comment_content}[👍{like_count}]
+            {comment_content} {like_count}
         </div>
         {replies}
     </div>
 </li>
-            """.format(user_name=c['user_name'], like_count=c['like_count'], comment_content=c['comment_content'],
+            """.format(user_name=c['user_name'], like_count="[{}赞]".format(c['like_count']) if c['like_count'] else '',
+                       comment_content=c['comment_content'],
                        comment_time=self._timestamp2str(c['comment_ctime']), replies=replies_html)
         return c_html
 

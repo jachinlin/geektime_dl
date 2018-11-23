@@ -16,20 +16,20 @@ def _render_file(template_name, context, output_name, output_dir):
         f.write(template.render(**context))
 
 
-def _render_toc_md(title, headers,  output_dir):
+def render_toc_md(title, headers, output_dir):
     with open(os.path.join(output_dir, 'toc.md'), "w") as f:
         f.writelines([title] + headers)
 
 
-def _render_article_html(title, content, output_dir):
+def render_article_html(title, content, output_dir):
     _render_file('article.html', {'title': title, 'content': content}, '{}.html'.format(title), output_dir)
 
 
-def _format_file_name(name):
+def format_file_name(name):
     return name.replace('/', '').replace(' ', '').replace('+', 'more').replace('"', '_')
 
 
-def _generate_cover_img(url, output_dir):
+def generate_cover_img(url, output_dir):
     try:
         r = requests.get(url)
         with open(os.path.join(output_dir, 'cover.jpg'), 'wb') as f:
@@ -39,7 +39,7 @@ def _generate_cover_img(url, output_dir):
         pass
 
 
-def _parse_image(content, output_dir):
+def parse_image(content, output_dir):
 
     p = r'img src="(.*?)"'
     img_url_list = re.findall(p, content, re.S)

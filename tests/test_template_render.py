@@ -10,7 +10,7 @@ def test__render_article_html_output_dir_and_title():
     content = '<p>hello world</p>'
     output_dir = '/tmp'
     os.system("mkdir -p %s" % output_dir)
-    maker._render_article_html(title, content, output_dir)
+    maker.render_article_html(title, content, output_dir)
     assert os.path.exists(os.path.join(output_dir, title+'.html'))
 
 
@@ -20,7 +20,7 @@ def test__render_article_html_content():
     content = '<p>hello world</p>'
     output_dir = '/tmp'
     os.system("mkdir -p %s" % output_dir)
-    maker._render_article_html(title, content, output_dir)
+    maker.render_article_html(title, content, output_dir)
     filename = os.path.join(output_dir, title+'.html')
 
     with open(filename, 'r') as f:
