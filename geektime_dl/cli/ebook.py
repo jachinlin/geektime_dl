@@ -71,10 +71,10 @@ class EBook(Command):
         course_id = args[0]
         for arg in args[1:]:
             if '--out-dir=' in arg:
-                out_dir = arg.split('--out-dir=')[1] or '.'
+                out_dir = arg.split('--out-dir=')[1] or './ebook'
                 break
         else:
-            out_dir = '.'
+            out_dir = './ebook'
 
         for arg in args[1:]:
             if '--enable-comments' in arg:
@@ -174,3 +174,16 @@ class EBook(Command):
         """
         f = '</ul>'
         return h + html + f
+
+
+class EbookBatch(EBook):
+    """批量制作电子书
+    懒， 不想写参数了
+    """
+    def run(self, args):
+        course_ids = args[0]
+        cid_list = course_ids.split(',')
+        for cid in cid_list:
+            super(EbookBatch, self).run([cid.strip()] + args[1:])
+
+

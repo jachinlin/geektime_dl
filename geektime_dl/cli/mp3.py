@@ -26,10 +26,10 @@ class Mp3(Command):
         url_only = '--url-only' in args[1:]
         for arg in args[1:]:
             if '--out-dir=' in arg:
-                out_dir = arg.split('--out-dir=')[1] or '.'
+                out_dir = arg.split('--out-dir=')[1] or './mp3'
                 break
         else:
-            out_dir = '.'
+            out_dir = './mp3'
         if not os.path.isdir(out_dir):
             os.makedirs(out_dir)
 
@@ -73,5 +73,13 @@ class Mp3(Command):
                 print('download mp3 done: ' + file_name)
 
 
-
+class Mp3Batch(Mp3):
+    """批量下载 mp3
+    懒， 不想写参数了
+    """
+    def run(self, args):
+        course_ids = args[0]
+        cid_list = course_ids.split(',')
+        for cid in cid_list:
+            super(Mp3Batch, self).run([cid.strip()] + args[1:])
 
