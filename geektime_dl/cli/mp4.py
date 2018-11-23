@@ -83,7 +83,7 @@ class Mp4Batch(Mp4):
     """
     def run(self, args):
 
-        if '--all' in args[1:]:
+        if '--all' in args:
             gk = GkApiClient()
             data = gk.get_course_list()
             cid_list = []

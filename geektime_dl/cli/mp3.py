@@ -78,7 +78,7 @@ class Mp3Batch(Mp3):
     懒， 不想写参数了
     """
     def run(self, args):
-        if '--all' in args[1:]:
+        if '--all' in args:
             gk = GkApiClient()
             data = gk.get_course_list()
             cid_list = []
