@@ -71,8 +71,12 @@ class Mp4(Command):
             if os.path.isfile(os.path.join(out_dir, file_name) + '.ts'):
                 print(file_name + ' exists')
                 continue
-            url = json.loads(post['video_media'])['hd']['url'] if hd_only else json.loads(post['video_media'])['sd']['url']
-            dl = Downloader(1)
+            if hd_only:  # some post has sd mp4 only
+                url = json.loads(post['video_media']).get('hd', {}).get('url') or json.loads(post['video_media']).get(
+                    'sd', {}).get('url')
+            else:
+                url = json.loads(post['video_media']).get('sd', {}).get('url')
+            dl = Downloader(3)
             dl.run(url, dir=out_dir, file_name=file_name)
             print('download mp4 done: ' + file_name)
 
