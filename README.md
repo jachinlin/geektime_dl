@@ -202,6 +202,7 @@ see [Dockerfile for 把极客时间专栏装进Kindle](https://hub.docker.com/r/
 
 - [X] MP3 and MP4
 - [X] comments
+- [X] batch download
 - [ ] support mathjax
 - [ ] support windows
 - [ ] ...

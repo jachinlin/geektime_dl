@@ -57,13 +57,13 @@ class Mp4(Command):
 
         if url_only:
             with open(os.path.join(out_dir, '%s.mp4.txt' % course_data['column_title']), 'w') as f:
-                # TODO alignment
-                f.write('\n'.join(
-                    ["{}:\t\t{}".format(
-                        post['article_title'],
-                        json.loads(post['video_media'])['hd']['url'] if hd_only else json.loads(post['video_media'])['sd']['url']
-                    ) for post in data])
-                )
+
+                if hd_only:  # some post has sd mp4 only
+                    url = json.loads(post['video_media']).get('hd', {}).get('url') or json.loads(post['video_media']).get('sd', {}).get('url')
+                else:
+                    url = json.loads(post['video_media']).get('sd', {}).get('url')
+                f.write('\n'.join(["{}:\t\t{}".format(post['article_title'], url) for post in data]))
+            print("download mp4 url done: " + course_data['column_title'])
             return
 
         for post in data:
