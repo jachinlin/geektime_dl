@@ -1,7 +1,7 @@
 # coding=utf8
 
-from ..gk_apis import *
-from ..store_client import StoreClient
+import os
+from geektime_dl.data_client import DataClient
 from ..utils.mp3_downloader import Downloader
 from . import Command
 from ..utils import format_path
@@ -33,13 +33,8 @@ class Mp3(Command):
         if not os.path.isdir(out_dir):
             os.makedirs(out_dir)
 
-        gk = GkApiClient()
-        store_client = StoreClient()
-
-        course_data = gk.get_course_intro(course_id)
-
-        store_client.save_column_info(**course_data)
-
+        dc = DataClient()
+        course_data = dc.get_course_intro(course_id)
         if int(course_data['column_type']) != 1:
             raise Exception('该课程不提供音频:%s' % course_data['column_title'])
 
@@ -47,13 +42,7 @@ class Mp3(Command):
         if not os.path.isdir(out_dir):
             os.makedirs(out_dir)
 
-        data = []
-        _data = gk.get_course_content(course_id)
-
-        for post in _data:
-            post_detail = gk.get_post_content(post['id'])
-            data.append(post_detail)
-            store_client.save_post_content(**post_detail)
+        data = dc.get_course_content(course_id)
 
         if url_only:
             with open(os.path.join(out_dir, '%s.mp3.txt' % course_data['column_title']), 'w') as f:
@@ -79,8 +68,8 @@ class Mp3Batch(Mp3):
     """
     def run(self, args):
         if '--all' in args:
-            gk = GkApiClient()
-            data = gk.get_course_list()
+            dc = DataClient()
+            data = dc.get_course_list()
             cid_list = []
             for c in data['1']['list']:
                 if c['had_sub']:

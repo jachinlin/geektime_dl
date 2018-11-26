@@ -1,5 +1,6 @@
 # coding=utf8
 
+import os
 import logging
 
 LOG_PATH = './geektime.log'
@@ -10,11 +11,12 @@ LOG_FORMAT = '\t'.join([
     '%(message)s',
     'location=%(pathname)s:%(lineno)d\n'])
 
+level = logging.DEBUG if os.getenv('DEBUG') == '1' else logging.INFO
 logger = logging.getLogger('geektime')
 file_handler = logging.FileHandler(filename=LOG_PATH)
 
-file_handler.setLevel(logging.INFO)
+file_handler.setLevel(level)
 file_handler.setFormatter(logging.Formatter(LOG_FORMAT))
-logger.setLevel(logging.INFO)
+logger.setLevel(level)
 logger.addHandler(file_handler)
 

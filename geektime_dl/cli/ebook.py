@@ -1,8 +1,9 @@
 # coding=utf8
 
+import os
+import json
 import datetime
-from ..gk_apis import *
-from ..store_client import StoreClient
+from geektime_dl.data_client import DataClient
 from . import Command
 from ..geektime_ebook import maker
 from kindle_maker import make_mobi
@@ -93,31 +94,19 @@ class EBook(Command):
         if not os.path.isdir(out_dir):
             os.makedirs(out_dir)
 
-        gk = GkApiClient()
-        store_client = StoreClient()
+        dc = DataClient()
 
-        course_data = gk.get_course_intro(course_id)
-
-        store_client.save_column_info(**course_data)
+        course_data = dc.get_course_intro(course_id)
 
         if int(course_data['column_type']) not in (1, 2):
             raise Exception('该课程不提供文本:%s' % course_data['column_title'])
 
         # data
-        data = []
-        _data = gk.get_course_content(course_id)
+        data = dc.get_course_content(course_id)
 
-        for post in _data:
-            post_detail = gk.get_post_content(post['id'])
-            data.append(post_detail)
-            store_client.save_post_content(**post_detail)
-
-            # comments
-            comments = gk.get_post_comments(post['id'])
-            if enable_comments:
-                post_detail['article_content'] += self._render_comment_html(comments, comment_count)
-            for c in comments:
-                store_client.save_post_comment(article_id=post['id'], **c)
+        if enable_comments:
+            for post in data:
+                post['article_content'] += self._render_comment_html(post['comments'], comment_count)
 
         # source file
         course_data['column_title'] = maker.format_file_name(course_data['column_title'])
@@ -129,11 +118,13 @@ class EBook(Command):
     def _timestamp2str(self, timestamp):
         if not timestamp:
             return ''
-        return datetime.datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
+
+        return datetime.datetime.fromtimestamp(int(timestamp)).strftime("%Y-%m-%d %H:%M:%S")
 
     def _render(self, c):
-        replies = c.get('replies') or [{}]
-        reply = replies[0]
+        replies = json.loads(c.get('replies'))
+
+        reply = replies[0] if replies else {}
         replies_html = """<br/>
 <div>
     <div style="color:#888;font-size:15.25px;font-weight:400;line-height:1.2">{}{}</div>
@@ -182,8 +173,8 @@ class EbookBatch(EBook):
     """
     def run(self, args):
         if '--all' in args:
-            gk = GkApiClient()
-            data = gk.get_course_list()
+            dc = DataClient()
+            data = dc.get_course_list()
             cid_list = []
             for c in data['1']['list'] + data['2']['list']:
                 if c['had_sub'] and c['update_frequency'] == '全集':

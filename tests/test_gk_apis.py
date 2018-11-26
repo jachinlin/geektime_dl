@@ -1,7 +1,7 @@
 # coding=utf8
 
 import os
-from geektime_dl.gk_apis import GkApiClient
+from geektime_dl.data_client.gk_apis import GkApiClient
 
 gk = GkApiClient()
 

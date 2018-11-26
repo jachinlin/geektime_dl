@@ -3,13 +3,15 @@ import sqlite3
 import datetime
 import os
 import traceback
-import json
-from .utils._logging import logger
+from geektime_dl.utils._logging import logger
+from geektime_dl.utils import Singleton
+from geektime_dl.utils import debug_log
 
 
 class DbClient(object):
     def __init__(self, **kwargs):
         self._db_client = sqlite3.connect(kwargs.get('db_url') or os.path.join('.', 'sqlite3.db'))
+        self._db_client.row_factory = sqlite3.Row
         self._init_tables()
 
     def _init_tables(self):
@@ -75,7 +77,9 @@ class DbClient(object):
         cur = self._db_client.cursor()
         try:
             cur.execute(*args, **kwargs)
-        except (sqlite3.IntegrityError, sqlite3.OperationalError) as e:
+        except sqlite3.OperationalError:
+            pass
+        except sqlite3.IntegrityError:
             logger.warn('exception=%s' % traceback.format_exc())
 
         self._db_client.commit()
@@ -87,14 +91,16 @@ class DbClient(object):
         cur = self._db_client.cursor()
         cur.execute(*args, **kwargs)
         result = cur.fetchall()
+        data = [dict(zip(row.keys(), row)) for row in result]
         cur.close()
-        return result
+        return data
 
 
-class StoreClient(object):
+class StoreClient(metaclass=Singleton):
     def __init__(self, **kwargs):
         self._db_conn = DbClient()
 
+    @debug_log
     def save_column_info(self, **kwargs):
         self._db_conn.execute(
             'INSERT INTO columns ('
@@ -109,6 +115,7 @@ class StoreClient(object):
             )
         )
 
+    @debug_log
     def save_post_content(self, **kwargs):
 
         self._db_conn.execute(
@@ -125,6 +132,7 @@ class StoreClient(object):
             )
         )
 
+    @debug_log
     def save_post_comment(self, **kwargs):
 
         self._db_conn.execute(
@@ -132,13 +140,38 @@ class StoreClient(object):
                 'comment_content, comment_ctime, replies, create_at) '
             'VALUES (?, ?, ?,?, ?,?, ?, ?)', (
                 kwargs['user_name'], kwargs['like_count'], kwargs['id'], kwargs['article_id'],
-                kwargs['comment_content'], kwargs['comment_ctime'], json.dumps(kwargs.get('replies', [])),
+                kwargs['comment_content'], kwargs['comment_ctime'], kwargs.get('replies', []),
                 datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             )
         )
 
+    @debug_log
     def get_course_content(self, course_id):
         data = self._db_conn.select(
-            'SELECT * FROM posts WHERE column_id=? ORDER BY article_id', (str(course_id),)
+            'SELECT * FROM posts WHERE column_id=? ORDER BY article_id', (int(course_id),)
         )
+        return data
+
+    @debug_log
+    def get_course_intro(self, course_id):
+        data = self._db_conn.select(
+            'SELECT * FROM columns WHERE column_id=? LIMIT 1', (int(course_id),)
+        )
+
+        return data[0] if data else {}
+
+    @debug_log
+    def get_post_content(self, post_id):
+        data = self._db_conn.select(
+            'SELECT * FROM posts WHERE article_id=? LIMIT 1', (int(post_id),)
+        )
+
+        return data[0] if data else {}
+
+    @debug_log
+    def get_post_comments(self, post_id):
+        data = self._db_conn.select(
+            'SELECT * FROM comments WHERE article_id=? ORDER BY like_count DESC', (int(post_id),)
+        )
+
         return data

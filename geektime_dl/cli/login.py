@@ -1,6 +1,6 @@
 # coding=utf8
 
-from ..gk_apis import *
+from geektime_dl.data_client.gk_apis import *
 from . import Command
 
 

@@ -1,7 +1,6 @@
 # coding=utf8
 
-from geektime_dl import store_client
-
+from geektime_dl.data_client import store_client
 
 dc = store_client.DbClient()
 

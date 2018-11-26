@@ -1,7 +1,6 @@
 # coding=utf8
 
-import sys
-from ..gk_apis import *
+from geektime_dl.data_client import DataClient
 from . import Command
 
 
@@ -13,11 +12,11 @@ class Query(Command):
     e.g.: geektime query
     """
     def run(self, args):
-        gk = GkApiClient()
-        if not gk.cookies:
+        dc = DataClient()
+        if not dc.cookies:
             print("尚未登录, 可以先 geektime login 以便查看更详细的信息")
 
-        data = gk.get_course_list()
+        data = dc.get_course_list()
 
         result_str = ''
         for i in ['1', '2', '3', '4']:

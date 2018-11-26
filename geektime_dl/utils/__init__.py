@@ -1,5 +1,6 @@
 # coding=utf8
 from functools import wraps
+from ._logging import logger
 
 
 class Singleton(type):
@@ -27,5 +28,15 @@ def synchronized(lock_attr='_lock'):
 
 def format_path(path):
     return path.replace(' ', '').replace('/', '').replace('\\', '').replace(':', '')
+
+
+def debug_log(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        logger.debug("function={}\targs={}\tkwargs={}".format(func.__name__, args, kwargs))
+        return result
+
+    return wrapper
 
 

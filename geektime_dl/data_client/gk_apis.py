@@ -4,7 +4,7 @@ import requests
 import os
 import json
 import threading
-from .utils import Singleton, synchronized
+from geektime_dl.utils import Singleton, synchronized, debug_log
 
 
 class GkApiClient(metaclass=Singleton):
@@ -55,6 +55,7 @@ class GkApiClient(metaclass=Singleton):
         with open(self._cookie_file, 'w') as f:
             f.write(json.dumps(self.cookies))
 
+    @debug_log
     def get_course_list(self):
         """获取课程列表"""
         url = 'https://time.geekbang.org/serv/v1/column/all'
@@ -69,6 +70,7 @@ class GkApiClient(metaclass=Singleton):
             raise Exception('course query fail:' + resp.json()['error']['msg'])
         return resp.json()['data']
 
+    @debug_log
     def get_course_content(self, course_id):
         """获取课程所有章节列表"""
         url = 'https://time.geekbang.org/serv/v1/column/articles'
@@ -80,9 +82,11 @@ class GkApiClient(metaclass=Singleton):
         resp = requests.post(url, json=data, headers=headers, cookies=self.cookies, timeout=10)
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
             raise Exception('course query fail:' + resp.json()['error']['msg'])
-
+        if not data:
+            raise Exception('course not exists:%s' % course_id)
         return resp.json()['data']['list'][::-1]
 
+    @debug_log
     def get_course_intro(self, course_id):
         """课程简介"""
         url = 'https://time.geekbang.org/serv/v1/column/intro'
@@ -100,6 +104,7 @@ class GkApiClient(metaclass=Singleton):
             raise Exception('course not exists:%s' % course_id)
         return data
 
+    @debug_log
     def get_post_content(self, post_id):
         """课程章节详情"""
         url = 'https://time.geekbang.org/serv/v1/article'
@@ -115,6 +120,7 @@ class GkApiClient(metaclass=Singleton):
 
         return resp.json()['data']
 
+    @debug_log
     def get_post_comments(self, post_id):
         """课程章节评论"""
         url = 'https://time.geekbang.org/serv/v1/comments'

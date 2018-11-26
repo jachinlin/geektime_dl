@@ -1,7 +1,8 @@
 # coding=utf8
 
-from ..gk_apis import *
-from ..store_client import StoreClient
+import os
+import json
+from geektime_dl.data_client import DataClient
 from . import Command
 from ..utils.m3u8_downloader import Downloader
 from ..utils import format_path
@@ -35,12 +36,9 @@ class Mp4(Command):
         if not os.path.isdir(out_dir):
             os.makedirs(out_dir)
 
-        gk = GkApiClient()
-        store_client = StoreClient()
+        dc = DataClient()
 
-        course_data = gk.get_course_intro(course_id)
-
-        store_client.save_column_info(**course_data)
+        course_data = dc.get_course_intro(course_id)
 
         if int(course_data['column_type']) != 3:
             raise Exception('该课程不是视频课程:%s' % course_data['column_title'])
@@ -49,20 +47,16 @@ class Mp4(Command):
         if not os.path.isdir(out_dir):
             os.makedirs(out_dir)
 
-        data = gk.get_course_content(course_id)
-
-        for post in data:
-            post_detail = gk.get_post_content(post['id'])
-            store_client.save_post_content(**post_detail)
+        data = dc.get_course_content(course_id)
 
         if url_only:
             with open(os.path.join(out_dir, '%s.mp4.txt' % course_data['column_title']), 'w') as f:
 
-                if hd_only:  # some post has sd mp4 only
-                    url = json.loads(post['video_media']).get('hd', {}).get('url') or json.loads(post['video_media']).get('sd', {}).get('url')
-                else:
-                    url = json.loads(post['video_media']).get('sd', {}).get('url')
-                f.write('\n'.join(["{}:\t\t{}".format(post['article_title'], url) for post in data]))
+                f.write('\n'.join(["{}:\n{}\n{}\n\n".format(
+                    post['article_title'],
+                    json.loads(post['video_media']).get('hd', {}).get('url'),
+                    json.loads(post['video_media']).get('sd', {}).get('url')
+                ) for post in data]))
             print("download mp4 url done: " + course_data['column_title'])
             return
 
@@ -88,8 +82,8 @@ class Mp4Batch(Mp4):
     def run(self, args):
 
         if '--all' in args:
-            gk = GkApiClient()
-            data = gk.get_course_list()
+            dc = DataClient()
+            data = dc.get_course_list()
             cid_list = []
             for c in data['3']['list']:
                 if c['had_sub']:
