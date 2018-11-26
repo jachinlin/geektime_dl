@@ -26,7 +26,7 @@ class EBook(Command):
     """
 
     @staticmethod
-    def render_column_source_files(course_intro, course_content, out_dir):
+    def render_column_source_files(course_intro, course_content, out_dir, force=False):
 
         # TODO refactor here
         # cover and introduction
@@ -39,8 +39,11 @@ class EBook(Command):
             os.makedirs(output_dir)
             print('mkdir ' + output_dir)
 
-        maker.render_article_html('简介', maker.parse_image(course_intro['column_intro'], output_dir), output_dir)
-        print('下载' + column_title + '简介' + ' done')
+        if not force and os.path.isfile(os.path.join(output_dir, '{}.html'.format('简介'))):
+            print('简介' + ' exists')
+        else:
+            maker.render_article_html('简介', maker.parse_image(course_intro['column_intro'], output_dir), output_dir)
+            print('下载' + column_title + '简介' + ' done')
         maker.generate_cover_img(course_intro['column_cover'], output_dir)
         print('下载' + column_title + '封面' + ' done')
 
@@ -64,6 +67,9 @@ class EBook(Command):
         for article in articles:
 
             title = maker.format_file_name(article['article_title'])
+            if not force and os.path.isfile(os.path.join(output_dir, '{}.html'.format(title))):
+                print(title + ' exists')
+                continue
             maker.render_article_html(title, maker.parse_image(article['article_content'], output_dir), output_dir)
             print('下载' + column_title + '：' + article['article_title'] + ' done')
 
@@ -76,6 +82,13 @@ class EBook(Command):
                 break
         else:
             out_dir = './ebook'
+
+        for arg in args[1:]:
+            if '--force' in arg:
+                force = True
+                break
+        else:
+            force = False
 
         for arg in args[1:]:
             if '--enable-comments' in arg:
@@ -102,7 +115,7 @@ class EBook(Command):
             raise Exception('该课程不提供文本:%s' % course_data['column_title'])
 
         # data
-        data = dc.get_course_content(course_id)
+        data = dc.get_course_content(course_id, force=force)
 
         if enable_comments:
             for post in data:
@@ -110,7 +123,7 @@ class EBook(Command):
 
         # source file
         course_data['column_title'] = maker.format_file_name(course_data['column_title'])
-        self.render_column_source_files(course_data, data, out_dir)
+        self.render_column_source_files(course_data, data, out_dir, force=force)
 
         # ebook
         make_mobi(source_dir=os.path.join(out_dir, course_data['column_title']), output_dir=out_dir)
