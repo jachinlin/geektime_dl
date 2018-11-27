@@ -26,7 +26,16 @@ class EBook(Command):
     """
 
     @staticmethod
-    def render_column_source_files(course_intro, course_content, out_dir, force=False):
+    def _title(c):
+        if not c['had_sub']:
+            t = c['column_title'] + '[免费试读]'
+        elif c['update_frequency'] == '全集':
+            t = c['column_title'] + '[更新完毕]'
+        else:
+            t = c['column_title'] + '[未完待续]'
+        return t
+
+    def render_column_source_files(self, course_intro, course_content, out_dir, force=False):
 
         # TODO refactor here
         # cover and introduction
@@ -47,16 +56,7 @@ class EBook(Command):
         maker.generate_cover_img(course_intro['column_cover'], output_dir)
         print('下载' + column_title + '封面' + ' done')
 
-        def _title(c):
-            if not c['had_sub']:
-                t = c['column_title'] + '[免费试读]'
-            elif c['update_frequency'] == '全集':
-                t = c['column_title'] + '[更新完毕]'
-            else:
-                t = c['column_title'] + '[未完待续]'
-            return t
-
-        ebook_name = _title(course_intro)
+        ebook_name = self._title(course_intro)
         maker.render_toc_md(
             ebook_name + '\n',
             ['# 简介\n'] + ['# ' + maker.format_file_name(t['article_title']) + '\n' for t in articles],
@@ -117,7 +117,10 @@ class EBook(Command):
 
         # ebook
         if not source_only:
-            make_mobi(source_dir=os.path.join(out_dir, course_data['column_title']), output_dir=out_dir)
+            if course_data['update_frequency'] == '全集' and os.path.isfile(os.path.join(out_dir, self._title(course_data)) + '.mobi'):
+                print("{} exists ".format(self._title(course_data)))
+            else:
+                make_mobi(source_dir=os.path.join(out_dir, course_data['column_title']), output_dir=out_dir)
 
     def _timestamp2str(self, timestamp):
         if not timestamp:
@@ -185,8 +188,10 @@ class EbookBatch(EBook):
                     continue
                 if c['update_frequency'] == '全集':
                     super(EbookBatch, self).run([str(c['id'])] + args)
+                    print('\n')
                 else:
                     super(EbookBatch, self).run([str(c['id']), '--source-only'] + args)
+                    print('\n')
 
         else:
             course_ids = args[0]
@@ -194,6 +199,7 @@ class EbookBatch(EBook):
 
             for cid in cid_list:
                 super(EbookBatch, self).run([cid.strip()] + args)
+                print('\n')
 
 
 

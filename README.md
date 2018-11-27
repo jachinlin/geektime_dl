@@ -220,6 +220,7 @@ docker run -v `pwd`:/output -it --rm geektime mp3batch --all
 - [X] MP3 and MP4
 - [X] comments
 - [X] batch download
+- [X] docker
 - [ ] support mathjax
 - [ ] support windows
 - [ ] ...
