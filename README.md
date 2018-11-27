@@ -84,6 +84,8 @@ brew install homebrew/cask/kindlegen
 ```
 coming soon ~~
 or pr is welcome
+
+or use docker, see below
 ```
 
 
@@ -190,7 +192,22 @@ notice: 此 subcmd 需要先执行 login subcmd
 
 ## 四、Docker
 
-see [Dockerfile for 把极客时间专栏装进Kindle](https://hub.docker.com/r/jostyee/docker_geektime_ebook_maker/)
+如果你对 Python 不是很了解，对上面的安装过程还是很迷惑的话，
+我们还提供了 docker 版本，只要安装好 docker ，依次复制下边指令并执行，
+就能下载全部以购买专栏文章、mp3、mp4，如果专栏更新完毕的话，我们还会把该专栏做成kindle电子书。
+
+```
+# 构建
+docker build https://github.com/jachinlin/geektime_dl.git -t geektime
+
+# 登录
+docker run -v `pwd`:/output -it --rm geektime login
+
+# 下载
+docker run -v `pwd`:/output -it --rm geektime ebookbatch --all --enable-comments
+docker run -v `pwd`:/output -it --rm geektime mp4batch --all
+docker run -v `pwd`:/output -it --rm geektime mp3batch --all
+```
 
 
 ## 五、效果

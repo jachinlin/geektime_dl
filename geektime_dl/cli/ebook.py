@@ -181,7 +181,9 @@ class EbookBatch(EBook):
             data = dc.get_course_list()
 
             for c in data['1']['list'] + data['2']['list']:
-                if c['had_sub'] and c['update_frequency'] == '全集':
+                if not c['had_sub']:
+                    continue
+                if c['update_frequency'] == '全集':
                     super(EbookBatch, self).run([str(c['id'])] + args)
                 else:
                     super(EbookBatch, self).run([str(c['id']), '--source-only'] + args)
