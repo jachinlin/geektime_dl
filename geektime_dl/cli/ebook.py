@@ -83,19 +83,9 @@ class EBook(Command):
         else:
             out_dir = './ebook'
 
-        for arg in args[1:]:
-            if '--force' in arg:
-                force = True
-                break
-        else:
-            force = False
-
-        for arg in args[1:]:
-            if '--enable-comments' in arg:
-                enable_comments = True
-                break
-        else:
-            enable_comments = False
+        force = '--force' in args[1:]
+        enable_comments = '--enable-comments' in args[1:]
+        source_only = '--source-only' in args[1:]
 
         for arg in args[1:]:
             if '--comment-count=' in arg:
@@ -126,7 +116,8 @@ class EBook(Command):
         self.render_column_source_files(course_data, data, out_dir, force=force)
 
         # ebook
-        make_mobi(source_dir=os.path.join(out_dir, course_data['column_title']), output_dir=out_dir)
+        if not source_only:
+            make_mobi(source_dir=os.path.join(out_dir, course_data['column_title']), output_dir=out_dir)
 
     def _timestamp2str(self, timestamp):
         if not timestamp:
@@ -188,17 +179,19 @@ class EbookBatch(EBook):
         if '--all' in args:
             dc = DataClient()
             data = dc.get_course_list()
-            cid_list = []
+
             for c in data['1']['list'] + data['2']['list']:
                 if c['had_sub'] and c['update_frequency'] == '全集':
-                    cid_list.append(str(c['id']))
+                    super(EbookBatch, self).run([str(c['id'])] + args)
+                else:
+                    super(EbookBatch, self).run([str(c['id']), '--source-only'] + args)
 
         else:
             course_ids = args[0]
             cid_list = course_ids.split(',')
 
-        for cid in cid_list:
-            super(EbookBatch, self).run([cid.strip()] + args)
+            for cid in cid_list:
+                super(EbookBatch, self).run([cid.strip()] + args)
 
 
 
