@@ -2,6 +2,8 @@
 
 import os
 import json
+import time
+from multiprocessing import Pool
 from geektime_dl.data_client import DataClient
 from . import Command
 from ..utils.m3u8_downloader import Downloader
@@ -33,6 +35,14 @@ class Mp4(Command):
                 break
         else:
             out_dir = './mp4'
+
+        for arg in args[1:]:
+            if '--workers=' in arg:
+                workers = int(arg.split('--workers=')[1]) or 1
+                break
+        else:
+            workers = 1
+
         if not os.path.isdir(out_dir):
             os.makedirs(out_dir)
 
@@ -60,6 +70,10 @@ class Mp4(Command):
             print("download mp4 url done: " + course_data['column_title'])
             return
 
+        dl = Downloader()
+        p = Pool(workers)
+        start = time.time()
+        print(start)
         for post in data:
             file_name = format_path(post['article_title'] + ('.hd' if hd_only else '.sd'))
             if os.path.isfile(os.path.join(out_dir, file_name) + '.ts'):
@@ -70,9 +84,12 @@ class Mp4(Command):
                     'sd', {}).get('url')
             else:
                 url = json.loads(post['video_media']).get('sd', {}).get('url')
-            dl = Downloader(3)
-            dl.run(url, dir=out_dir, file_name=file_name)
-            print('download mp4 done: ' + file_name)
+
+            p.apply_async(dl.run, (url, out_dir, file_name))
+
+        p.close()
+        p.join()
+        print('download {} done, cost {}s\n'.format(course_data['column_title'], int(time.time() - start)))
 
 
 class Mp4Batch(Mp4):
