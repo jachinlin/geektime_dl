@@ -1,4 +1,4 @@
-FROM python:3.5-alpine
+FROM python:3.7-alpine
 
 RUN apk add --no-cache --virtual=.build-dependencies git gcc musl-dev && \
     pip install -U --no-cache-dir git+https://github.com/jachinlin/geektime_dl.git && \
