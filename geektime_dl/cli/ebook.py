@@ -135,8 +135,8 @@ class EBook(Command):
 
             with open('smtp.conf') as f:
                 smtp_conf = json.loads(f.read())
-            m = MailServer(**smtp_conf)
-            message = m.build_email(email_to='janxyline@kindle.cn', subject='convert', body='', attachments=[("{}.mobi".format(self._title(course_data)), d)])
+            m = MailServer(host=smtp_conf['host'], port=smtp_conf['port'], user=smtp_conf['user'], password=smtp_conf['password'], encryption=smtp_conf['encryption'])
+            message = m.build_email(email_to=smtp_conf['email_to'], subject='convert', body='', attachments=[("{}.mobi".format(self._title(course_data)), d)])
             m.send_email(message)
             print("push to kindle done")
 
