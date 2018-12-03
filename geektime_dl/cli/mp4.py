@@ -73,7 +73,6 @@ class Mp4(Command):
         dl = Downloader()
         p = Pool(workers)
         start = time.time()
-        print(start)
         for post in data:
             file_name = format_path(post['article_title'] + ('.hd' if hd_only else '.sd'))
             if os.path.isfile(os.path.join(out_dir, file_name) + '.ts'):
