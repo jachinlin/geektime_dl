@@ -221,6 +221,7 @@ docker run -v `pwd`:/output -it --rm geektime mp3batch --all
 - [X] comments
 - [X] batch download
 - [X] docker
+- [X] push to kindle
 - [ ] support mathjax
 - [ ] support windows
 - [ ] ...

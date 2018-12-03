@@ -7,6 +7,7 @@ from geektime_dl.data_client import DataClient
 from . import Command
 from ..geektime_ebook import maker
 from kindle_maker import make_mobi
+from geektime_dl.utils.mail import MailServer
 
 
 class EBook(Command):
@@ -86,6 +87,7 @@ class EBook(Command):
         force = '--force' in args[1:]
         enable_comments = '--enable-comments' in args[1:]
         source_only = '--source-only' in args[1:]
+        push = '--push' in args[1:]
 
         for arg in args[1:]:
             if '--comment-count=' in arg:
@@ -121,6 +123,22 @@ class EBook(Command):
                 print("{} exists ".format(self._title(course_data)))
             else:
                 make_mobi(source_dir=os.path.join(out_dir, course_data['column_title']), output_dir=out_dir)
+        if push:
+
+            fn = os.path.join(out_dir, "{}.mobi".format(self._title(course_data)))
+            if os.path.getsize(fn) / 1024.0 / 1024 > 50:
+                print("电子书大小超过50M")
+                return
+            f = open(fn, 'rb')
+            d = f.read()
+            f.close()
+
+            with open('smtp.conf') as f:
+                smtp_conf = json.loads(f.read())
+            m = MailServer(**smtp_conf)
+            message = m.build_email(email_to='janxyline@kindle.cn', subject='convert', body='', attachments=[("{}.mobi".format(self._title(course_data)), d)])
+            m.send_email(message)
+            print("push to kindle done")
 
     def _timestamp2str(self, timestamp):
         if not timestamp:
