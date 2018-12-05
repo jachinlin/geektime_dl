@@ -26,7 +26,7 @@
 
 - kindle_maker: 一个mobi电子书制作工具。用户只需要提供制作电子书的html文件，和一个包含目录信息的toc.md文件，kindle_maker即可制作出一本精美的kindle电子书。这部分已拎出来放在单独的项目里，具体使用方式见该项目文档[kindle_maker](https://github.com/jachinlin/kindle_maker)
 
-- geektime_ebook: 主要将抓取到的数据转化为 kindle_maker 需要的源文件
+- geektime_ebook: 主要将抓取到的数据转化为 kindle_maker 需要的源文件，主要是 html 文件
 
 - utils: 提供了mp3和mp4下载器等工具
 
@@ -82,10 +82,9 @@ brew install homebrew/cask/kindlegen
 3. Windows:
 
 ```
-coming soon ~~
-or pr is welcome
+not test now!
 
-or use docker, see below
+use docker, see below
 ```
 
 
@@ -189,6 +188,28 @@ geektime mp4 <course_id> [--url-only] [--hd-only] [--out-dir=xxx]
 
 notice: 此 subcmd 需要先执行 login subcmd
 
+#### 推送到kindle
+
+如果你想把制作完成的电子书推送到kindle的话，需要在工作目录(当前目录)下添加 `smtp.conf` smtp配置文件，文件格式如下（以qq邮箱为例），
+
+```
+{
+    "host": "smtp.qq.com",
+    "port": "465",
+    "user": "1234@qq.com",
+    "password": "psd",
+    "encryption": "ssl",
+    "email_to": "xxx@kindle.cn"
+}
+```
+
+然后在[制作电子书](https://github.com/jachinlin/geektime_dl#%E5%88%B6%E4%BD%9C%E7%94%B5%E5%AD%90%E4%B9%A6) ebook subcmd后添加 `--push` 参数即可，例如，
+
+```
+geektime ebook 42 --push
+```
+
+至于邮箱smtp配置和kindle邮箱配置就自行google吧。
 
 ## 四、Docker
 
@@ -223,7 +244,6 @@ docker run -v `pwd`:/output -it --rm geektime mp3batch --all
 - [X] docker
 - [X] push to kindle
 - [ ] support mathjax
-- [ ] support windows
 - [ ] ...
 
 
