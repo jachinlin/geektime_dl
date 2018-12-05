@@ -62,7 +62,7 @@ cd ~ && virtualenv -p python3 venv3 && source venv3/bin/activate
 #### 代码
 
 ```
-pip install -U git+https://github.com/jachinlin/geektime_dl.git
+pip install -U geektime_dl
 ```
 
 #### 安装kindlegen
@@ -157,7 +157,7 @@ geektime ebook <course_id> [--out-dir=<out_dir>] [--enable-comments] [--comment-
 ```
 
 - course_id: 课程ID，可以从 query subcmd 查看
-- --out_dir: 电子书存放目录，默认当前目录
+- --out_dir: 电子书存放目录，默认`./ebook/`
 - --enable-comments: 启动评论下载，默认不下载评论
 - --comment-count: 在启动评论下载时，设置评论条数，默认10条
 
@@ -170,7 +170,7 @@ geektime mp3 <course_id> [--url-only] [--out-dir=<out_dir>]
 ```
 - course_id: 课程ID，可以从 query subcmd 查看
 - --url-only: 只保存音频url，不下载音频
-- --out_dir: 音频存放目录，默认当前目录
+- --out_dir: 音频存放目录，默认`./mp3/`
 
 
 notice: 此 subcmd 需要先执行 login subcmd
@@ -184,7 +184,7 @@ geektime mp4 <course_id> [--url-only] [--hd-only] [--out-dir=xxx]
 - course_id: 课程ID，可以从 query subcmd 查看
 - --url-only: 只保存视频url
 - --hd-only：下载高清视频，默认下载标清视频
-- --out_dir: 视频存放目录，默认当前目录
+- --out_dir: 视频存放目录，默认`./mp4/`
 
 notice: 此 subcmd 需要先执行 login subcmd
 

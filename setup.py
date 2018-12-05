@@ -10,7 +10,7 @@ setup(
     version=version,
     author='jachinlin',
     author_email='linjx1000@gmail.com',
-    url='https://github.com/jachinlin/geektime_ebook_maker',
+    url='https://github.com/jachinlin/geektime_dl',
     description='把极客时间装进Kindle',
     license='MIT',
     keywords='kindle ebook mobi geektime',
