@@ -41,8 +41,14 @@ def generate_cover_img(url, output_dir):
 
 def parse_image(content, output_dir):
 
-    p = r'img src="(.*?)"'
-    img_url_list = re.findall(p, content, re.S)
+    # remove the xxx `style=xxx`
+    p = r'img (.{1,15}=".*?") src=".*?"'
+    fucking_styles = re.findall(p, content)
+    for style in fucking_styles:
+        content = content.replace(style, '')
+
+    p = r'img\s+src="(.*?)"'
+    img_url_list = re.findall(p, content)
     for url in img_url_list:
         try:
             url_local = str(uuid.uuid4()) + '.jpg'
