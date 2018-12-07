@@ -153,7 +153,7 @@ class EBook(Command):
         replies_html = """<br/>
 <div>
     <div style="color:#888;font-size:15.25px;font-weight:400;line-height:1.2">{}{}</div>
-    <div style="color:#353535;font-size:15.25px;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6">{}</div>
+    <div style="color:#353535;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6">{}</div>
 </div>
             """.format(reply.get('user_name'), self._timestamp2str(reply.get('ctime')), reply.get('content')) if reply else ''
 
@@ -163,7 +163,7 @@ class EBook(Command):
         <div style="color: #888;font-size:15.25px;font-weight:400;line-height:1.2">
             {user_name}  {comment_time}
         </div>
-        <div style="color:#353535;font-size:15.25px;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6">
+        <div style="color:#353535;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6">
             {comment_content} {like_count}
         </div>
         {replies}

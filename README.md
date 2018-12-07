@@ -215,7 +215,7 @@ geektime ebook 42 --push
 
 如果你对 Python 不是很了解，对上面的安装过程还是很迷惑的话，
 我们还提供了 docker 版本，只要安装好 docker ，依次复制下边指令并执行，
-就能下载全部以购买专栏文章、mp3、mp4，如果专栏更新完毕的话，我们还会把该专栏做成kindle电子书。
+就能下载全部已购买专栏文章、mp3、mp4，如果专栏更新完毕的话，我们还会把该专栏做成kindle电子书。
 
 ```
 # 构建
@@ -226,15 +226,18 @@ docker run -v `pwd`:/output -it --rm geektime login
 
 # 下载
 docker run -v `pwd`:/output -it --rm geektime ebookbatch --all --enable-comments
-docker run -v `pwd`:/output -it --rm geektime mp4batch --all
-docker run -v `pwd`:/output -it --rm geektime mp3batch --all
+docker run -v `pwd`:/output --rm geektime mp4batch --all
+docker run -v `pwd`:/output --rm geektime mp3batch --all
 ```
 
 
 ## 五、效果
 
+我把免费试读的课程章节的电子书、音频、视频都下载下来，并上传到网盘，你可以把资源下载下来查看效果
 
-
+- [百度网盘mp4](https://pan.baidu.com/s/13Vu8N94wK4gWP86bJI9wAA ) 密码:j9yx
+- [百度网盘mp3](https://pan.baidu.com/s/1_l5iBZxcBZi0pGszM1oE9A)  密码:byng
+- [百度网盘ebook](https://pan.baidu.com/s/19lNyWE2FxXBHPwsAlTg4EQ) 密码:phng
 
 ## 六、Todo list
 
