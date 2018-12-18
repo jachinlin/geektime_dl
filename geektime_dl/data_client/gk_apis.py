@@ -13,6 +13,11 @@ class GkApiClient(metaclass=Singleton):
     课程下的章节，包括文章、者视频等，称作 `post`
     """
 
+    _headers_tmpl = {
+        'Content-Type': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:59.0) Gecko/20100101 Firefox/59.0'
+    }
+
     def __init__(self):
         self.cookies = None
         self._cookie_file = os.path.join('.', 'cookie.json')
@@ -33,7 +38,7 @@ class GkApiClient(metaclass=Singleton):
             'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
             'Host': 'account.geekbang.org',
             'Referer': 'https://account.geekbang.org/signin?redirect=https%3A%2F%2Fwww.geekbang.org%2F',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:59.0) Gecko/20100101 Firefox/59.0'
+            **self._headers_tmpl
         }
 
         data = {
@@ -61,7 +66,7 @@ class GkApiClient(metaclass=Singleton):
         url = 'https://time.geekbang.org/serv/v1/column/all'
         headers = {
             'Referer': 'https://time.geekbang.org/paid-content',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:59.0) Gecko/20100101 Firefox/59.0'
+            **self._headers_tmpl
         }
 
         resp = requests.get(url, headers=headers, cookies=self.cookies)
@@ -76,10 +81,12 @@ class GkApiClient(metaclass=Singleton):
         url = 'https://time.geekbang.org/serv/v1/column/articles'
         data = {"cid": str(course_id), "size": 1000, "prev": 0, "order": "newest"}
         headers = {
-            'Referer': 'https://time.geekbang.org/column/{}'.format(str(course_id))
+            'Referer': 'https://time.geekbang.org/column/{}'.format(str(course_id)),
+            **self._headers_tmpl
         }
 
         resp = requests.post(url, json=data, headers=headers, cookies=self.cookies, timeout=10)
+
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
             raise Exception('course query fail:' + resp.json()['error']['msg'])
         if not data:
@@ -91,8 +98,8 @@ class GkApiClient(metaclass=Singleton):
         """课程简介"""
         url = 'https://time.geekbang.org/serv/v1/column/intro'
         headers = {
-            'Content-Type': 'application/json',
-            'Referer': 'https://time.geekbang.org/column/{}'.format(course_id)
+            'Referer': 'https://time.geekbang.org/column/{}'.format(course_id),
+            **self._headers_tmpl
         }
 
         resp = requests.post(url, headers=headers, cookies=self.cookies, json={'cid': str(course_id)}, timeout=10)
@@ -109,8 +116,8 @@ class GkApiClient(metaclass=Singleton):
         """课程章节详情"""
         url = 'https://time.geekbang.org/serv/v1/article'
         headers = {
-            'Content-Type': 'application/json',
-            'Referer': 'https://time.geekbang.org/column/article/{}'.format(str(post_id))
+            'Referer': 'https://time.geekbang.org/column/article/{}'.format(str(post_id)),
+            **self._headers_tmpl
         }
 
         resp = requests.post(url, headers=headers, cookies=self.cookies, json={'id': str(post_id)}, timeout=10)
@@ -125,8 +132,8 @@ class GkApiClient(metaclass=Singleton):
         """课程章节评论"""
         url = 'https://time.geekbang.org/serv/v1/comments'
         headers = {
-            'Content-Type': 'application/json',
-            'Referer': 'https://time.geekbang.org/column/article/{}'.format(str(post_id))
+            'Referer': 'https://time.geekbang.org/column/article/{}'.format(str(post_id)),
+            **self._headers_tmpl
         }
 
         resp = requests.post(url, headers=headers, cookies=self.cookies, json={"aid": str(post_id), "prev": 0}, timeout=10)
