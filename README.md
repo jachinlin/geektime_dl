@@ -2,7 +2,7 @@
 
 [![travis](https://travis-ci.org/jachinlin/geektime_dl.svg?branch=master)](https://travis-ci.org/jachinlin/geektime_dl)
 [![codecov](https://codecov.io/gh/jachinlin/geektime_dl/branch/master/graph/badge.svg)](https://codecov.io/gh/jachinlin/geektime_dl)
-[![Python 3](![](https://img.shields.io/pypi/pyversions/geektime-dl.svg))](https://www.python.org/downloads/release/python-356/)
+[![Python versions](https://img.shields.io/pypi/pyversions/geektime-dl.svg)](https://pypi.org/project/geektime-dl/)
 [![PyPI - Downloads](https://img.shields.io/pypi/dd/geektime-dl.svg)](https://pypi.org/project/geektime-dl/)
 [![PyPI](https://img.shields.io/pypi/v/geektime-dl.svg)](https://pypi.org/project/geektime-dl/)
 

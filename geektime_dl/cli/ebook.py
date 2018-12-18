@@ -33,7 +33,7 @@ class EBook(Command):
         elif c['update_frequency'] == '全集':
             t = c['column_title'] + '[更新完毕]'
         else:
-            t = c['column_title'] + '[未完待续]'
+            t = c['column_title'] + '[未完待续{}]'.format(datetime.date.today())
         return t
 
     def render_column_source_files(self, course_intro, course_content, out_dir, force=False):
