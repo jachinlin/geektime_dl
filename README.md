@@ -168,6 +168,8 @@ geektime ebook <course_id> [--out-dir=<out_dir>] [--enable-comments] [--comment-
 
 notice: 此 subcmd 需要先执行 login subcmd
 
+*批量下载所有已订阅专栏的方法`geektime query | grep '是' | cut -d ' ' -f 1 | xargs -I {} geektime ebook {}`*
+
 #### 下载mp3
 
 ```
