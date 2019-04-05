@@ -100,8 +100,7 @@ class EBook(Command):
             os.makedirs(out_dir)
 
         dc = DataClient()
-
-        course_data = dc.get_course_intro(course_id)
+        course_data = dc.get_course_intro(course_id, force=True)
 
         if int(course_data['column_type']) not in (1, 2):
             raise Exception('该课程不提供文本:%s' % course_data['column_title'])

@@ -155,7 +155,7 @@ class StoreClient(metaclass=Singleton):
     @debug_log
     def get_course_intro(self, course_id):
         data = self._db_conn.select(
-            'SELECT * FROM columns WHERE column_id=? LIMIT 1', (int(course_id),)
+            'SELECT * FROM columns WHERE column_id=? ORDER BY create_at DESC LIMIT 1', (int(course_id),)
         )
 
         return data[0] if data else {}
