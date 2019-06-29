@@ -33,7 +33,7 @@ brew install homebrew/cask/kindlegen
 
 ```
 virtualenv -p python3 ./venv3
-
+cp config.ini.tmpl config.ini 
 
 ```
 #### 下载
