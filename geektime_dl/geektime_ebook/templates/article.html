@@ -3,11 +3,155 @@
 <head>
     <title>{{title}}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=320,maximum-scale=1.3,user-scalable=no">
+    <style>
+	/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        font-size: 100%;
+        font: inherit;
+        vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+        display: block;
+}
+body {
+        line-height: 1;
+}
+ol, ul {
+        list-style: none;
+}
+blockquote, q {
+        quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+        content: '';
+        content: none;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+body {
+    word-spacing: 0.2rem;
+    letter-spacing: 0.01rem;
+    margin-top: 20px;
+    font-size:20px;
+    background-color: #f5f5d5;
+    padding-bottom: .96rem;
+    line-height: 130%; 
+    font-family: Arial, "宋体";
+}
+
+@media screen and (min-width: 500px){
+    body{
+        font-family: Arial, "宋体";
+        width:950px;
+        margin-left:auto;
+        margin-right:auto;
+    }
+}
+
+pre {
+    background: #f5f2f0;
+    border: 1px dashed #ccc;
+    font-family: monospace, Consolas, Monaco, 'Andale Mono';
+    tab-size: 4;
+    line-height: 1rem;
+    font-size: .6rem;
+    max-width: 100%;
+    max-height: 100%;
+    word-wrap:break-word;
+    white-space: pre-wrap;
+    margin: 10px 10px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+h2 {
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 1.2rem; 
+    font-weight: bold;
+}
+
+p { 
+    word-wrap: break-word;
+    word-break: break-all;
+    overflow: hidden;
+    font-size: .875rem; 
+    margin: 0px 0px 15px 0px;
+}
+
+li { font-size: .875rem; } /* =14px? */
+li li, li p /* etc */ { font-size: .875rem; } 
+
+a {
+  word-wrap:break-word;
+  word-break: break-all;
+}
+
+img,video {
+    max-width: 100%;
+    max-height: 100%;
+    objec-fit: none;
+    margin: 5px 1px 5px 1px;
+}
+
+strong {
+    font-size: 100%;
+    font-weight: 900;
+    color: red;
+    vertical-align: baseline;
+}
+
+</style>
 </head>
 <body>
+
+<div style="margin:10px">
 <h1>{{title}}</h1>
 
+{% if column_type == 1 %}
+<div style="text-align: center; margin: 10px 0px 2px 0px;">
+    <audio controls="controls" src="/mp3/{{ column_title|urlencode }}/{{ title|urlencode }}.mp3"></audio>
+</div>
+{% elif column_type == 3 %}
+<video controls="" autoplay="" name="media" x5-video-player-type="h5" x5-video-player-fullscreen="true" playsinline="true" webkit-playsinline="true" x-webkit-airplay="true">
+    <source src="/mp4/{{ column_title|urlencode }}/{{ title|urlencode }}.sd.ts.mp4" type="video/mp4"></source>   
+</video>
+{% endif %}
+
 {{content | safe}}
+</div>
 
 </body>
 </html>

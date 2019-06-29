@@ -5,7 +5,10 @@ import os
 import json
 import threading
 from geektime_dl.utils import Singleton, synchronized, debug_log
-
+import base64
+import traceback
+import time
+from configparser import ConfigParser
 
 class GkApiClient(metaclass=Singleton):
     """
@@ -17,10 +20,16 @@ class GkApiClient(metaclass=Singleton):
         'Content-Type': 'application/json',
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:59.0) Gecko/20100101 Firefox/59.0'
     }
-
     def __init__(self):
+
+        cfg = ConfigParser()
+        cfg.read('config.ini')
+
+        self.username = cfg.get('user','username')
+        self.password = cfg.get('user','password') 
+
         self.cookies = None
-        self._cookie_file = os.path.join('.', 'cookie.json')
+        self._cookie_file = cfg.get('user','cookie_path') 
         self._lock = threading.Lock()
 
         if os.path.exists(self._cookie_file):
@@ -29,7 +38,7 @@ class GkApiClient(metaclass=Singleton):
                 self.cookies = json.loads(cookies) if cookies else None
 
     @synchronized()
-    def login(self, acc, psd, area='86'):
+    def login(self, ):
         """登录"""
         url = 'https://account.geekbang.org/account/ticket/login'
 
@@ -40,17 +49,15 @@ class GkApiClient(metaclass=Singleton):
             'Referer': 'https://account.geekbang.org/signin?redirect=https%3A%2F%2Fwww.geekbang.org%2F',
             **self._headers_tmpl
         }
-
         data = {
-            "country": area,
-            "cellphone": acc,
-            "password": psd,
+            "country": '86',
+            "cellphone": self.username,
+            "password": self.password,
             "captcha": "",
             "remember": 1,
             "platform": 3,
             "appid": 1
         }
-
         resp = requests.post(url, headers=headers, json=data, timeout=10)
 
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
@@ -68,11 +75,17 @@ class GkApiClient(metaclass=Singleton):
             'Referer': 'https://time.geekbang.org/paid-content',
             **self._headers_tmpl
         }
-
+        if self.cookies == None:
+            self.login()
+            
         resp = requests.get(url, headers=headers, cookies=self.cookies)
 
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
-            raise Exception('course query fail:' + resp.json()['error']['msg'])
+            time.sleep(5)
+            self.login()
+            return self.get_course_list()
+            #raise Exception('course query fail:' + resp
+            #raise Exception('course query fail:' + resp.json()['error']['msg'])
         return resp.json()['data']
 
     @debug_log
@@ -84,11 +97,17 @@ class GkApiClient(metaclass=Singleton):
             'Referer': 'https://time.geekbang.org/column/{}'.format(str(course_id)),
             **self._headers_tmpl
         }
-
+        if self.cookies == None:
+            self.login()
+            
         resp = requests.post(url, json=data, headers=headers, cookies=self.cookies, timeout=10)
 
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
-            raise Exception('course query fail:' + resp.json()['error']['msg'])
+            print('--------------------------- wait 5 seconds to retry ------------------------------------')
+            time.sleep(5)
+            self.login()
+            return self.get_course_content(course_id)
+            #raise Exception('course query fail:' + resp.json()['error']['msg'])
         if not data:
             raise Exception('course not exists:%s' % course_id)
         return resp.json()['data']['list'][::-1]
@@ -101,11 +120,16 @@ class GkApiClient(metaclass=Singleton):
             'Referer': 'https://time.geekbang.org/column/{}'.format(course_id),
             **self._headers_tmpl
         }
-
+        if self.cookies == None:
+            self.login()
         resp = requests.post(url, headers=headers, cookies=self.cookies, json={'cid': str(course_id)}, timeout=10)
 
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
-            raise Exception('course query fail:' + resp.json()['error']['msg'])
+            print('--------------------------- wait 5 seconds to retry ------------------------------------')
+            time.sleep(5)
+            self.login()
+            return self.get_course_intro(course_id)
+            # raise Exception('course query fail:' + resp.json()['error']['msg'])
         data = resp.json()['data']
         if not data:
             raise Exception('course not exists:%s' % course_id)
@@ -119,11 +143,16 @@ class GkApiClient(metaclass=Singleton):
             'Referer': 'https://time.geekbang.org/column/article/{}'.format(str(post_id)),
             **self._headers_tmpl
         }
-
+        if self.cookies == None:
+            self.login()
         resp = requests.post(url, headers=headers, cookies=self.cookies, json={'id': str(post_id)}, timeout=10)
 
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
-            raise Exception('course query fail:' + resp.json()['error']['msg'])
+            print("get_post_content error: " + resp.text)
+            time.sleep(5)
+            self.login()
+            return self.get_post_content(post_id)
+            #raise Exception('course query fail:' + resp.json()['error']['msg'])
 
         return resp.json()['data']
 
@@ -135,10 +164,46 @@ class GkApiClient(metaclass=Singleton):
             'Referer': 'https://time.geekbang.org/column/article/{}'.format(str(post_id)),
             **self._headers_tmpl
         }
-
-        resp = requests.post(url, headers=headers, cookies=self.cookies, json={"aid": str(post_id), "prev": 0}, timeout=10)
-
+        result = []
+        prev = 0
+        while True:
+            if self.cookies == None:
+                self.login()
+            resp = requests.post(url, headers=headers, cookies=self.cookies, json={"aid": str(post_id), "prev": prev}, timeout=10)
+            if not (resp.status_code == 200 and resp.json().get('code') == 0):
+                print('--------------------------- wait 5 seconds to retry ------------------------------------')
+                time.sleep(5)
+                self.login()
+                return self.get_post_comments(post_id)
+                #raise Exception('course query fail:' + resp.json()['error']['msg'])
+            if len(resp.json()['data']['list']) > 0:
+                prev = resp.json()['data']['list'][-1]['comment_ctime']
+                result.extend(resp.json()['data']['list']) 
+            return result
+    
+    @debug_log
+    def get_video_play_auth(self, post):
+        url = 'https://time.geekbang.org/serv/v3/source_auth/video_play_auth'
+        
+        headers = {
+            'Referer': 'https://time.geekbang.org/course/detail/190-{}'.format(str(post['id'])),
+            **self._headers_tmpl
+        }
+        if self.cookies == None:
+            self.login()
+        resp = requests.post(url, headers=headers, cookies=self.cookies, json={
+            "aid": post['id'],
+            "sku": str(post['sku']),
+            "video_id": str(post['video_id']),
+            "source_type": 1
+        }, timeout=10)
         if not (resp.status_code == 200 and resp.json().get('code') == 0):
-            raise Exception('course query fail:' + resp.json()['error']['msg'])
+            print('--------------------------- wait 5 seconds to retry ------------------------------------')
+            time.sleep(5)
+            self.login()
+            return self.get_video_play_auth(post)
+        play_auth = resp.json().get('data').get('play_auth')
+        return json.loads(base64.b64decode(play_auth))
 
-        return resp.json()['data']['list']
+    
+    

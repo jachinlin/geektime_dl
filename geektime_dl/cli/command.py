@@ -5,9 +5,7 @@ import os
 import traceback
 from ..utils._logging import logger
 
-
 commands = {}
-
 
 class CommandType(type):
     def __init__(cls, name, bases, attrs):
@@ -17,7 +15,6 @@ class CommandType(type):
         if name != 'command':
             commands[name] = cls
 
-
 def work(self, args):
     if '--help' in args:
         result = (self.__doc__ or '').strip()
@@ -25,9 +22,7 @@ def work(self, args):
         return
     return self.run(args)
 
-
 Command = CommandType('Command', (object,), {'run': lambda self, args: None, 'work': work})
-
 
 class Help(Command):
     """Display the list of available commands"""
@@ -44,7 +39,6 @@ class Help(Command):
         result = '\n'.join(result)
         print(result)
         return result
-
 
 def main():
     args = sys.argv[1:]

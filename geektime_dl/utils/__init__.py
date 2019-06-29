@@ -27,7 +27,7 @@ def synchronized(lock_attr='_lock'):
 
 
 def format_path(path):
-    return path.replace(' ', '').replace('/', '').replace('\\', '').replace(':', '')
+    return path.replace(' ', '').replace('/', '').replace('\\', '').replace(':', '').replace('+', 'more').replace('"', '_').replace('$', '').replace('\t', '')
 
 
 def debug_log(func):

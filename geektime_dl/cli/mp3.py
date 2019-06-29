@@ -5,31 +5,25 @@ from geektime_dl.data_client import DataClient
 from ..utils.mp3_downloader import Downloader
 from . import Command
 from ..utils import format_path
-
+from ..geektime_ebook import maker
+import time
+from configparser import ConfigParser
 
 class Mp3(Command):
     """保存专栏音频
-    eektime mp3 <course_id> [--url-only] [--out-dir=<out_dir>]
-
-    `[]`表示可选，`<>`表示相应变量值
-
+    eektime mp3 <course_id>
     course_id: 课程ID，可以从 query subcmd 查看
-    --url-only: 只保存音频url
-    --out_dir: 音频存放目录，默认当前目录
-
-    notice: 此 subcmd 需要先执行 login subcmd
-    e.g.: geektime mp3 48 --out-dir=~/geektime-ebook
     """
+    def __init__(self):
+        cfg = ConfigParser()
+        cfg.read('config.ini')
+        self.mp3_out_dir = cfg.get('output','mp3_out_dir') 
+
     def run(self, args):
 
         course_id = args[0]
-        url_only = '--url-only' in args[1:]
-        for arg in args[1:]:
-            if '--out-dir=' in arg:
-                out_dir = arg.split('--out-dir=')[1] or './mp3'
-                break
-        else:
-            out_dir = './mp3'
+        out_dir = self.mp3_out_dir
+
         if not os.path.isdir(out_dir):
             os.makedirs(out_dir)
 
@@ -44,23 +38,17 @@ class Mp3(Command):
 
         data = dc.get_course_content(course_id)
 
-        if url_only:
-            with open(os.path.join(out_dir, '%s.mp3.txt' % course_data['column_title']), 'w') as f:
-                # TODO alignment
-                f.write('\n'.join(["{}:\t\t{}".format(post['article_title'], post['audio_download_url']) for post in data]))
-
-            return
-
         dl = Downloader()
         for post in data:
-            file_name = format_path(post['article_title'] + '.mp3')
+            file_name = maker.format_file_name(post['article_title'] + '.mp3')
             if os.path.isfile(os.path.join(out_dir, file_name)):
                 print(file_name + ' exists')
                 continue
             if post['audio_download_url']:
                 dl.run(post['audio_download_url'], out_file=file_name, out_dir=out_dir)
                 print('download mp3 done: ' + file_name)
-
+            time.sleep(1)
+        
 
 class Mp3Batch(Mp3):
     """批量下载 mp3
@@ -81,4 +69,5 @@ class Mp3Batch(Mp3):
 
         for cid in cid_list:
             super(Mp3Batch, self).run([cid.strip()] + args)
+            time.sleep(5)
 

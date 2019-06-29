@@ -21,13 +21,12 @@ def render_toc_md(title, headers, output_dir):
         f.writelines([title] + headers)
 
 
-def render_article_html(title, content, output_dir):
-    _render_file('article.html', {'title': title, 'content': content}, '{}.html'.format(title), output_dir)
+def render_article_html(title, content, output_dir, column_title, column_type):
+    _render_file('article.html', {'title': title, 'content': content, 'column_title': column_title, 'column_type': column_type }, '{}.html'.format(title), output_dir)
 
 
 def format_file_name(name):
-    return name.replace('/', '').replace(' ', '').replace('+', 'more').replace('"', '_')
-
+    return name.replace('/', '').replace(' ', '').replace('+', 'more').replace('"', '_').replace('$', '').replace('\t', '')
 
 def generate_cover_img(url, output_dir):
     try:
