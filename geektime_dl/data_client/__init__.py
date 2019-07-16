@@ -1,7 +1,8 @@
 # coding=utf8
 
 import json
-from .gk_apis import GkApiClient
+
+from .gk_apis import GkApiClient, GkApiError
 from .store_client import StoreClient
 from geektime_dl.utils import Singleton
 from geektime_dl.utils._logging import logger
@@ -9,18 +10,14 @@ from geektime_dl.utils._logging import logger
 
 class DataClient(metaclass=Singleton):
 
-    def __init__(self):
-        self._gk = GkApiClient()
-        self._sc = StoreClient()
+    def __init__(self, gk: GkApiClient, sc: StoreClient):
+        self._gk = gk
+        self._sc = sc
 
-    @property
-    def cookies(self):
-        return self._gk.cookies
-
-    def get_course_list(self):
+    def get_course_list(self, force: bool = False) -> dict:
         return self._gk.get_course_list()
 
-    def get_course_intro(self, course_id, force=False):
+    def get_course_intro(self, course_id: int, force: bool = False):
 
         data = self._sc.get_course_intro(course_id)
         if force or not data:
@@ -29,7 +26,7 @@ class DataClient(metaclass=Singleton):
 
         return data
 
-    def get_post_content(self, post_id, force=False):
+    def get_post_content(self, post_id: int, force: bool = False) -> dict:
 
         data = self._sc.get_post_content(post_id)
         if force or not data:
@@ -38,7 +35,7 @@ class DataClient(metaclass=Singleton):
 
         return data
 
-    def _get_post_comments(self, post_id, force=False):
+    def _get_post_comments(self, post_id: int, force: bool = False):
 
         data = self._sc.get_post_comments(post_id)
         if force or not data:
@@ -49,7 +46,7 @@ class DataClient(metaclass=Singleton):
 
         return data
 
-    def get_course_content(self, course_id, force=False):
+    def get_course_content(self, course_id: int, force: bool = False) -> list:
 
         # data
         data = []
@@ -63,4 +60,14 @@ class DataClient(metaclass=Singleton):
         return data
 
 
+def get_data_client(cfg: dict) -> DataClient:
+    gk = GkApiClient(
+        account=cfg['account'],
+        password=cfg['password'],
+        area=cfg['area']
+    )
+    sc = StoreClient()
 
+    dc = DataClient(gk, sc)
+
+    return dc

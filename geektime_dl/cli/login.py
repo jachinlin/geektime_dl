@@ -1,11 +1,13 @@
 # coding=utf8
 
-from geektime_dl.data_client.gk_apis import *
-from . import Command
+import sys
+
+from geektime_dl.data_client.gk_apis import GkApiClient
+from . import Command, save_cfg
 
 
 class Login(Command):
-    """登录极客时间，保存登录token
+    """登录极客时间，保存账号密码至配置文件
     geektime login  [--account=<account>] [--password=<password>] [--area=<area>]
 
     `[]`表示可选，`<>`表示相应变量值
@@ -14,40 +16,31 @@ class Login(Command):
     --account: 手机账号，不提供可稍后手动输入
     --password: 账号密码，不提供可稍后手动输入
 
-    notice: 登录后，token会保存至 cookie.json
     e.g.: geektime login
     """
-    def run(self, args):
+    def run(self, args: dict):
 
-        for arg in args:
-            if '--area=' in arg:
-                area = arg.split('--area=')[1] or '86'
-                break
-        else:
-            area = '86'
-
-        for arg in args:
-            if '--account=' in arg:
-                account = arg.split('--account=')[1] or ''
-                break
-        else:
-            account = None
-
-        for arg in args:
-            if '--password=' in arg:
-                password = arg.split('--password=')[1] or ''
-                break
-        else:
-            password = None
+        area = args.get('area')
+        account = args.get('account')
+        password = args.get('password')
+        need_save = not (area and account and password)
 
         if not account:
             account = input("enter your registered account(phone): ")
+        if not area:
+            area = input("enter country code: ")
         if not password:
-            password = input("enter password: ")
+            password = input("account: +{} {}\n"
+                             "enter password: ".format(area, account))
 
-        gk = GkApiClient()
-        gk.login(account, password, area)
-        print('登录成功')
+        if need_save:
+            args.update({'account': account, 'password': password, 'area': area})
+            save_cfg(args)
+
+        GkApiClient(account=account, password=password, area=area)
+        sys.stdout.write("Login succeed\n")
+
+
 
 
 

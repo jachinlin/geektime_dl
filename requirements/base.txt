@@ -1,4 +1,4 @@
 kindle_maker
 requests
-Jinja2==2.10
+Jinja2
 

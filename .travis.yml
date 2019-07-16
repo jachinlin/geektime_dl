@@ -5,12 +5,11 @@ python:
 
 # command to install dependencies
 install:
-  - pip install -r requirements/base.txt
   - pip install -r requirements/dev.txt
+
 # command to run tests
 script:
-  - pytest --cov=./
-
+  - python -m pytest --cov=./
 
 after_success:
   - codecov

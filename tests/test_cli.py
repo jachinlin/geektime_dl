@@ -18,5 +18,5 @@ def test_command_metaclass3():
 
 def test_command_metaclass4():
     Help = command.commands[command.Help.name]
-    result = Help().run(args=None)
+    result = Help().run(cfg=None)
     assert "Available commands:" in result

@@ -1,13 +1,15 @@
 # coding=utf8
 
 import os
+import sys
 import json
 import time
 from multiprocessing import Pool
-from geektime_dl.data_client import DataClient
+
+from geektime_dl.data_client import get_data_client
+from geektime_dl.geektime_ebook import maker
 from . import Command
 from ..utils.m3u8_downloader import Downloader
-from ..utils import format_path
 
 
 class Mp4(Command):
@@ -24,29 +26,31 @@ class Mp4(Command):
     notice: 此 subcmd 需要先执行 login subcmd
     e.g.: geektime mp4 66 --out-dir=~/geektime-ebook
     """
-    def run(self, args):
+    def run(self, cfg: dict):
 
-        course_id = args[0]
-        url_only = '--url-only' in args[1:]
-        hd_only = '--hd-only' in args[1:]
-        for arg in args[1:]:
-            if '--out-dir=' in arg:
-                out_dir = arg.split('--out-dir=')[1] or './mp4'
-                break
-        else:
-            out_dir = './mp4'
+        course_id = cfg['course_id']
+        if not course_id:
+            sys.stderr.write("ERROR: couldn't find the target course id\n")
+            return
 
-        for arg in args[1:]:
-            if '--workers=' in arg:
-                workers = int(arg.split('--workers=')[1]) or 1
-                break
-        else:
-            workers = 1
-
+        out_dir = os.path.join(cfg['output_folder'], 'mp4')
         if not os.path.isdir(out_dir):
-            os.makedirs(out_dir)
+            try:
+                os.makedirs(out_dir)
+            except OSError:
+                sys.stderr.write("ERROR: couldn't create the output folder {}\n".format(out_dir))
+                return
 
-        dc = DataClient()
+        url_only = cfg['url_only']
+        hd_only = cfg['hd_only']
+        workers = cfg['workers']
+
+        try:
+            dc = get_data_client(cfg)
+        except:
+            sys.stderr.write("ERROR: invalid geektime account or password\n"
+                             "Use '%s <command> login --help' for  help.\n" % sys.argv[0].split(os.path.sep)[-1])
+            return
 
         course_data = dc.get_course_intro(course_id)
 
@@ -58,25 +62,25 @@ class Mp4(Command):
             os.makedirs(out_dir)
 
         data = dc.get_course_content(course_id)
-
         if url_only:
-            with open(os.path.join(out_dir, '%s.mp4.txt' % course_data['column_title']), 'w') as f:
+            title = maker.format_file_name(course_data['column_title'])
+            with open(os.path.join(out_dir, '%s.mp4.txt' % title), 'w') as f:
 
                 f.write('\n'.join(["{}:\n{}\n{}\n\n".format(
-                    post['article_title'],
+                    maker.format_file_name(post['article_title']),
                     json.loads(post['video_media']).get('hd', {}).get('url'),
                     json.loads(post['video_media']).get('sd', {}).get('url')
                 ) for post in data]))
-            print("download mp4 url done: " + course_data['column_title'])
+            sys.stdout.write('download {} mp4 url done\n'.format(title))
             return
 
         dl = Downloader()
         p = Pool(workers)
         start = time.time()
         for post in data:
-            file_name = format_path(post['article_title'] + ('.hd' if hd_only else '.sd'))
+            file_name = maker.format_file_name(post['article_title']) + ('.hd' if hd_only else '.sd')
             if os.path.isfile(os.path.join(out_dir, file_name) + '.ts'):
-                print(file_name + ' exists')
+                sys.stdout.write(file_name + ' exists\n')
                 continue
             if hd_only:  # some post has sd mp4 only
                 url = json.loads(post['video_media']).get('hd', {}).get('url') or json.loads(post['video_media']).get(
@@ -88,17 +92,22 @@ class Mp4(Command):
 
         p.close()
         p.join()
-        print('download {} done, cost {}s\n'.format(course_data['column_title'], int(time.time() - start)))
+        sys.stdout.write('download {} done, cost {}s\n'.format(course_data['column_title'], int(time.time() - start)))
 
 
 class Mp4Batch(Mp4):
     """批量下载 mp4
     懒， 不想写参数了
     """
-    def run(self, args):
+    def run(self, cfg: dict):
 
-        if '--all' in args:
-            dc = DataClient()
+        if cfg['all']:
+            try:
+                dc = get_data_client(cfg)
+            except:
+                sys.stderr.write("ERROR: invalid geektime account or password\n"
+                                 "Use '%s <command> login --help' for  help.\n" % sys.argv[0].split(os.path.sep)[-1])
+                return
             data = dc.get_course_list()
             cid_list = []
             for c in data['3']['list']:
@@ -106,8 +115,11 @@ class Mp4Batch(Mp4):
                     cid_list.append(str(c['id']))
 
         else:
-            course_ids = args[0]
+            course_ids = cfg['course_ids']
             cid_list = course_ids.split(',')
 
         for cid in cid_list:
-            super(Mp4Batch, self).run([cid.strip()] + args)
+            args = cfg.copy()
+            args['course_id'] = int(cid)
+            super().run(args)
+            sys.stderr.write('\n')

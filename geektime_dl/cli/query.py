@@ -1,6 +1,9 @@
 # coding=utf8
 
-from geektime_dl.data_client import DataClient
+import sys
+import os
+
+from geektime_dl.data_client import get_data_client
 from . import Command
 
 
@@ -11,10 +14,13 @@ class Query(Command):
     notice: 此 subcmd 需要先执行 login subcmd
     e.g.: geektime query
     """
-    def run(self, args):
-        dc = DataClient()
-        if not dc.cookies:
-            print("尚未登录, 可以先 geektime login 以便查看更详细的信息")
+    def run(self, cfg: dict):
+        try:
+            dc = get_data_client(cfg)
+        except:
+            sys.stderr.write("ERROR: invalid geektime account or password\n"
+                             "Use '%s <command> login --help' for  help.\n" % sys.argv[0].split(os.path.sep)[-1])
+            return
 
         data = dc.get_course_list()
 
@@ -28,5 +34,5 @@ class Query(Command):
                     str(c['id']), '是' if c['had_sub'] else '否', c['column_title'], c['update_frequency'] or None
                 )
 
-        print(result_str)
+        sys.stdout.write(result_str)
 

@@ -7,11 +7,6 @@ from geektime_dl import utils
 from geektime_dl.utils import mp3_downloader, m3u8_downloader, _logging
 
 
-def test_format_path():
-    file_name = 'hell\\'
-    assert '\\' not in utils.format_path(file_name)
-
-
 def test_mp3_downloader():
     dl = mp3_downloader.Downloader()
     dl.run(

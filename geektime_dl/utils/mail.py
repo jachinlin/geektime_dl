@@ -1,5 +1,6 @@
 # coding=utf8
 
+import os
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -104,3 +105,19 @@ class MailServer(object):
 
 
 
+def send_to_kindle(file_name: str, smtp_cfg: dict):
+    if os.path.getsize(file_name) / 1024.0 / 1024 > 50:
+        raise Exception("电子书大小超过50M")
+
+    f = open(file_name, 'rb')
+    d = f.read()
+    f.close()
+
+    m = MailServer(
+    host=smtp_cfg['smtp_host'], port=smtp_cfg['smtp_port'],
+    user=smtp_cfg['smtp_user'], password=smtp_cfg['smtp_password'],
+    encryption=smtp_cfg['smtp_encryption'])
+    message = m.build_email(
+    email_to=smtp_cfg['email_to'], subject='convert',
+    body='', attachments=[(os.path.basename(file_name), d)])
+    m.send_email(message)

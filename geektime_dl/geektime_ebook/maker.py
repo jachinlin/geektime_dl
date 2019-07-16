@@ -26,8 +26,7 @@ def render_article_html(title, content, output_dir):
 
 
 def format_file_name(name):
-    return name.replace('/', '').replace(' ', '').replace('+', 'more').replace('"', '_')
-
+    return name.replace('/', '').replace(' ', '').replace('+', '-').replace('"', '').replace('\\', '').replace(':', '-').replace('|', '-')
 
 def generate_cover_img(url, output_dir):
     try:

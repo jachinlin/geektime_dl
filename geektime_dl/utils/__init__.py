@@ -1,15 +1,8 @@
 # coding=utf8
+
 from functools import wraps
+import threading
 from ._logging import logger
-
-
-class Singleton(type):
-    _instances = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
 
 
 def synchronized(lock_attr='_lock'):
@@ -26,8 +19,15 @@ def synchronized(lock_attr='_lock'):
     return decorator
 
 
-def format_path(path):
-    return path.replace(' ', '').replace('/', '').replace('\\', '').replace(':', '')
+class Singleton(type):
+    _instances = {}
+    _lock = threading.Lock()
+
+    @synchronized()
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
 
 
 def debug_log(func):
