@@ -2,7 +2,6 @@
 
 import os
 import sys
-import json
 import time
 from multiprocessing import Pool
 
@@ -49,7 +48,7 @@ class Mp4(Command):
             dc = get_data_client(cfg)
         except:
             sys.stderr.write("ERROR: invalid geektime account or password\n"
-                             "Use '%s <command> login --help' for  help.\n" % sys.argv[0].split(os.path.sep)[-1])
+                             "Use '%s login --help' for  help.\n" % sys.argv[0].split(os.path.sep)[-1])
             return
 
         course_data = dc.get_course_intro(course_id)
@@ -68,8 +67,8 @@ class Mp4(Command):
 
                 f.write('\n'.join(["{}:\n{}\n{}\n\n".format(
                     maker.format_file_name(post['article_title']),
-                    json.loads(post['video_media']).get('hd', {}).get('url'),
-                    json.loads(post['video_media']).get('sd', {}).get('url')
+                    post['video_media_map'].get('hd', {}).get('url'),
+                    post['video_media_map'].get('sd', {}).get('url')
                 ) for post in data]))
             sys.stdout.write('download {} mp4 url done\n'.format(title))
             return
@@ -83,10 +82,10 @@ class Mp4(Command):
                 sys.stdout.write(file_name + ' exists\n')
                 continue
             if hd_only:  # some post has sd mp4 only
-                url = json.loads(post['video_media']).get('hd', {}).get('url') or json.loads(post['video_media']).get(
+                url = post['video_media_map'].get('hd', {}).get('url') or post['video_media'].get(
                     'sd', {}).get('url')
             else:
-                url = json.loads(post['video_media']).get('sd', {}).get('url')
+                url = post['video_media_map'].get('sd', {}).get('url')
 
             p.apply_async(dl.run, (url, out_dir, file_name))
 
@@ -106,7 +105,7 @@ class Mp4Batch(Mp4):
                 dc = get_data_client(cfg)
             except:
                 sys.stderr.write("ERROR: invalid geektime account or password\n"
-                                 "Use '%s <command> login --help' for  help.\n" % sys.argv[0].split(os.path.sep)[-1])
+                                 "Use '%s login --help' for  help.\n" % sys.argv[0].split(os.path.sep)[-1])
                 return
             data = dc.get_course_list()
             cid_list = []

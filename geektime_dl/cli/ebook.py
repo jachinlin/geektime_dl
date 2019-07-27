@@ -31,7 +31,7 @@ class EBook(Command):
     def _title(c):
         if not c['had_sub']:
             t = c['column_title'] + '[免费试读]'
-        elif c['update_frequency'] == '全集':
+        elif c['is_finish']:
             t = c['column_title'] + '[更新完毕]'
         else:
             t = c['column_title'] + '[未完待续{}]'.format(datetime.date.today())
@@ -97,7 +97,7 @@ class EBook(Command):
             dc = get_data_client(cfg)
         except:
             sys.stderr.write("ERROR: invalid geektime account or password\n"
-                             "Use '%s <command> login --help' for  help.\n" % sys.argv[0].split(os.path.sep)[-1])
+                             "Use '%s login --help' for  help.\n" % sys.argv[0].split(os.path.sep)[-1])
             return
 
         course_data = dc.get_course_intro(course_id, force=True)
@@ -118,7 +118,7 @@ class EBook(Command):
 
         # ebook
         if not cfg['source_only']:
-            if course_data['update_frequency'] == '全集' and os.path.isfile(os.path.join(out_dir, self._title(course_data)) + '.mobi'):
+            if course_data['is_finish'] and os.path.isfile(os.path.join(out_dir, self._title(course_data)) + '.mobi'):
                 sys.stdout.write("{} exists\n".format(self._title(course_data)))
             else:
                 make_mobi(source_dir=os.path.join(out_dir, course_data['column_title']), output_dir=out_dir)
@@ -195,7 +195,7 @@ class EbookBatch(EBook):
                 dc = get_data_client(cfg)
             except:
                 sys.stderr.write("ERROR: invalid geektime account or password\n"
-                                 "Use '{} <command> login --help' for  help.\n".format(
+                                 "Use '{} login --help' for  help.\n".format(
                     sys.argv[0].split(os.path.sep)[-1]))
                 return
 

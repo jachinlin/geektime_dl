@@ -50,7 +50,7 @@ class DataClient(metaclass=Singleton):
 
         # data
         data = []
-        post_ids = self._gk.get_course_content(course_id)
+        post_ids = self._gk.get_post_list_of(course_id)
 
         for post in post_ids:
             post_detail = self.get_post_content(post['id'], force=force)

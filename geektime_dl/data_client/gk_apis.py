@@ -8,44 +8,17 @@ import random
 
 import requests
 
-from geektime_dl.utils import Singleton, synchronized, debug_log
+from geektime_dl.utils import Singleton, synchronized
 
 _ua = [
-    "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/534.25 (KHTML, like Gecko) Chrome/12.0.706.0 Safari/534.25",
-    "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/534.25 (KHTML, like Gecko) Chrome/12.0.704.0 Safari/534.25",
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/534.24 (KHTML, like Gecko) Ubuntu/10.10 Chromium/12.0.703.0 Chrome/12.0.703.0 Safari/534.24",
-    "Mozilla/5.0 (X11; Linux i686) AppleWebKit/534.24 (KHTML, like Gecko) Ubuntu/10.10 Chromium/12.0.702.0 Chrome/12.0.702.0 Safari/534.24",
-    "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/12.0.702.0 Safari/534.24",
-    "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/12.0.702.0 Safari/534.24",
-    "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.700.3 Safari/534.24",
-    "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.699.0 Safari/534.24",
-    "Mozilla/5.0 (Windows NT 6.0; WOW64) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.699.0 Safari/534.24",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_6) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.698.0 Safari/534.24",
-    "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.697.0 Safari/534.24",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.696.71 Safari/534.24",
-    "Mozilla/5.0 (X11; U; Linux amd64; rv:5.0) Gecko/20100101 Firefox/5.0 (Debian)",
-    "Mozilla/5.0 (X11; U; Linux amd64; en-US; rv:5.0) Gecko/20110619 Firefox/5.0",
-    "Mozilla/5.0 (X11; Linux) Gecko Firefox/5.0",
-    "Mozilla/5.0 (X11; Linux x86_64; rv:5.0) Gecko/20100101 Firefox/5.0 FirePHP/0.5",
-    "Mozilla/5.0 (X11; Linux x86_64; rv:5.0) Gecko/20100101 Firefox/5.0 Firefox/5.0",
-    "Mozilla/5.0 (X11; Linux x86_64) Gecko Firefox/5.0",
-    "Mozilla/5.0 (X11; Linux ppc; rv:5.0) Gecko/20100101 Firefox/5.0",
-    "Mozilla/5.0 (X11; Linux AMD64) Gecko Firefox/5.0",
-    "Mozilla/5.0 (X11; FreeBSD amd64; rv:5.0) Gecko/20100101 Firefox/5.0",
-    "Mozilla/5.0 (Windows NT 6.2; WOW64; rv:5.0) Gecko/20100101 Firefox/5.0",
-    "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:5.0) Gecko/20110619 Firefox/5.0",
-    "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:5.0) Gecko/20100101 Firefox/5.0",
-    "Mozilla/5.0 (Windows NT 6.1; rv:6.0) Gecko/20100101 Firefox/5.0",
-    "Mozilla/5.0 (Windows NT 6.1.1; rv:5.0) Gecko/20100101 Firefox/5.0",
-    "Mozilla/5.0 (Windows NT 5.2; WOW64; rv:5.0) Gecko/20100101 Firefox/5.0",
-    "Mozilla/5.0 (Windows NT 5.1; U; rv:5.0) Gecko/20100101 Firefox/5.0"
+    "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Mobile Safari/537.36"
 ]
 
 class GkApiError(Exception):
     """"""
 
 
-def retry(func):
+def _retry(func):
     """
     0.1s 后重试
     """
@@ -123,12 +96,19 @@ class GkApiClient(metaclass=Singleton):
 
         resp = self._post(url, data, headers=headers)
 
-        self._cookies = dict(resp.cookies.items())
+        self._cookies = resp.cookies
 
-    @debug_log
-    @retry
-    def get_course_list(self):
-        """获取课程列表"""
+    @_retry
+    def get_course_list(self) -> dict:
+        """
+        获取课程列表
+        :return:
+            key: value
+            '1'
+            '2'
+            '3'
+            '4':
+        """
         url = 'https://time.geekbang.org/serv/v1/column/all'
         headers = {
             'Referer': 'https://time.geekbang.org/paid-content',
@@ -137,9 +117,8 @@ class GkApiClient(metaclass=Singleton):
         resp = self._post(url, headers=headers, cookies=self._cookies)
         return resp.json()['data']
 
-    @debug_log
-    @retry
-    def get_course_content(self, course_id: int):
+    @_retry
+    def get_post_list_of(self, course_id: int):
         """获取课程所有章节列表"""
         url = 'https://time.geekbang.org/serv/v1/column/articles'
         data = {"cid": str(course_id), "size": 1000, "prev": 0, "order": "newest"}
@@ -154,8 +133,7 @@ class GkApiClient(metaclass=Singleton):
 
         return resp.json()['data']['list'][::-1]
 
-    @debug_log
-    @retry
+    @_retry
     def get_course_intro(self, course_id: int):
         """课程简介"""
         url = 'https://time.geekbang.org/serv/v1/column/intro'
@@ -170,21 +148,19 @@ class GkApiClient(metaclass=Singleton):
             raise GkApiError('course not exists:%s' % course_id)
         return data
 
-    @debug_log
-    @retry
+    @_retry
     def get_post_content(self, post_id: int):
         """课程章节详情"""
         url = 'https://time.geekbang.org/serv/v1/article'
         headers = {
-            'Referer': 'https://time.geekbang.org/column/article/{}'.format(str(post_id)),
+            'Referer': 'https://time.geekbang.org/column/article/{}'.format(str(post_id))
         }
 
-        resp = self._post(url, {'id': str(post_id)}, headers=headers, cookies=self._cookies)
+        resp = self._post(url, {'id': post_id}, headers=headers, cookies=self._cookies)
 
         return resp.json()['data']
 
-    @debug_log
-    @retry
+    @_retry
     def get_post_comments(self, post_id: int):
         """课程章节评论"""
         url = 'https://time.geekbang.org/serv/v1/comments'

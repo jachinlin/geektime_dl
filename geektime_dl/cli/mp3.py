@@ -43,7 +43,7 @@ class Mp3(Command):
             dc = get_data_client(cfg)
         except:
             sys.stderr.write("ERROR: invalid geektime account or password\n"
-                             "Use '%s <command> login --help' for  help.\n" % sys.argv[0].split(os.path.sep)[-1])
+                             "Use '%s login --help' for  help.\n" % sys.argv[0].split(os.path.sep)[-1])
             return
 
         course_data = dc.get_course_intro(course_id)
@@ -88,7 +88,7 @@ class Mp3Batch(Mp3):
                 dc = get_data_client(cfg)
             except:
                 sys.stderr.write("ERROR: invalid geektime account or password\n"
-                                 "Use '%s <command> login --help' for  help.\n" % sys.argv[0].split(os.path.sep)[-1])
+                                 "Use '%s login --help' for  help.\n" % sys.argv[0].split(os.path.sep)[-1])
                 return
 
             data = dc.get_course_list()
