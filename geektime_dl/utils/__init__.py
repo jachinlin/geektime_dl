@@ -30,13 +30,5 @@ class Singleton(type):
         return cls._instances[cls]
 
 
-def debug_log(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        result = func(*args, **kwargs)
-        logger.debug("function={}\targs={}\tkwargs={}".format(func.__name__, args, kwargs))
-        return result
-
-    return wrapper
 
 

@@ -4,7 +4,7 @@
 import os
 from setuptools import setup, find_packages
 
-version = '0.2.1'
+version = '0.3.3'
 
 
 def read(fname):
@@ -32,9 +32,8 @@ setup(
     ],
     keywords='kindle ebook mobi geektime',
     packages=find_packages(exclude=['examples', 'tests']),
-    package_data={'geektime_dl': ['geektime_ebook/templates/*']},
+    package_data={'geektime_dl': ['utils/templates/*']},
     install_requires=[
-        'Jinja2',
         'kindle_maker',
         'requests',
         'tinydb'

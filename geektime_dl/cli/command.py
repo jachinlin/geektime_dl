@@ -175,7 +175,7 @@ def main():
         try:
             o.work(args)
         except Exception as e:
-            sys.stderr.write("ERROR: {}".format(e))
+            sys.stderr.write("ERROR: {}\n".format(e))
             logger.error('ERROR: {}'.format(traceback.format_exc()))
     else:
         print('Unknow command %r\n\n' % (command,))

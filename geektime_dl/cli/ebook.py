@@ -20,7 +20,7 @@ class EBook(Command):
 
     course_id: 课程ID，可以从 query subcmd 查看
     output_folder: 电子书存放目录，默认当前目录
-    enable_comments: 启动评论下载，默认不下载评论
+    --enable-comments: 启动评论下载，默认不下载评论
     comments_count: 在启动评论下载时，设置评论条数，默认10条
 
     notice: 此 subcmd 需要先执行 login subcmd
