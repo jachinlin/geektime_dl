@@ -96,7 +96,8 @@ def get_data_client(cfg: dict) -> DataClient:
         password=cfg['password'],
         area=cfg['area']
     )
-    f = os.path.join(cfg['output_folder'], 'geektime-localstorage.json')
+    f = os.path.expanduser(
+        os.path.join(cfg['output_folder'], 'geektime-localstorage.json'))
     db = TinyDB(f)
 
     dc = DataClient(gk, db)

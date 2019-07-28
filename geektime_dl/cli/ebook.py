@@ -14,17 +14,17 @@ from geektime_dl.utils.mail import send_to_kindle
 class EBook(Command):
     """将专栏文章制作成电子书
 
-    geektime ebook <course_id> [--out-dir=<out_dir>] [--enable-comments] [--comment-count=<comment_count>]
+    geektime ebook -c <course_id> [--output-folder=<output_folder>] [--enable-comments] [--comments-count=<comments_count>]
 
     `[]`表示可选，`<>`表示相应变量值
 
     course_id: 课程ID，可以从 query subcmd 查看
-    --out_dir: 电子书存放目录，默认当前目录
-    --enable-comments: 启动评论下载，默认不下载评论
-    --comment-count: 在启动评论下载时，设置评论条数，默认10条
+    output_folder: 电子书存放目录，默认当前目录
+    enable_comments: 启动评论下载，默认不下载评论
+    comments_count: 在启动评论下载时，设置评论条数，默认10条
 
     notice: 此 subcmd 需要先执行 login subcmd
-    e.g.: geektime ebook 48 --out-dir=~/geektime-ebook
+    e.g.: geektime ebook 48 --output-folder=~/geektime-ebook
     """
 
     @staticmethod
@@ -87,6 +87,7 @@ class EBook(Command):
             sys.stderr.write("ERROR: couldn't find the target course id\n")
             return
         out_dir = os.path.join(cfg['output_folder'], 'ebook')
+        out_dir = os.path.expanduser(out_dir)
         if not os.path.isdir(out_dir):
             try:
                 os.makedirs(out_dir)
@@ -106,6 +107,7 @@ class EBook(Command):
             return
 
         # data
+        sys.stdout.write('doing ......\n')
         data = dc.get_course_content(course_id, force=cfg['force'])
         if cfg['enable_comments']:
             for post in data:

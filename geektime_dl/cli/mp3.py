@@ -11,16 +11,16 @@ from geektime_dl.cli import Command
 
 class Mp3(Command):
     """保存专栏音频
-    eektime mp3 <course_id> [--url-only] [--out-dir=<out_dir>]
+    eektime mp3 -c <course_id> [--url-only] [--output-folder=<output_folder>]
 
     `[]`表示可选，`<>`表示相应变量值
 
     course_id: 课程ID，可以从 query subcmd 查看
-    --url-only: 只保存音频url
-    --out_dir: 音频存放目录，默认当前目录
+    url_only: 只保存音频url
+    output_folder: 音频存放目录，默认当前目录
 
     notice: 此 subcmd 需要先执行 login subcmd
-    e.g.: geektime mp3 48 --out-dir=~/geektime-ebook
+    e.g.: geektime mp3 -c 48 --output-folder=~/geektime-mp3
     """
     def run(self, cfg: dict):
 
@@ -30,6 +30,7 @@ class Mp3(Command):
             return
 
         out_dir = os.path.join(cfg['output_folder'], 'mp3')
+        out_dir = os.path.expanduser(out_dir)
         if not os.path.isdir(out_dir):
             try:
                 os.makedirs(out_dir)
@@ -54,6 +55,7 @@ class Mp3(Command):
         if not os.path.isdir(out_dir):
             os.makedirs(out_dir)
 
+        sys.stdout.write('doing ......\n')
         data = dc.get_course_content(course_id)
 
         if url_only:
@@ -75,7 +77,7 @@ class Mp3(Command):
                 continue
             if post['audio_download_url']:
                 dl.run(post['audio_download_url'], out_file=file_name, out_dir=out_dir)
-                sys.stdout.write('download mp3 {} done: \n'.format(file_name))
+                sys.stdout.write('download mp3 {} done\n'.format(file_name))
 
 
 class Mp3Batch(Mp3):

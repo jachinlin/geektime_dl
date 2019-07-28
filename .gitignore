@@ -40,4 +40,3 @@ nosetests.xml
 .idea
 
 # tmp files
-sqlite3.db

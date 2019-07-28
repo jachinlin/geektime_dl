@@ -50,7 +50,7 @@ class Help(Command):
         result.append("\nUse '%s <command> --help' for individual command help." % sys.argv[0].split(os.path.sep)[-1])
 
         result = '\n'.join(result)
-        print(result)
+        sys.stdout.write(result)
         return result
 
 
@@ -94,7 +94,7 @@ def save_cfg(cfg: dict) -> None:
 
 
 def parse_config(args: list) -> dict:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(prog='{} <command>'.format(sys.argv[0]))
     parser.add_argument("--config", dest="config", type=str, default=geektime_cfg,
                       help="specify alternate config file")
     parser.add_argument("-a", "--account", dest="account", type=str,
@@ -139,6 +139,7 @@ def parse_config(args: list) -> dict:
                         help="specify the kindle receiver email")
     parser.add_argument("--workers", dest="workers", type=int, default=1,
                         help="specify the workers number")
+
     opt = parser.parse_args(args)
 
     cfg_file = opt.config

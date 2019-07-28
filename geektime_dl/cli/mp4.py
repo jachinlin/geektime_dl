@@ -13,17 +13,17 @@ from ..utils.m3u8_downloader import Downloader
 
 class Mp4(Command):
     """保存视频课程视频
-    geektime mp4 <course_id> [--url-only] [--hd-only] [--out-dir=<out_dir>]
+    geektime mp4 -c <course_id> [--url-only] [--hd-only] [--output-folder=<output_folder>]
 
     `[]`表示可选，`<>`表示相应变量值
 
     course_id: 课程ID，可以从 query subcmd 查看
     --url-only: 只保存视频url
     --hd-only：下载高清视频，默认下载标清视频
-    --out_dir: 视频存放目录，默认当前目录
+    output_folder: 视频存放目录，默认当前目录
 
     notice: 此 subcmd 需要先执行 login subcmd
-    e.g.: geektime mp4 66 --out-dir=~/geektime-ebook
+    e.g.: geektime mp4 -c 66 --output-folder=~/geektime-mp4
     """
     def run(self, cfg: dict):
 
@@ -33,6 +33,7 @@ class Mp4(Command):
             return
 
         out_dir = os.path.join(cfg['output_folder'], 'mp4')
+        out_dir = os.path.expanduser(out_dir)
         if not os.path.isdir(out_dir):
             try:
                 os.makedirs(out_dir)
@@ -60,6 +61,7 @@ class Mp4(Command):
         if not os.path.isdir(out_dir):
             os.makedirs(out_dir)
 
+        sys.stdout.write('doing ......\n')
         data = dc.get_course_content(course_id)
         if url_only:
             title = EbookRender.format_file_name(course_data['column_title'])
