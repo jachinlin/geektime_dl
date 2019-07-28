@@ -41,8 +41,8 @@ def _retry(func):
 
 class GkApiClient(metaclass=Singleton):
     """
-    一个课程，包括专栏、视频、微课等，称作 `course`
-    课程下的章节，包括文章、者视频等，称作 `post`
+    一个课程，包括专栏、视频、微课等，称作 `course` 或者 `column`
+    课程下的章节，包括文章、者视频等，称作 `post` 或者 `article`
     """
     _headers_tmpl = {
         'Content-Type': 'application/json',
@@ -118,7 +118,7 @@ class GkApiClient(metaclass=Singleton):
         return resp.json()['data']
 
     @_retry
-    def get_post_list_of(self, course_id: int):
+    def get_post_list_of(self, course_id: int) -> list:
         """获取课程所有章节列表"""
         url = 'https://time.geekbang.org/serv/v1/column/articles'
         data = {"cid": str(course_id), "size": 1000, "prev": 0, "order": "newest"}
@@ -134,7 +134,7 @@ class GkApiClient(metaclass=Singleton):
         return resp.json()['data']['list'][::-1]
 
     @_retry
-    def get_course_intro(self, course_id: int):
+    def get_course_intro(self, course_id: int) -> dict:
         """课程简介"""
         url = 'https://time.geekbang.org/serv/v1/column/intro'
         headers = {
@@ -149,7 +149,7 @@ class GkApiClient(metaclass=Singleton):
         return data
 
     @_retry
-    def get_post_content(self, post_id: int):
+    def get_post_content(self, post_id: int) -> dict:
         """课程章节详情"""
         url = 'https://time.geekbang.org/serv/v1/article'
         headers = {
@@ -161,7 +161,7 @@ class GkApiClient(metaclass=Singleton):
         return resp.json()['data']
 
     @_retry
-    def get_post_comments(self, post_id: int):
+    def get_post_comments(self, post_id: int) -> list:
         """课程章节评论"""
         url = 'https://time.geekbang.org/serv/v1/comments'
         headers = {

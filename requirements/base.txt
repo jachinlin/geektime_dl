@@ -1,4 +1,4 @@
 kindle_maker
 requests
 Jinja2
-
+tinydb

@@ -36,7 +36,8 @@ setup(
     install_requires=[
         'Jinja2',
         'kindle_maker',
-        'requests'
+        'requests',
+        'tinydb'
     ],
     entry_points={
         'console_scripts': [

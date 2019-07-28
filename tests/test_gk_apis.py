@@ -34,7 +34,7 @@ def test_api_get_course_post_list(gk: GkApiClient):
 def test_api_get_post_content(gk: GkApiClient):
     article = gk.get_post_content(333)
     assert article and isinstance(article, dict)
-    for key in {'id', 'article_title', 'article_content'}:
+    for key in {'id', 'article_title', 'article_content', 'column_id'}:
         assert article.get(key) is not None, '{} 不存在'.format(key)
 
     # mp3
