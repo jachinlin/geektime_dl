@@ -4,9 +4,9 @@ import os
 import sys
 
 from geektime_dl.data_client import get_data_client
-from geektime_dl.geektime_ebook import maker
-from ..utils.mp3_downloader import Downloader
-from . import Command
+from geektime_dl.utils.ebook import Render as EbookRender
+from geektime_dl.utils.mp3_downloader import Downloader
+from geektime_dl.cli import Command
 
 
 class Mp3(Command):
@@ -57,11 +57,11 @@ class Mp3(Command):
         data = dc.get_course_content(course_id)
 
         if url_only:
-            title = maker.format_file_name(course_data['column_title'])
+            title = EbookRender.format_file_name(course_data['column_title'])
             with open(os.path.join(out_dir, '%s.mp3.txt' % title), 'w') as f:
                 # TODO alignment
                 f.write('\n'.join(["{}:\t\t{}".format(
-                    maker.format_file_name(post['article_title']),
+                    EbookRender.format_file_name(post['article_title']),
                     post['audio_download_url']
                 ) for post in data]))
                 sys.stdout.write('download {} mp3 url done\n'.format(title))
@@ -69,7 +69,7 @@ class Mp3(Command):
 
         dl = Downloader()
         for post in data:
-            file_name = maker.format_file_name(post['article_title']) + '.mp3'
+            file_name = EbookRender.format_file_name(post['article_title']) + '.mp3'
             if os.path.isfile(os.path.join(out_dir, file_name)):
                 sys.stdout.write(file_name + ' exists\n')
                 continue
@@ -105,5 +105,4 @@ class Mp3Batch(Mp3):
             args = cfg.copy()
             args['course_id'] = int(cid)
             super().run(args)
-            sys.stderr.write('\n')
 

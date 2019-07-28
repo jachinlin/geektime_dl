@@ -6,7 +6,7 @@ import time
 from multiprocessing import Pool
 
 from geektime_dl.data_client import get_data_client
-from geektime_dl.geektime_ebook import maker
+from geektime_dl.utils.ebook import Render as EbookRender
 from . import Command
 from ..utils.m3u8_downloader import Downloader
 
@@ -62,11 +62,11 @@ class Mp4(Command):
 
         data = dc.get_course_content(course_id)
         if url_only:
-            title = maker.format_file_name(course_data['column_title'])
+            title = EbookRender.format_file_name(course_data['column_title'])
             with open(os.path.join(out_dir, '%s.mp4.txt' % title), 'w') as f:
 
                 f.write('\n'.join(["{}:\n{}\n{}\n\n".format(
-                    maker.format_file_name(post['article_title']),
+                    EbookRender.format_file_name(post['article_title']),
                     post['video_media_map'].get('hd', {}).get('url'),
                     post['video_media_map'].get('sd', {}).get('url')
                 ) for post in data]))
@@ -77,7 +77,7 @@ class Mp4(Command):
         p = Pool(workers)
         start = time.time()
         for post in data:
-            file_name = maker.format_file_name(post['article_title']) + ('.hd' if hd_only else '.sd')
+            file_name = EbookRender.format_file_name(post['article_title']) + ('.hd' if hd_only else '.sd')
             if os.path.isfile(os.path.join(out_dir, file_name) + '.ts'):
                 sys.stdout.write(file_name + ' exists\n')
                 continue
@@ -121,4 +121,3 @@ class Mp4Batch(Mp4):
             args = cfg.copy()
             args['course_id'] = int(cid)
             super().run(args)
-            sys.stderr.write('\n')

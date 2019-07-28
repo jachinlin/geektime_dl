@@ -8,6 +8,7 @@ from tinydb.storages import MemoryStorage
 
 from geektime_dl.data_client.gk_apis import GkApiClient
 from geektime_dl.data_client import DataClient
+from geektime_dl.utils.ebook import Render
 
 
 @pytest.fixture
@@ -46,3 +47,14 @@ def dc() -> DataClient:
     yield _dc
 
     _dc.db.close()
+
+
+@pytest.fixture
+def output_folder() -> str:
+    return '/tmp'
+
+
+@pytest.fixture
+def render(output_folder) -> Render:
+    render = Render(output_folder)
+    return render
