@@ -4,8 +4,11 @@ import json
 import os
 import functools
 import threading
+import time
+import atexit
 
 from tinydb import TinyDB, Query
+from tinydb.storages import JSONStorage
 
 from geektime_dl.data_client.gk_apis import GkApiClient, GkApiError
 from geektime_dl.utils import Singleton, synchronized
@@ -90,6 +93,41 @@ class DataClient(metaclass=Singleton):
         return posts
 
 
+class _JSONStorage(JSONStorage):
+    """
+    Store the data in a JSON file.
+    重写 JSONStorage，优化性能
+        1、read 不读文件
+        2、write 10s 刷一次盘
+        3、退出时刷盘保存数据以免数据丢失
+    """
+
+    SAVE_DELTA = 10
+
+    def __init__(self, path, create_dirs=False, encoding=None, **kwargs):
+        super().__init__(path, create_dirs, encoding, **kwargs)
+        self._data = super().read()
+        self._last_save = time.time()
+        atexit.register(self._register_exit)
+
+    def _register_exit(self):
+        super().write(self._data)
+        super().close()
+
+    def read(self) -> dict:
+        return self._data
+
+    def write(self, data) -> None:
+        self._data = data
+        now = time.time()
+        if now - self._last_save > self.SAVE_DELTA:
+            super().write(data)
+            self._last_save = now
+
+    def close(self):
+        pass
+
+
 def get_data_client(cfg: dict) -> DataClient:
     gk = GkApiClient(
         account=cfg['account'],
@@ -98,7 +136,7 @@ def get_data_client(cfg: dict) -> DataClient:
     )
     f = os.path.expanduser(
         os.path.join(cfg['output_folder'], 'geektime-localstorage.json'))
-    db = TinyDB(f)
+    db = TinyDB(f, storage=_JSONStorage)
 
     dc = DataClient(gk, db)
 

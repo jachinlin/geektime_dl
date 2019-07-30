@@ -33,7 +33,7 @@ class Query(Command):
                 result_str += "\t{:<15}{}\t{}\t{:<10}\n".format(
                     str(c['id']),
                     '是' if c['had_sub'] else '否',
-                    '是' if c['is_finish'] else '否',
+                    '是' if (c['update_frequency'] == '全集' or c['is_finish']) else '否',
                     c['column_title'],
 
                 )

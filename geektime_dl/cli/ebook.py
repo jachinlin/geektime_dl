@@ -34,7 +34,7 @@ class EBook(Command):
         """
         if not c['had_sub']:
             t = c['column_title'] + '[免费试读]'
-        elif c['is_finish']:
+        elif c['update_frequency'] == '全集' or c['is_finish']:
             t = c['column_title'] + '[更新完毕]'
         else:
             t = c['column_title'] + '[未完待续{}]'.format(datetime.date.today())
@@ -214,7 +214,7 @@ class EbookBatch(EBook):
 
             data = dc.get_course_list()
             for c in data['1']['list'] + data['2']['list']:
-                if c['update_frequency'] == '全集':
+                if c['had_sub'] and (c['update_frequency'] == '全集' or c['is_finish']):
                     cid_list.append(c['id'])
 
 

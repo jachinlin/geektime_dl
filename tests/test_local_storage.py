@@ -1,8 +1,11 @@
 # coding=utf8
 
-from tinydb import Query
+import json
+import time
 
-from geektime_dl.data_client import DataClient
+from tinydb import Query, TinyDB
+
+from geektime_dl.data_client import DataClient, _JSONStorage
 
 
 def test_get_course_list(dc: DataClient):
@@ -28,6 +31,7 @@ def test_local_storage(dc: DataClient):
     course = Query()
     assert dc.db.table('course').search(course.id==course_id)[0]
 
+
 def test_force(dc: DataClient):
     course_id = 212
     course = Query()
@@ -49,3 +53,28 @@ def test_force(dc: DataClient):
     res = dc.db.table('course').search(course.id == course_id)
     assert  len(res) == 1
     assert  res[0]['access_count'] == 2
+
+
+def test_json_storage(db_file):
+    """
+    test my own json storage
+    """
+
+    db = TinyDB(db_file, storage=_JSONStorage)
+    item = {'name': 'A very long entry'}
+
+    db.insert(item)
+    with open(db_file) as f:
+        assert not f.read()
+
+    time.sleep(10)
+    db.insert(item)
+    with open(db_file) as f:
+        assert json.loads(f.read()) == {'_default': {'1': {'name': 'A very long entry'}, '2': {'name': 'A very long entry'}}}
+
+    db.close()
+
+
+def test_json_storage_atexit():
+    # how to ?
+    pass

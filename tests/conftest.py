@@ -56,5 +56,14 @@ def output_folder() -> str:
 
 @pytest.fixture
 def render(output_folder) -> Render:
-    render = Render(output_folder)
-    return render
+    r = Render(output_folder)
+    return r
+
+
+@pytest.fixture
+def db_file() -> str:
+    path = '/tmp/test.json'
+    if os.path.exists(path):
+        os.remove(path)
+    yield path
+    os.remove(path)
