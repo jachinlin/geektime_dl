@@ -129,7 +129,7 @@ def parse_config(args: list) -> dict:
                         help="specify the smtp host")
     parser.add_argument("--smtp-port", dest="smtp_port", type=int,
                         help="specify the a smtp port")
-    parser.add_argument("--smtp-encryption", dest="smtp_encryption", type=int,
+    parser.add_argument("--smtp-encryption", dest="smtp_encryption", type=str,
                         help="specify the a smtp encryption")
     parser.add_argument("--smtp-user", dest="smtp_user", type=str,
                         help="specify the smtp user")
