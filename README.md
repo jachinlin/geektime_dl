@@ -5,6 +5,7 @@
 [![Python versions](https://img.shields.io/pypi/pyversions/geektime-dl.svg)](https://pypi.org/project/geektime-dl/)
 [![PyPI - Downloads](https://img.shields.io/pypi/dd/geektime-dl.svg)](https://pypi.org/project/geektime-dl/)
 [![PyPI](https://img.shields.io/pypi/v/geektime-dl.svg)](https://pypi.org/project/geektime-dl/)
+[![Actions Status](https://github.com/jachinlin/geektime_dl/workflows/Python%20package/badge.svg)](https://github.com/jachinlin/geektime_dl/actions)
 
 
 <p align="center" style="margin:70px">
