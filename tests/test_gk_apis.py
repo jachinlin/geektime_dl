@@ -2,6 +2,16 @@
 
 from geektime_dl.data_client.gk_apis import GkApiClient
 
+course_keys_needed = {
+    'id', 'column_title', 'had_sub', 'is_finish', 'update_frequency'
+}
+post_keys_needed = {
+    'id', 'article_title', 'article_content', 'column_id'
+}
+comment_keys_needed = {
+    'user_name', 'like_count', 'comment_content', 'comment_ctime'
+}
+
 
 def test_api_get_course_list(gk: GkApiClient):
     res = gk.get_course_list()
@@ -12,14 +22,14 @@ def test_api_get_course_list(gk: GkApiClient):
         course_list = res[type_]['list']
         course = course_list[0]
         assert isinstance(course, dict)
-        for key in  {'id', 'column_title', 'had_sub', 'is_finish', 'update_frequency'}:
+        for key in course_keys_needed:
             assert course.get(key) is not None, '{} 不存在'.format(key)
 
 
 def test_api_get_course_intro(gk: GkApiClient):
     course = gk.get_course_intro(48)
     assert isinstance(course, dict)
-    for key in {'id', 'column_title', 'had_sub', 'is_finish', 'update_frequency'}:
+    for key in course_keys_needed:
         assert course.get(key) is not None, '{} 不存在'.format(key)
 
 
@@ -34,7 +44,7 @@ def test_api_get_course_post_list(gk: GkApiClient):
 def test_api_get_post_content(gk: GkApiClient):
     article = gk.get_post_content(333)
     assert article and isinstance(article, dict)
-    for key in {'id', 'article_title', 'article_content', 'column_id'}:
+    for key in post_keys_needed:
         assert article.get(key) is not None, '{} 不存在'.format(key)
 
     # mp3
@@ -51,5 +61,5 @@ def test_api_get_post_comments(gk: GkApiClient):
     res = gk.get_post_comments(109572)
     assert res and isinstance(res, list)
     comment = res[0]
-    for key in {'user_name', 'like_count', 'comment_content', 'comment_ctime'}:
+    for key in comment_keys_needed:
         assert comment.get(key) is not None, '{} 不存在'.format(key)

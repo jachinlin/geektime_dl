@@ -13,7 +13,8 @@ from ..utils.m3u8_downloader import Downloader
 
 class Mp4(Command):
     """保存视频课程视频
-    geektime mp4 -c <course_id> [--url-only] [--hd-only] [--output-folder=<output_folder>]
+    geektime mp4 -c <course_id> [--url-only] [--hd-only] \
+    [--output-folder=<output_folder>]
 
     `[]`表示可选，`<>`表示相应变量值
 
@@ -25,7 +26,7 @@ class Mp4(Command):
     notice: 此 subcmd 需要先执行 login subcmd
     e.g.: geektime mp4 -c 66 --output-folder=~/geektime-mp4
     """
-    def run(self, cfg: dict):
+    def run(self, cfg: dict):  # noqa: C901
 
         course_id = cfg['course_id']
         if not course_id:
@@ -38,7 +39,9 @@ class Mp4(Command):
             try:
                 os.makedirs(out_dir)
             except OSError:
-                sys.stderr.write("ERROR: couldn't create the output folder {}\n".format(out_dir))
+                sys.stderr.write(
+                    "ERROR: couldn't create the output folder {}\n".format(
+                        out_dir))
                 return
 
         url_only = cfg['url_only']
@@ -47,9 +50,11 @@ class Mp4(Command):
 
         try:
             dc = get_data_client(cfg)
-        except:
-            sys.stderr.write("ERROR: invalid geektime account or password\n"
-                             "Use '%s login --help' for  help.\n" % sys.argv[0].split(os.path.sep)[-1])
+        except Exception:
+            sys.stderr.write(
+                "ERROR: invalid geektime account or password\n"
+                "Use '{} login --help' for  help.\n".format(
+                    sys.argv[0].split(os.path.sep)[-1]))
             return
 
         course_data = dc.get_course_intro(course_id)
@@ -79,13 +84,14 @@ class Mp4(Command):
         p = Pool(workers)
         start = time.time()
         for post in data:
-            file_name = EbookRender.format_file_name(post['article_title']) + ('.hd' if hd_only else '.sd')
+            file_name = EbookRender.format_file_name(
+                post['article_title']) + ('.hd' if hd_only else '.sd')
             if os.path.isfile(os.path.join(out_dir, file_name) + '.ts'):
                 sys.stdout.write(file_name + ' exists\n')
                 continue
             if hd_only:  # some post has sd mp4 only
-                url = post['video_media_map'].get('hd', {}).get('url') or post['video_media'].get(
-                    'sd', {}).get('url')
+                url = (post['video_media_map'].get('hd', {}).get('url')
+                       or post['video_media'].get('sd', {}).get('url'))
             else:
                 url = post['video_media_map'].get('sd', {}).get('url')
 
@@ -93,7 +99,8 @@ class Mp4(Command):
 
         p.close()
         p.join()
-        sys.stdout.write('download {} done, cost {}s\n'.format(course_data['column_title'], int(time.time() - start)))
+        sys.stdout.write('download {} done, cost {}s\n'.format(
+            course_data['column_title'], int(time.time() - start)))
 
 
 class Mp4Batch(Mp4):
@@ -105,9 +112,11 @@ class Mp4Batch(Mp4):
         if cfg['all']:
             try:
                 dc = get_data_client(cfg)
-            except:
-                sys.stderr.write("ERROR: invalid geektime account or password\n"
-                                 "Use '%s login --help' for  help.\n" % sys.argv[0].split(os.path.sep)[-1])
+            except Exception:
+                sys.stderr.write(
+                    "ERROR: invalid geektime account or password\n"
+                    "Use '%s login --help' for  help.\n".format(
+                        sys.argv[0].split(os.path.sep)[-1]))
                 return
             data = dc.get_course_list()
             cid_list = []

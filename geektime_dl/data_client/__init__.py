@@ -10,7 +10,7 @@ import atexit
 from tinydb import TinyDB, Query
 from tinydb.storages import JSONStorage
 
-from geektime_dl.data_client.gk_apis import GkApiClient, GkApiError
+from geektime_dl.data_client.gk_apis import GkApiClient
 from geektime_dl.utils import Singleton, synchronized
 
 
@@ -36,7 +36,7 @@ def _local_storage(table: str):
                 self.db.table(table).upsert(data, collection.id == _id)
             return data
         return wrap
-    return  decorator
+    return decorator
 
 
 class DataClient(metaclass=Singleton):

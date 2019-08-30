@@ -1,5 +1,5 @@
 -r base.txt
 pytest
 codecov
-pytest-cov==2.6.0
+pytest-cov
 

@@ -18,7 +18,8 @@ class Render:
             '{}/templates/'.format(os.path.dirname(__file__))
         ))
 
-    def _render_file(self, template_name: str, context: dict, filename: str) -> None:
+    def _render_file(
+            self, template_name: str, context: dict, filename: str) -> None:
         """
         生成 html 文件
         """
@@ -33,7 +34,6 @@ class Render:
         with open(os.path.join(self._output_folder, 'toc.md'), "w") as f:
             headers = ['# {}'.format(h) for h in headers]
             f.writelines('\n'.join([title] + headers))
-
 
     def render_article_html(self, title: str, content: str) -> None:
         """
@@ -52,7 +52,8 @@ class Render:
         """
         with contextlib.suppress(Exception):
             r = requests.get(url, timeout=20)
-            with open(os.path.join(self._output_folder, 'cover.jpg'), 'wb') as f:
+            cover = os.path.join(self._output_folder, 'cover.jpg')
+            with open(cover, 'wb') as f:
                 f.write(r.content)
 
     def _parse_image(self, content: str) -> str:
@@ -71,7 +72,8 @@ class Render:
             with contextlib.suppress(Exception):
                 url_local = str(uuid.uuid4()) + '.jpg'
                 r = requests.get(url, timeout=20)
-                with open(os.path.join(self._output_folder, url_local), 'wb') as f:
+                img = os.path.join(self._output_folder, url_local)
+                with open(img, 'wb') as f:
                     f.write(r.content)
                 content = content.replace(url, url_local)
 

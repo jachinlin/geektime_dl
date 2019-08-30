@@ -27,7 +27,10 @@ class FakeGk(GkApiClient):
         return {'id': course_id, 'access_count': self._access_count}
 
     def get_course_list(self):
-        return {'1': {'list': []}, '2': {'list': []}, '3': {'list': []}, '4': {'list': []}}
+        return {
+            '1': {'list': []}, '2': {'list': []},
+            '3': {'list': []}, '4': {'list': []}
+        }
 
     def get_post_content(self, post_id: int):
         return {'id': post_id}

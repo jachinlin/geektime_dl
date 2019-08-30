@@ -8,7 +8,8 @@ from . import Command, save_cfg
 
 class Login(Command):
     """登录极客时间，保存账号密码至配置文件
-    geektime login  [--account=<account>] [--password=<password>] [--area=<area>]
+    geektime login  [--account=<account>] \
+    [--password=<password>] [--area=<area>]
 
     `[]`表示可选，`<>`表示相应变量值
 
@@ -34,7 +35,9 @@ class Login(Command):
                              "enter password: ".format(area, account))
 
         if need_save:
-            args.update({'account': account, 'password': password, 'area': area})
+            args.update({
+                'account': account, 'password': password, 'area': area
+            })
             save_cfg(args)
 
         GkApiClient(account=account, password=password, area=area)

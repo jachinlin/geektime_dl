@@ -22,15 +22,20 @@ class Downloader:
         if not body:
             raise Exception('message=invalid_url:{}'.format(r.url))
 
-        ts_list = [urljoin(m3u8_url, n.strip()) for n in body.split('\n') if n and not n.startswith("#")]
+        ts_list = [urljoin(m3u8_url, n.strip())
+                   for n in body.split('\n') if n and not n.startswith("#")]
         if not ts_list:
             raise Exception('message=invalid_url:{}'.format(r.url))
-
-        with open(os.path.join(out_dir, file_name + '.' + ts_list[0].split('/')[-1].split('?')[0].split('.')[-1]), 'wb') as outfile:
+        of = (file_name + '.'
+              + ts_list[0].split('/')[-1].split('?')[0].split('.')[-1])
+        with open(os.path.join(out_dir, of), 'wb') as outfile:
 
             for i, url in enumerate(ts_list):
                 percent = i * 1.0 / len(ts_list) * 100
-                print("download {} {:20} {}%".format(file_name, '#' * math.ceil(percent*20/100), math.ceil(percent)))
+                print("download {} {:20} {}%".format(
+                    file_name, '#' * math.ceil(percent * 20 / 100),
+                    math.ceil(percent))
+                )
                 r = requests.get(url, timeout=20)
 
                 if r.ok:
@@ -38,6 +43,4 @@ class Downloader:
             print("download {} {:20} {}%".format(file_name, '#' * 20, 100))
 
 
-if __name__ == '__main__':
-    downloader = Downloader()
-    downloader.run('https://res001.geekbang.org/media/video/17/ae/17af9f0d61ff9df13b26f299082d81ae/sd/sd.m3u8', '.')
+

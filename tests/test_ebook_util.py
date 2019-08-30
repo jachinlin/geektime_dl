@@ -10,7 +10,7 @@ def test_render_article_html(render: Render, output_folder: str):
     title = 'hello'
     content = '<p>hello world</p>'
     render.render_article_html(title, content)
-    fn = os.path.join(output_folder, title+'.html')
+    fn = os.path.join(output_folder, title + '.html')
 
     assert os.path.isfile(fn)
     with open(fn) as f:

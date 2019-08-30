@@ -6,11 +6,9 @@ import traceback
 import configparser
 import argparse
 
-from ..utils._logging import logger
-
+from geektime_dl.utils.log import logger
 
 commands = {}
-
 
 geektime_cfg = os.path.abspath('./geektime.cfg')
 cwd = os.path.abspath('.')
@@ -34,11 +32,16 @@ def work(self: 'Command', args: list):
     return self.run(cfg)
 
 
-Command = CommandType('Command', (object,), {'run': lambda self, args: None, 'work': work})
+Command = CommandType(
+    'Command',
+    (object,),
+    {'run': lambda self, args: None, 'work': work}
+)
 
 
 class Help(Command):
     """Display the list of available commands"""
+
     def run(self, cfg):
         result = ["Available commands:"]
         names = list(commands)
@@ -47,7 +50,9 @@ class Help(Command):
             name = k.ljust(padding, ' ')
             doc = (commands[k].__doc__ or '').split('\n')[0]
             result.append("    %s%s" % (name, doc))
-        result.append("\nUse '%s <command> --help' for individual command help." % sys.argv[0].split(os.path.sep)[-1])
+        result.append(
+            "\nUse '{} <command> --help' for individual command help.".format(
+                sys.argv[0].split(os.path.sep)[-1]))
 
         result = '\n'.join(result)
         sys.stdout.write(result)
@@ -55,7 +60,6 @@ class Help(Command):
 
 
 def _load_cfg(cfg_file: str) -> dict:
-
     p = configparser.RawConfigParser()
     cfg = dict()
     try:
@@ -95,37 +99,46 @@ def save_cfg(cfg: dict) -> None:
 
 def parse_config(args: list) -> dict:
     parser = argparse.ArgumentParser(prog='{} <command>'.format(sys.argv[0]))
-    parser.add_argument("--config", dest="config", type=str, default=geektime_cfg,
-                      help="specify alternate config file")
+    parser.add_argument("--config", dest="config", type=str,
+                        default=geektime_cfg,
+                        help="specify alternate config file")
     parser.add_argument("-a", "--account", dest="account", type=str,
-                      help="specify the account phone number")
+                        help="specify the account phone number")
     parser.add_argument("-p", "--password", dest="password", type=str,
-                      help="specify the account password")
+                        help="specify the account password")
     parser.add_argument("--area", dest="area", type=str, default='86',
-                      help="specify the account country code")
-    parser.add_argument("-o", "--output-folder", dest="output_folder", type=str, default=cwd,
-                      help="specify the output folder")
+                        help="specify the account country code")
+    parser.add_argument("-o", "--output-folder", dest="output_folder", type=str,
+                        default=cwd,
+                        help="specify the output folder")
     parser.add_argument("-c", "--course-id", dest="course_id", type=int,
-                      help="specify the target course id")
-    parser.add_argument("--force", dest="force", action='store_true', default=False,
-                      help="do not use the cache data")
-    parser.add_argument("--enable-comments", dest="enable_comments", action='store_true', default=False,
-                      help="fetch the course comments")
-    parser.add_argument("--comments-count", dest="comments_count", type=int, default=10,
-                      help="the count of comments to fetch each post")
-    parser.add_argument("--push", dest="push", action='store_true', default=False,
-                      help="push to kindle")
-    parser.add_argument("--source-only", dest="source_only", action='store_true', default=False,
-                      help="download source file only")
-    parser.add_argument("--url-only", dest="url_only", action='store_true', default=False,
+                        help="specify the target course id")
+    parser.add_argument("--force", dest="force", action='store_true',
+                        default=False,
+                        help="do not use the cache data")
+    parser.add_argument("--enable-comments", dest="enable_comments",
+                        action='store_true', default=False,
+                        help="fetch the course comments")
+    parser.add_argument("--comments-count", dest="comments_count", type=int,
+                        default=10,
+                        help="the count of comments to fetch each post")
+    parser.add_argument("--push", dest="push", action='store_true',
+                        default=False,
+                        help="push to kindle")
+    parser.add_argument("--source-only", dest="source_only",
+                        action='store_true', default=False,
+                        help="download source file only")
+    parser.add_argument("--url-only", dest="url_only", action='store_true',
+                        default=False,
                         help="download mp3/mp4 url only")
-    parser.add_argument("--hd-only", dest="hd_only", action='store_true', default=False,
+    parser.add_argument("--hd-only", dest="hd_only", action='store_true',
+                        default=False,
                         help="download mp4 with high quality")
-    parser.add_argument("--all", dest="all", action='store_true',  default=False,
-                      help="fetch all courses")
-    parser.add_argument("--course-ids", dest="course_ids",  type=str,
-                      help="specify the target course ids")
-    parser.add_argument( "--smtp-host", dest="smtp_host", type=str,
+    parser.add_argument("--all", dest="all", action='store_true', default=False,
+                        help="fetch all courses")
+    parser.add_argument("--course-ids", dest="course_ids", type=str,
+                        help="specify the target course ids")
+    parser.add_argument("--smtp-host", dest="smtp_host", type=str,
                         help="specify the smtp host")
     parser.add_argument("--smtp-port", dest="smtp_port", type=int,
                         help="specify the a smtp port")
@@ -147,7 +160,8 @@ def parse_config(args: list) -> dict:
 
     keys = ['config', 'account', 'area', 'password', 'output_folder',
             'force', 'enable_comments', 'comments_count', 'push',
-            'course_id', 'source_only', 'url_only', 'hd_only', 'all', 'course_ids',
+            'course_id', 'source_only', 'url_only', 'hd_only', 'all',
+            'course_ids',
             'smtp_host', 'smtp_port', 'smtp_user', 'smtp_password',
             'smtp_encryption', 'email_to', 'workers']
     for name in keys:
@@ -169,7 +183,6 @@ def main():
         command = args[0]
         args = args[1:]
 
-
     if command in commands:
         o = commands[command]()
         try:
@@ -178,4 +191,4 @@ def main():
             sys.stderr.write("ERROR: {}\n".format(e))
             logger.error('ERROR: {}'.format(traceback.format_exc()))
     else:
-        print('Unknow command %r\n\n' % (command,))
+        sys.stderr.write('Unknow command %r\n\n' % (command,))

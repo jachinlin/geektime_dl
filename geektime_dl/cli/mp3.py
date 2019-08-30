@@ -22,7 +22,7 @@ class Mp3(Command):
     notice: 此 subcmd 需要先执行 login subcmd
     e.g.: geektime mp3 -c 48 --output-folder=~/geektime-mp3
     """
-    def run(self, cfg: dict):
+    def run(self, cfg: dict):  # noqa: C901
 
         course_id = cfg['course_id']
         if not course_id:
@@ -35,16 +35,20 @@ class Mp3(Command):
             try:
                 os.makedirs(out_dir)
             except OSError:
-                sys.stderr.write("ERROR: couldn't create the output folder {}\n".format(out_dir))
+                sys.stderr.write(
+                    "ERROR: couldn't create the output folder {}\n".format(
+                        out_dir))
                 return
 
         url_only = cfg['url_only']
 
         try:
             dc = get_data_client(cfg)
-        except:
-            sys.stderr.write("ERROR: invalid geektime account or password\n"
-                             "Use '%s login --help' for  help.\n" % sys.argv[0].split(os.path.sep)[-1])
+        except Exception:
+            sys.stderr.write(
+                "ERROR: invalid geektime account or password\n"
+                "Use '{} login --help' for  help.\n".format(
+                    sys.argv[0].split(os.path.sep)[-1]))
             return
 
         course_data = dc.get_course_intro(course_id)
@@ -71,12 +75,14 @@ class Mp3(Command):
 
         dl = Downloader()
         for post in data:
-            file_name = EbookRender.format_file_name(post['article_title']) + '.mp3'
+            file_name = EbookRender.format_file_name(
+                post['article_title']) + '.mp3'
             if os.path.isfile(os.path.join(out_dir, file_name)):
                 sys.stdout.write(file_name + ' exists\n')
                 continue
             if post['audio_download_url']:
-                dl.run(post['audio_download_url'], out_file=file_name, out_dir=out_dir)
+                dl.run(post['audio_download_url'],
+                       out_file=file_name, out_dir=out_dir)
                 sys.stdout.write('download mp3 {} done\n'.format(file_name))
 
 
@@ -88,9 +94,11 @@ class Mp3Batch(Mp3):
         if cfg['all']:
             try:
                 dc = get_data_client(cfg)
-            except:
-                sys.stderr.write("ERROR: invalid geektime account or password\n"
-                                 "Use '%s login --help' for  help.\n" % sys.argv[0].split(os.path.sep)[-1])
+            except Exception:
+                sys.stderr.write(
+                    "ERROR: invalid geektime account or password\n"
+                    "Use '{} login --help' for  help.\n".format(
+                        sys.argv[0].split(os.path.sep)[-1]))
                 return
 
             data = dc.get_course_list()

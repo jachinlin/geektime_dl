@@ -4,13 +4,13 @@ import os
 import threading
 import time
 from geektime_dl import utils
-from geektime_dl.utils import mp3_downloader, m3u8_downloader, _logging
+from geektime_dl.utils import mp3_downloader, m3u8_downloader, log
 
 
 def test_mp3_downloader():
     dl = mp3_downloader.Downloader()
     dl.run(
-        mp3_url='https://res001.geekbang.org/resource/audio/fd/da/fde5b177af8b243cbd34413535e72cda.mp3',
+        mp3_url='https://res001.geekbang.org/resource/audio/fd/da/fde5b177af8b243cbd34413535e72cda.mp3',  # noqa: E501
         out_file='mp3.mp3',
         out_dir='.'
     )
@@ -18,11 +18,11 @@ def test_mp3_downloader():
 
 def test_mp4_downloader():
     dl = m3u8_downloader.Downloader()
-    dl.run('https://res001.geekbang.org/media/video/17/ae/17af9f0d61ff9df13b26f299082d81ae/sd/sd.m3u8', '.')
+    dl.run('https://res001.geekbang.org/media/video/17/ae/17af9f0d61ff9df13b26f299082d81ae/sd/sd.m3u8', '.')  # noqa: E501
 
 
 def test_logging():
-    _logging.logger.info('guess where i will be ')
+    log.logger.info('guess where i will be ')
 
     with open(os.path.join('.', 'geektime.log')) as f:
         logs = f.read()

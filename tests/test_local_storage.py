@@ -9,7 +9,7 @@ from geektime_dl.data_client import DataClient, _JSONStorage
 
 
 def test_get_course_list(dc: DataClient):
-    assert  isinstance(dc.get_course_list(), dict)
+    assert isinstance(dc.get_course_list(), dict)
 
 
 def test_get_course_intro(dc: DataClient):
@@ -29,7 +29,7 @@ def test_local_storage(dc: DataClient):
     dc.get_course_intro(course_id)
 
     course = Query()
-    assert dc.db.table('course').search(course.id==course_id)[0]
+    assert dc.db.table('course').search(course.id == course_id)[0]
 
 
 def test_force(dc: DataClient):
@@ -45,14 +45,14 @@ def test_force(dc: DataClient):
 
     # read from local storage
     res = dc.get_course_intro(course_id)
-    assert  res['access_count'] == 1
+    assert res['access_count'] == 1
     # force read from gk api
     res = dc.get_course_intro(course_id, force=True)
     assert res['access_count'] == 2
     # check local storage
     res = dc.db.table('course').search(course.id == course_id)
-    assert  len(res) == 1
-    assert  res[0]['access_count'] == 2
+    assert len(res) == 1
+    assert res[0]['access_count'] == 2
 
 
 def test_json_storage(db_file):
@@ -69,8 +69,15 @@ def test_json_storage(db_file):
 
     time.sleep(10)
     db.insert(item)
+    expected = {
+        '_default':
+            {
+                '1': {'name': 'A very long entry'},
+                '2': {'name': 'A very long entry'}
+            }
+    }
     with open(db_file) as f:
-        assert json.loads(f.read()) == {'_default': {'1': {'name': 'A very long entry'}, '2': {'name': 'A very long entry'}}}
+        assert json.loads(f.read()) == expected
 
     db.close()
 
