@@ -88,7 +88,7 @@ class DataClient(metaclass=Singleton):
         posts = []
         post_ids = self._gk.get_post_list_of(course_id)
         for post in post_ids:
-            post_detail = self.get_post_content(post['id'], force=force)
+            post_detail = self.get_post_content('134020', force=force)
             posts.append(post_detail)
         return posts
 
