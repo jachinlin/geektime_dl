@@ -159,7 +159,7 @@ class GkApiClient(metaclass=Singleton):
         url = 'https://time.geekbang.org/serv/v1/article'
         headers = {
             'Referer': 'https://time.geekbang.org/column/article/{}'.format(
-                post_id)
+                '134020')
         }
 
         resp = self._post(
