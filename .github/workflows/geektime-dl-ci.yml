@@ -27,14 +27,11 @@ jobs:
     - name: Lint with flake8
       run: |
         pip install flake8
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 .
+        flake8 geektime_dl
     - name: Test with pytest
       env:
         account: ${{ secrets.account }}
         password: ${{ secrets.password }}
       run: |
-        pip install pytest codecov pytest-cov
-        python -m pytest  --cov=./
-        codecov
+        pip install pytest
+        python -m pytest

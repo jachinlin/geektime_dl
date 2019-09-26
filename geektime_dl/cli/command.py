@@ -80,7 +80,8 @@ def save_cfg(cfg: dict) -> None:
     p = configparser.RawConfigParser()
     p.add_section('default')
     for opt in sorted(cfg):
-        if opt in ['config', 'course_id', 'course_ids']:
+        if opt in ['config', 'course_id', 'course_ids',
+                   'video_id', 'force', 'push', 'all']:
             continue
         p.set('default', opt, cfg[opt])
 
@@ -113,6 +114,8 @@ def parse_config(args: list) -> dict:
                         help="specify the output folder")
     parser.add_argument("-c", "--course-id", dest="course_id", type=int,
                         help="specify the target course id")
+    parser.add_argument("-v", "--video-id", dest="video_id", type=int,
+                        help="specify the target video id")
     parser.add_argument("--force", dest="force", action='store_true',
                         default=False,
                         help="do not use the cache data")
@@ -161,7 +164,7 @@ def parse_config(args: list) -> dict:
     keys = ['config', 'account', 'area', 'password', 'output_folder',
             'force', 'enable_comments', 'comments_count', 'push',
             'course_id', 'source_only', 'url_only', 'hd_only', 'all',
-            'course_ids',
+            'course_ids', 'video_id',
             'smtp_host', 'smtp_port', 'smtp_user', 'smtp_password',
             'smtp_encryption', 'email_to', 'workers']
     for name in keys:

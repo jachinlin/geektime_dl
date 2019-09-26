@@ -9,7 +9,7 @@ install:
 
 # command to run tests
 script:
-  - python -m pytest --cov=./
+  - python -m pytest --cov=./geektime_dl
 
 after_success:
   - codecov

@@ -72,29 +72,6 @@ pip install -U geektime_dl
 pip install -U git+https://github.com/jachinlin/geektime_dl.git
 ```
 
-**安装kindlegen**
-
-
-1. Linux:
-
-```
-wget http://kindlegen.s3.amazonaws.com/kindlegen_linux_2.6_i386_v2_9.tar.gz -O - | tar -xzf - -C ~/venv3/bin
-```
-
-2. macOS:
-
-```
-brew install homebrew/cask/kindlegen
-```
-
-3. Windows:
-
-```
-not test now!
-use docker, see below
-```
-
-
 ## 四、使用
 
 

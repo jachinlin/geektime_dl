@@ -92,6 +92,12 @@ class DataClient(metaclass=Singleton):
             posts.append(post_detail)
         return posts
 
+    def get_video_collection_list(self, **kwargs) -> list:
+        """
+        获取每日一课合辑列表
+        """
+        return self._gk.get_video_collection_list()
+
 
 class _JSONStorage(JSONStorage):
     """

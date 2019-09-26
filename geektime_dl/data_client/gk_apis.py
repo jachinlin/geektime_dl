@@ -183,3 +183,43 @@ class GkApiClient(metaclass=Singleton):
         )
 
         return resp.json()['data']['list']
+
+    @_retry
+    def get_video_collection_intro(self, collection_id: int) -> dict:
+        """每日一课合辑简介"""
+        url = 'https://time.geekbang.org/serv/v2/video/GetCollectById'
+        headers = {
+            'Referer': 'https://time.geekbang.org/dailylesson/collection/{}'.format(  # noqa: E501
+                collection_id)
+        }
+
+        resp = self._post(
+            url, {'id': str(collection_id)},
+            headers=headers, cookies=self._cookies
+        )
+
+        data = resp.json()['data']
+        return data
+
+    @_retry
+    def get_video_collection_list(self) -> list:
+        """每日一课合辑列表"""
+        # 没分析出接口
+        ids = list(range(3, 82)) + list(range(104, 141))
+        return [{'collection_id': id_ for id_ in ids}]
+
+    @_retry
+    def get_video_list_of(self, collection_id: int) -> list:
+        """每日一课合辑视频列表"""
+        url = 'https://time.geekbang.org/serv/v2/video/GetListByType'
+        headers = {
+            'Referer': 'https://time.geekbang.org/dailylesson/collection/{}'.format(  # noqa: E501
+                collection_id)
+        }
+
+        resp = self._post(
+            url, {"id": str(collection_id), "size": 50},
+            headers=headers, cookies=self._cookies
+        )
+
+        return resp.json()['data']['list']
