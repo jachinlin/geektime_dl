@@ -40,3 +40,5 @@ nosetests.xml
 .idea
 
 # tmp files
+geektime.cfg
+htmlcov

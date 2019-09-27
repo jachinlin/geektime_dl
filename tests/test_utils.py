@@ -3,22 +3,31 @@
 import os
 import threading
 import time
+from pathlib import Path
+
 from geektime_dl import utils
 from geektime_dl.utils import mp3_downloader, m3u8_downloader, log
 
 
-def test_mp3_downloader():
-    dl = mp3_downloader.Downloader()
+def test_mp3_downloader(tmp_path: Path):
+    dl = mp3_downloader.Downloader(str(tmp_path))
     dl.run(
-        mp3_url='https://res001.geekbang.org/resource/audio/fd/da/fde5b177af8b243cbd34413535e72cda.mp3',  # noqa: E501
-        out_file='mp3.mp3',
-        out_dir='.'
+        url='https://res001.geekbang.org/resource/audio/fd/da/fde5b177af8b243cbd34413535e72cda.mp3',  # noqa: E501
+        file_name='mp3.mp3'
     )
+    dl.shutdown()
+    mp3 = tmp_path / 'mp3.mp3'
+    assert mp3.is_file()
+    mp3.unlink()
 
 
-def test_mp4_downloader():
-    dl = m3u8_downloader.Downloader()
-    dl.run('https://res001.geekbang.org/media/video/17/ae/17af9f0d61ff9df13b26f299082d81ae/sd/sd.m3u8', '.')  # noqa: E501
+def test_mp4_downloader(tmp_path: Path):
+    dl = m3u8_downloader.Downloader(str(tmp_path))
+    dl.run('https://res001.geekbang.org/media/video/17/ae/17af9f0d61ff9df13b26f299082d81ae/sd/sd.m3u8', 'mp4')  # noqa: E501
+    dl.shutdown()
+    mp4 = tmp_path / 'mp4.ts'
+    assert mp4.is_file()
+    mp4.unlink()
 
 
 def test_logging():
@@ -46,17 +55,17 @@ def test_synchronized():
             self._lock = threading.Lock()
 
         def func(self):
-            time.sleep(2)
+            time.sleep(0.2)
 
         @utils.synchronized()
         def synchronized_func(self):
-            time.sleep(2)
+            time.sleep(0.2)
 
     a = A()
 
     start = time.time()
     t_list = []
-    for i in range(3):
+    for i in range(2):
         t = threading.Thread(target=a.synchronized_func)
         t_list.append(t)
         t.start()
@@ -64,11 +73,11 @@ def test_synchronized():
         t.join()
     time_cost = time.time() - start
 
-    assert time_cost > 6
+    assert time_cost >= 0.2 * 2
 
     start = time.time()
     t_list = []
-    for i in range(3):
+    for i in range(2):
         t = threading.Thread(target=a.func)
         t_list.append(t)
         t.start()
@@ -76,6 +85,6 @@ def test_synchronized():
         t.join()
     time_cost = time.time() - start
 
-    assert time_cost < 3
+    assert time_cost < 0.2 * 2
 
 

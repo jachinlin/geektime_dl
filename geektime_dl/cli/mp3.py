@@ -3,116 +3,87 @@
 import os
 import sys
 
-from geektime_dl.data_client import get_data_client
-from geektime_dl.utils.ebook import Render as EbookRender
+from termcolor import colored
+
+from geektime_dl.data_client.gk_apis import GkApiError
+from geektime_dl.utils.ebook import Render
 from geektime_dl.utils.mp3_downloader import Downloader
-from geektime_dl.cli import Command
+from geektime_dl.cli import Command, add_argument
 
 
 class Mp3(Command):
-    """保存专栏音频
-    eektime mp3 -c <course_id> [--url-only] [--output-folder=<output_folder>]
+    """保存专栏音频"""
 
-    `[]`表示可选，`<>`表示相应变量值
-
-    course_id: 课程ID，可以从 query subcmd 查看
-    url_only: 只保存音频url
-    output_folder: 音频存放目录，默认当前目录
-
-    notice: 此 subcmd 需要先执行 login subcmd
-    e.g.: geektime mp3 -c 48 --output-folder=~/geektime-mp3
-    """
-    def run(self, cfg: dict):  # noqa: C901
-
-        course_id = cfg['course_id']
-        if not course_id:
-            sys.stderr.write("ERROR: couldn't find the target course id\n")
-            return
-
-        out_dir = os.path.join(cfg['output_folder'], 'mp3')
-        out_dir = os.path.expanduser(out_dir)
-        if not os.path.isdir(out_dir):
-            try:
-                os.makedirs(out_dir)
-            except OSError:
-                sys.stderr.write(
-                    "ERROR: couldn't create the output folder {}\n".format(
-                        out_dir))
-                return
-
-        url_only = cfg['url_only']
-
-        try:
-            dc = get_data_client(cfg)
-        except Exception:
-            sys.stderr.write(
-                "ERROR: invalid geektime account or password\n"
-                "Use '{} login --help' for  help.\n".format(
-                    sys.argv[0].split(os.path.sep)[-1]))
-            return
-
-        course_data = dc.get_course_intro(course_id)
-        if int(course_data['column_type']) != 1:
-            raise Exception('该课程不提供音频:%s' % course_data['column_title'])
-
-        out_dir = os.path.join(out_dir, course_data['column_title'])
-        if not os.path.isdir(out_dir):
-            os.makedirs(out_dir)
-
-        sys.stdout.write('doing ......\n')
-        data = dc.get_course_content(course_id)
-
-        if url_only:
-            title = EbookRender.format_file_name(course_data['column_title'])
-            with open(os.path.join(out_dir, '%s.mp3.txt' % title), 'w') as f:
-                # TODO alignment
-                f.write('\n'.join(["{}:\t\t{}".format(
-                    EbookRender.format_file_name(post['article_title']),
-                    post['audio_download_url']
-                ) for post in data]))
-                sys.stdout.write('download {} mp3 url done\n'.format(title))
-            return
-
-        dl = Downloader()
-        for post in data:
-            file_name = EbookRender.format_file_name(
-                post['article_title']) + '.mp3'
-            if os.path.isfile(os.path.join(out_dir, file_name)):
-                sys.stdout.write(file_name + ' exists\n')
-                continue
-            if post['audio_download_url']:
-                dl.run(post['audio_download_url'],
-                       out_file=file_name, out_dir=out_dir)
-                sys.stdout.write('download mp3 {} done\n'.format(file_name))
-
-
-class Mp3Batch(Mp3):
-    """批量下载 mp3
-    懒， 不想写参数了
-    """
+    @add_argument("course_ids", type=str,
+                  help="specify the target course ids")
+    @add_argument("--url-only", dest="url_only", action='store_true',
+                  default=False, help="download mp3/mp4 url only")
+    @add_argument("--workers", dest="workers", type=int, save=True,
+                  help="specify the number of threads to download mp3/mp4")
     def run(self, cfg: dict):
-        if cfg['all']:
+
+        course_ids = self.parse_course_ids(cfg['course_ids'])
+        output_folder = self._format_out_folder(cfg)
+
+        dc = self.get_data_client(cfg)
+        dl = Downloader(output_folder, workers=cfg['workers'])
+
+        for course_id in course_ids:
             try:
-                dc = get_data_client(cfg)
-            except Exception:
-                sys.stderr.write(
-                    "ERROR: invalid geektime account or password\n"
-                    "Use '{} login --help' for  help.\n".format(
-                        sys.argv[0].split(os.path.sep)[-1]))
-                return
+                course_data = dc.get_course_intro(course_id)
+            except GkApiError as e:
+                sys.stderr.write('{}\n\n'.format(e))
+                continue
+            if int(course_data['column_type']) != 1:
+                sys.stderr.write('该课程不提供音频:{} {}\n\n'.format(
+                    course_id, course_data['column_title']))
+                continue
+            out_dir = os.path.join(
+                output_folder,
+                Render.format_file_name(course_data['column_title']))
+            if not os.path.isdir(out_dir):
+                os.makedirs(out_dir)
 
-            data = dc.get_course_list()
-            cid_list = []
-            for c in data['1']['list']:
-                if c['had_sub']:
-                    cid_list.append(c['id'])
+            # fetch raw data
+            print(colored('开始下载音频:{}-{}'.format(
+                course_id, course_data['column_title']), 'green'))
+            pbar_desc = '数据爬取中:{}'.format(course_data['column_title'][:10])
+            data = dc.get_course_content(course_id, pbar_desc=pbar_desc)
 
-        else:
-            course_ids = cfg['course_ids']
-            cid_list = course_ids.split(',')
+            # save url
+            if cfg['url_only']:
+                self._parse_and_save_url(course_data, data, out_dir)
+                continue
 
-        for cid in cid_list:
-            args = cfg.copy()
-            args['course_id'] = int(cid)
-            super().run(args)
+            # download mp3
+            for post in data:
+                fn = Render.format_file_name(
+                    post['article_title']) + '.mp3'
+                if os.path.isfile(os.path.join(out_dir, fn)):
+                    sys.stdout.write(fn + ' exists\n')
+                    continue
+                if post['audio_download_url']:
+                    dl.run(post['audio_download_url'],
+                           file_name=os.path.join(out_dir, fn))
+        dl.shutdown()
+
+    @staticmethod
+    def _format_out_folder(cfg):
+        output_folder = os.path.join(cfg['output_folder'], 'mp3')
+        output_folder = os.path.expanduser(output_folder)
+        if not os.path.isdir(output_folder):
+            os.makedirs(output_folder)
+        return output_folder
+
+    @staticmethod
+    def _parse_and_save_url(course_intro: dict,
+                            course_data: list, out_dir: str):
+        title = Render.format_file_name(course_intro['column_title'])
+        fn = os.path.join(out_dir, '{}.mp3.txt'.format(title))
+        with open(fn, 'w') as f:
+            f.write('\n'.join(["{}:\t\t{}".format(
+                Render.format_file_name(post['article_title']),
+                post['audio_download_url']
+            ) for post in course_data]))
+        sys.stdout.write('音频链接下载完成：{}\n\n'.format(fn))
 
