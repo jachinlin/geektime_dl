@@ -9,6 +9,7 @@ import atexit
 
 from tinydb import TinyDB, Query
 from tinydb.storages import JSONStorage
+from tqdm import tqdm
 
 from geektime_dl.data_client.gk_apis import GkApiClient
 from geektime_dl.utils import Singleton, synchronized
@@ -81,12 +82,16 @@ class DataClient(metaclass=Singleton):
             c['replies'] = json.dumps(c.get('replies', []))
         return data
 
-    def get_course_content(self, course_id: int, force: bool = False) -> list:
+    def get_course_content(self, course_id: int, force: bool = False,
+                           pbar=True, pbar_desc='') -> list:
         """
         获取课程ID为 course_id 的所有章节内容
         """
         posts = []
         post_ids = self._gk.get_post_list_of(course_id)
+        if pbar:
+            post_ids = tqdm(post_ids)
+            post_ids.set_description(pbar_desc)
         for post in post_ids:
             post_detail = self.get_post_content(post['id'], force=force)
             posts.append(post_detail)

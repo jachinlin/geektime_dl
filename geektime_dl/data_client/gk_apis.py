@@ -150,7 +150,7 @@ class GkApiClient(metaclass=Singleton):
 
         data = resp.json()['data']
         if not data:
-            raise GkApiError('course not exists:%s' % course_id)
+            raise GkApiError('无效的课程 ID: {}'.format(course_id))
         return data
 
     @_retry

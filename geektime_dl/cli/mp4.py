@@ -2,133 +2,104 @@
 
 import os
 import sys
-import time
-from multiprocessing import Pool
 
-from geektime_dl.data_client import get_data_client
-from geektime_dl.utils.ebook import Render as EbookRender
-from . import Command
-from ..utils.m3u8_downloader import Downloader
+from termcolor import colored
+
+from geektime_dl.utils.ebook import Render
+from geektime_dl.cli import Command, add_argument
+from geektime_dl.utils.m3u8_downloader import Downloader
+from geektime_dl.data_client.gk_apis import GkApiError
 
 
 class Mp4(Command):
-    """保存视频课程视频
-    geektime mp4 -c <course_id> [--url-only] [--hd-only] \
-    [--output-folder=<output_folder>]
+    """保存视频课程视频"""
 
-    `[]`表示可选，`<>`表示相应变量值
-
-    course_id: 课程ID，可以从 query subcmd 查看
-    --url-only: 只保存视频url
-    --hd-only：下载高清视频，默认下载标清视频
-    output_folder: 视频存放目录，默认当前目录
-
-    notice: 此 subcmd 需要先执行 login subcmd
-    e.g.: geektime mp4 -c 66 --output-folder=~/geektime-mp4
-    """
-    def run(self, cfg: dict):  # noqa: C901
-
-        course_id = cfg['course_id']
-        if not course_id:
-            sys.stderr.write("ERROR: couldn't find the target course id\n")
-            return
-
-        out_dir = os.path.join(cfg['output_folder'], 'mp4')
-        out_dir = os.path.expanduser(out_dir)
-        if not os.path.isdir(out_dir):
-            try:
-                os.makedirs(out_dir)
-            except OSError:
-                sys.stderr.write(
-                    "ERROR: couldn't create the output folder {}\n".format(
-                        out_dir))
-                return
-
-        url_only = cfg['url_only']
-        hd_only = cfg['hd_only']
-        workers = cfg['workers']
-
-        try:
-            dc = get_data_client(cfg)
-        except Exception:
-            sys.stderr.write(
-                "ERROR: invalid geektime account or password\n"
-                "Use '{} login --help' for  help.\n".format(
-                    sys.argv[0].split(os.path.sep)[-1]))
-            return
-
-        course_data = dc.get_course_intro(course_id)
-
-        if int(course_data['column_type']) != 3:
-            raise Exception('该课程不是视频课程:%s' % course_data['column_title'])
-
-        out_dir = os.path.join(out_dir, course_data['column_title'])
-        if not os.path.isdir(out_dir):
-            os.makedirs(out_dir)
-
-        sys.stdout.write('doing ......\n')
-        data = dc.get_course_content(course_id)
-        if url_only:
-            title = EbookRender.format_file_name(course_data['column_title'])
-            with open(os.path.join(out_dir, '%s.mp4.txt' % title), 'w') as f:
-
-                f.write('\n'.join(["{}:\n{}\n{}\n\n".format(
-                    EbookRender.format_file_name(post['article_title']),
-                    post['video_media_map'].get('hd', {}).get('url'),
-                    post['video_media_map'].get('sd', {}).get('url')
-                ) for post in data]))
-            sys.stdout.write('download {} mp4 url done\n'.format(title))
-            return
-
-        dl = Downloader()
-        p = Pool(workers)
-        start = time.time()
-        for post in data:
-            file_name = EbookRender.format_file_name(
-                post['article_title']) + ('.hd' if hd_only else '.sd')
-            if os.path.isfile(os.path.join(out_dir, file_name) + '.ts'):
-                sys.stdout.write(file_name + ' exists\n')
-                continue
-            if hd_only:  # some post has sd mp4 only
-                url = (post['video_media_map'].get('hd', {}).get('url')
-                       or post['video_media'].get('sd', {}).get('url'))
-            else:
-                url = post['video_media_map'].get('sd', {}).get('url')
-
-            p.apply_async(dl.run, (url, out_dir, file_name))
-
-        p.close()
-        p.join()
-        sys.stdout.write('download {} done, cost {}s\n'.format(
-            course_data['column_title'], int(time.time() - start)))
-
-
-class Mp4Batch(Mp4):
-    """批量下载 mp4
-    懒， 不想写参数了
-    """
+    @add_argument("course_ids", type=str,
+                  help="specify the target course ids")
+    @add_argument("--url-only", dest="url_only", action='store_true',
+                  default=False, help="download mp3/mp4 url only")
+    @add_argument("--hd-only", dest="hd_only", action='store_true',
+                  default=False, help="download mp4 with high quality")
+    @add_argument("--workers", dest="workers", type=int, save=True,
+                  help="specify the number of threads to download mp3/mp4")
     def run(self, cfg: dict):
 
-        if cfg['all']:
+        course_ids = self.parse_course_ids(cfg['course_ids'])
+        output_folder = self._format_output_folder(cfg)
+
+        dc = self.get_data_client(cfg)
+        dl = Downloader(output_folder, workers=cfg['workers'])
+
+        for course_id in course_ids:
             try:
-                dc = get_data_client(cfg)
-            except Exception:
-                sys.stderr.write(
-                    "ERROR: invalid geektime account or password\n"
-                    "Use '%s login --help' for  help.\n".format(
-                        sys.argv[0].split(os.path.sep)[-1]))
-                return
-            data = dc.get_course_list()
-            cid_list = []
-            for c in data['3']['list']:
-                if c['had_sub']:
-                    cid_list.append(str(c['id']))
+                course_data = dc.get_course_intro(course_id)
+            except GkApiError as e:
+                sys.stderr.write('{}\n\n'.format(e))
+                continue
+            if int(course_data['column_type']) != 3:
+                sys.stderr.write('该课程不是视频课程:{} {}\n\n'.format(
+                    course_id, course_data['column_title']))
+                continue
 
+            out_dir = os.path.join(
+                output_folder,
+                Render.format_file_name(course_data['column_title']))
+            if not os.path.isdir(out_dir):
+                os.makedirs(out_dir)
+
+            # fetch raw data
+            print(colored('开始下载视频:{}-{}'.format(
+                course_id, course_data['column_title']), 'green'))
+            pbar_desc = '数据爬取中:{}'.format(course_data['column_title'][:10])
+            data = dc.get_course_content(course_id, pbar_desc=pbar_desc)
+
+            # save url
+            if cfg['url_only']:
+                self._parse_and_save_url(course_data, data, out_dir)
+                continue
+
+            # download mp4
+            for post in data:
+                fn = (Render.format_file_name(post['article_title']) +
+                      ('.hd' if cfg['hd_only'] else '.sd'))
+                if os.path.isfile(os.path.join(out_dir, fn) + '.ts'):
+                    sys.stdout.write(fn + ' exists\n')
+                    continue
+                url = self._parse_url(post, cfg['hd_only'])
+                if url:
+                    dl.run(url, os.path.join(out_dir, fn))
+        dl.shutdown()
+
+    @staticmethod
+    def _format_output_folder(cfg):
+        output_folder = os.path.join(cfg['output_folder'], 'mp4')
+        output_folder = os.path.expanduser(output_folder)
+        if not os.path.isdir(output_folder):
+            os.makedirs(output_folder)
+        return output_folder
+
+    @staticmethod
+    def _parse_and_save_url(course_intro, course_data, out_dir):
+        title = Render.format_file_name(course_intro['column_title'])
+        fn = os.path.join(out_dir, '{}.mp4.txt'.format(title))
+        with open(fn, 'w') as f:
+            f.write('\n'.join(["{}:\n{}\n{}\n\n".format(
+                Render.format_file_name(post['article_title']),
+                (post.get('video_media_map') or {}).get('hd', {}).get('url'),
+                (post.get('video_media_map') or {}).get('sd', {}).get('url')
+            ) for post in course_data]))
+
+        sys.stdout.write('视频链接下载完成：{}\n\n'.format(fn))
+
+    @staticmethod
+    def _parse_url(post_content: dict, hd_only: bool):
+
+        if hd_only:  # some post has sd mp4 only
+            url = ((post_content.get('video_media_map') or {}).get(
+                'hd', {}).get('url') or post_content['video_media'].get(
+                'sd', {}).get('url'))
         else:
-            course_ids = cfg['course_ids']
-            cid_list = course_ids.split(',')
+            url = (post_content.get('video_media_map') or {}).get(
+                'sd', {}).get('url')
 
-        for cid in cid_list:
-            args = cfg.copy()
-            args['course_id'] = int(cid)
-            super().run(args)
+        return url

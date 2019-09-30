@@ -28,6 +28,9 @@ class Singleton(type):
             cls._instances[cls] = super().__call__(*args, **kwargs)
         return cls._instances[cls]
 
-
+    @classmethod
+    @synchronized()
+    def clear_singletons(cls):
+        return cls._instances.clear()
 
 

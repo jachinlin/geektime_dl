@@ -36,7 +36,9 @@ setup(
     install_requires=[
         'kindle_maker',
         'requests',
-        'tinydb'
+        'tinydb',
+        'termcolor',
+        'tqdm',
     ],
     entry_points={
         'console_scripts': [

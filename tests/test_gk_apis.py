@@ -15,6 +15,7 @@ daily_video_keys_needed = {
     'id', 'article_title', 'column_had_sub', 'video_media_map'
 }
 
+
 def test_api_get_course_list(gk: GkApiClient):
     res = gk.get_course_list()
 

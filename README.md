@@ -141,21 +141,19 @@ geektime query
 **制作电子书**
 
 ```
-geektime ebook -c <course_id> [--output-folder=<output_folder>] [--enable-comments] [--comments-count=<comments_count>]
+geektime ebook <course_id> [--output-folder=<output_folder> [--comments-count=<comments_count>]
 ```
 
 - course_id: 课程ID，可以从 query subcmd 查看
 - output_folder: 电子书存放目录，默认`./ebook/`
-- --enable-comments: 启动评论下载，默认不下载评论
-- comments_count: 在启动评论下载时，设置评论条数，默认10条
+- comments_count: 在启动评论下载时，设置评论条数，默认0条
 
 notice: 此 subcmd 需要先执行 login subcmd
-
 
 **下载mp3**
 
 ```
-geektime mp3  -c <course_id> [--url-only] [--output-folder=<output_folder>]
+geektime mp3 <course_id> [--url-only] [--output-folder=<output_folder>]
 ```
 - course_id: 课程ID，可以从 query subcmd 查看
 - --url-only: 只保存音频url，不下载音频
@@ -167,7 +165,7 @@ notice: 此 subcmd 需要先执行 login subcmd
 **下载mp4**
 
 ```
-geektime mp4 -c <course_id> [--url-only] [--hd-only] [--output-folder=<output_folder>]
+geektime mp4 <course_id> [--url-only] [--hd-only] [--output-folder=<output_folder>]
 ```
 
 - course_id: 课程ID，可以从 query subcmd 查看
@@ -204,8 +202,7 @@ geektime ebook -c 42 --push --smtp-host=smtp.qq.com --smtp-port=465 --smtp-encry
 
 ## 五、Docker
 
-如果你对 Python 不是很了解，对上面的安装过程还是很迷惑的话，
-我们还提供了 docker 版本，只要安装好 docker ，依次复制下边指令并执行，
+如果你对 Python 不是很了解，我们还提供了 docker 版本，只要安装好 docker ，依次复制下边指令并执行，
 就能下载全部已购买专栏文章、mp3、mp4，如果专栏更新完毕的话，我们还会把该专栏做成kindle电子书。
 
 ```

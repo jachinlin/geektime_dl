@@ -1,42 +1,30 @@
 # coding=utf8
-# flake8: noqa
 
 import os
 import sys
 import json
 import datetime
-from geektime_dl.data_client import get_data_client
-from . import Command
-from geektime_dl.utils.ebook import Render
+
+from termcolor import colored
 from kindle_maker import make_mobi
+from tqdm import tqdm
+
+from geektime_dl.cli import Command, add_argument
+from geektime_dl.utils.ebook import Render
 from geektime_dl.utils.mail import send_to_kindle
+from geektime_dl.data_client.gk_apis import GkApiError
 
 
 class EBook(Command):
-    """将专栏文章制作成电子书
+    """将专栏文章制作成电子书"""
 
-    geektime ebook -c <course_id> [--output-folder=<output_folder>] \
-    [--enable-comments] [--comments-count=<comments_count>]
-
-    `[]`表示可选，`<>`表示相应变量值
-
-    course_id: 课程ID，可以从 query subcmd 查看
-    output_folder: 电子书存放目录，默认当前目录
-    --enable-comments: 启动评论下载，默认不下载评论
-    comments_count: 在启动评论下载时，设置评论条数，默认10条
-
-    notice: 此 subcmd 需要先执行 login subcmd
-    e.g.: geektime ebook 48 --output-folder=~/geektime-ebook
-    """
-
-    @staticmethod
-    def _title(c):
+    def _format_title(self, c):
         """
         课程文件名
         """
         if not c['had_sub']:
             t = c['column_title'] + '[免费试读]'
-        elif c['update_frequency'] == '全集' or c['is_finish']:
+        elif self.is_course_finished(c):
             t = c['column_title'] + '[更新完毕]'
         else:
             t = c['column_title'] + '[未完待续{}]'.format(datetime.date.today())
@@ -67,7 +55,7 @@ class EBook(Command):
             render.generate_cover_img(course_intro['column_cover'])
             sys.stdout.write('下载{}封面 done\n'.format(column_title))
         # toc
-        ebook_name = self._title(course_intro)
+        ebook_name = self._format_title(course_intro)
         render.render_toc_md(
             ebook_name,
             ['简介']
@@ -75,81 +63,103 @@ class EBook(Command):
         )
         sys.stdout.write('下载{}目录 done\n'.format(column_title))
         # articles
+        articles = tqdm(articles)
         for article in articles:
+            articles.set_description('HTML 文件下载中:{}'.format(
+                article['article_title'][:10]))
             title = render.format_file_name(article['article_title'])
             fn = os.path.join(_out_dir, '{}.html'.format(title))
             if not force and os.path.isfile(fn):
-                sys.stdout.write(title + ' exists\n')
                 continue
             render.render_article_html(title, article['article_content'])
-            sys.stdout.write('下载{}:{} done\n'.format(column_title, title))
 
+    @add_argument("course_ids", type=str,
+                  help="specify the target course ids")
+    @add_argument("--force", dest="force", action='store_true', default=False,
+                  help="do not use the cache data")
+    @add_argument("--comments-count", dest="comments_count", type=int,
+                  default=0, save=True,
+                  help="the count of comments to fetch each post")
+    @add_argument("--push", dest="push", action='store_true', default=False,
+                  help="push to kindle")
+    @add_argument("--smtp-host", dest="smtp_host", type=str, save=True,
+                  help="specify the smtp host")
+    @add_argument("--smtp-port", dest="smtp_port", type=int, save=True,
+                  help="specify the a smtp port")
+    @add_argument("--smtp-encryption", dest="smtp_encryption", save=True,
+                  help="specify the a smtp encryption")
+    @add_argument("--smtp-user", dest="smtp_user", type=str, save=True,
+                  help="specify the smtp user")
+    @add_argument("--smtp-password", dest="smtp_password", type=str, save=True,
+                  help="specify the smtp password")
+    @add_argument("--email-to", dest="email_to", type=str, save=True,
+                  help="specify the kindle receiver email")
     def run(self, cfg: dict) -> None:
 
-        course_id = cfg['course_id']
-        if not course_id:
-            sys.stderr.write("ERROR: couldn't find the target course id\n")
-            return
-        out_dir = os.path.join(cfg['output_folder'], 'ebook')
-        out_dir = os.path.expanduser(out_dir)
-        if not os.path.isdir(out_dir):
+        course_ids = self.parse_course_ids(cfg['course_ids'])
+        output_folder = self._format_output_folder(cfg)
+
+        dc = self.get_data_client(cfg)
+
+        for course_id in course_ids:
             try:
-                os.makedirs(out_dir)
-            except OSError:
-                sys.stderr.write(
-                    "ERROR: couldn't create the output folder {}\n".format(
-                        out_dir)
-                )
-                return
-        try:
-            dc = get_data_client(cfg)
-        except Exception:
-            sys.stderr.write(
-                "ERROR: invalid geektime account or password\n"
-                "Use '{} login --help' for  help.\n".format(
-                    sys.argv[0].split(os.path.sep)[-1])
-            )
-            return
+                course_intro = dc.get_course_intro(course_id, force=True)
+            except GkApiError as e:
+                sys.stderr.write('{}\n\n'.format(e))
+                continue
+            if int(course_intro['column_type']) not in (1, 2):
+                sys.stderr.write("ERROR: 该课程不提供文本:{}".format(
+                    course_intro['column_title']))
+                continue
+            course_intro['column_title'] = Render.format_file_name(
+                course_intro['column_title'])
 
-        course_data = dc.get_course_intro(course_id, force=True)
-        if int(course_data['column_type']) not in (1, 2):
-            sys.stderr.write("ERROR: 该课程不提供文本:{}".format(
-                course_data['column_title']))
-            return
+            # fetch raw data
+            print(colored('开始制作电子书:{}-{}'.format(
+                course_id, course_intro['column_title']), 'green'))
+            pbar_desc = '数据爬取中:{}'.format(course_intro['column_title'][:10])
+            data = dc.get_course_content(
+                course_id, force=cfg['force'], pbar_desc=pbar_desc)
+            if cfg['comments_count'] > 0:
+                for post in data:
+                    post['article_content'] += self._render_comment_html(
+                        post['comments'], cfg['comments_count'])
 
-        # data
-        sys.stdout.write('doing ......\n')
-        data = dc.get_course_content(course_id, force=cfg['force'])
-        if cfg['enable_comments']:
-            for post in data:
-                post['article_content'] += self._render_comment_html(
-                    post['comments'], cfg['comments_count'])
+            # source file
+            self._render_source_files(
+                course_intro, data, output_folder, force=cfg['force'])
 
-        # source file
-        course_data['column_title'] = Render.format_file_name(
-            course_data['column_title'])
-        self._render_source_files(
-            course_data, data, out_dir, force=cfg['force'])
-
-        # ebook
-        ebook_name = self._title(course_data)
-        if not cfg['source_only']:
-            fn = os.path.join(out_dir, ebook_name) + '.mobi'
-            if course_data['is_finish'] and os.path.isfile(fn):
+            # ebook 未完结或者 force 都会重新制作电子书
+            ebook_name = self._format_title(course_intro)
+            fn = os.path.join(output_folder, ebook_name) + '.mobi'
+            if (not cfg['force'] and self.is_course_finished(course_intro) and
+                    os.path.isfile(fn)):
                 sys.stdout.write("{} exists\n".format(ebook_name))
             else:
-                src_dir = os.path.join(out_dir, course_data['column_title'])
-                make_mobi(source_dir=src_dir, output_dir=out_dir)
+                src_dir = os.path.join(
+                    output_folder, course_intro['column_title'])
+                make_mobi(source_dir=src_dir, output_dir=output_folder)
 
-        # push to kindle
-        if cfg['push'] and not cfg['source_only']:
-            fn = os.path.join(out_dir, "{}.mobi".format(ebook_name))
-            try:
-                send_to_kindle(fn, cfg)
-                sys.stdout.write("push to kindle done\n")
-            except Exception as e:
-                sys.stderr.write(
-                    "ERROR: push to kindle failed, e={}\n".format(e))
+            # push to kindle
+            if cfg['push']:
+                self._send_to_kindle(cfg, fn)
+                sys.stdout.write("{} 已推送到 kindle\n\n".format(ebook_name))
+
+    @staticmethod
+    def _send_to_kindle(cfg, fn):
+        try:
+            send_to_kindle(fn, cfg)
+        except Exception as e:
+            sys.stderr.write(
+                "ERROR: push to kindle failed, e={}\n".format(e))
+
+    @staticmethod
+    def _format_output_folder(cfg):
+        output_folder = os.path.join(cfg['output_folder'], 'ebook')
+        output_folder = os.path.expanduser(output_folder)
+        if not os.path.isdir(output_folder):
+            os.makedirs(output_folder)
+        return output_folder
 
     @staticmethod
     def _timestamp2str(timestamp: int) -> str:
@@ -164,8 +174,10 @@ class EBook(Command):
         reply = replies[0] if replies else {}
         replies_html = """<br/>
 <div>
-    <div style="color:#888;font-size:15.25px;font-weight:400;line-height:1.2">{}{}</div>
-    <div style="color:#353535;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6">{}</div>
+    <div style="color:#888;font-size:15.25px;font-weight:400;\
+        line-height:1.2">{}{}</div>
+    <div style="color:#353535;font-weight:400;white-space:normal;\
+        word-break:break-all;line-height:1.6">{}</div>
 </div>
             """.format(
             reply.get('user_name'),
@@ -177,10 +189,12 @@ class EBook(Command):
         c_html = """
 <li>
     <div>
-        <div style="color: #888;font-size:15.25px;font-weight:400;line-height:1.2">
+        <div style="color: #888;font-size:15.25px;font-weight:400;\
+            line-height:1.2">
             {user_name}  {comment_time}
         </div>
-        <div style="color:#353535;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6">
+        <div style="color:#353535;font-weight:400;white-space:normal;\
+            word-break:break-all;line-height:1.6">
             {comment_content} {like_count}
         </div>
         {replies}
@@ -214,39 +228,3 @@ class EBook(Command):
         """
         f = '</ul>'
         return h + html + f
-
-
-class EbookBatch(EBook):
-    """批量制作电子书
-    懒， 不想写参数了
-    """
-    def run(self, cfg: dict):
-        cid_list = []
-        if cfg['all']:
-            try:
-                dc = get_data_client(cfg)
-            except Exception:
-                sys.stderr.write(
-                    "ERROR: invalid geektime account or password\n"
-                    "Use '{} login --help' for  help.\n".format(
-                        sys.argv[0].split(os.path.sep)[-1]))
-                return
-
-            data = dc.get_course_list()
-            for c in data['1']['list'] + data['2']['list']:
-                if (c['had_sub']
-                        and (c['update_frequency'] == '全集' or c['is_finish'])):
-                    cid_list.append(c['id'])
-
-        else:
-            course_ids = cfg['course_ids']
-            cid_list.extend(course_ids.split(','))
-
-        for cid in cid_list:
-            args = cfg.copy()
-            args['course_id'] = int(cid)
-            super().run(args)
-            sys.stderr.write('\n')
-
-
-

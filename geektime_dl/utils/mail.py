@@ -125,8 +125,13 @@ class MailServer(object):
 
 
 def send_to_kindle(file_name: str, smtp_cfg: dict):
+
+    if not (smtp_cfg.get('smtp_host') and smtp_cfg.get('smtp_port') and
+            smtp_cfg.get('smtp_user') and smtp_cfg.get('smtp_password') and
+            smtp_cfg.get('smtp_encryption')):
+        raise Exception("邮箱配置错误")
     if os.path.getsize(file_name) / 1024.0 / 1024 > 50:
-        raise Exception("电子书大小超过50M")
+        raise Exception("电子书大小超过 50M")
 
     f = open(file_name, 'rb')
     d = f.read()
