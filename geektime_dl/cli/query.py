@@ -36,4 +36,5 @@ class Query(Command):
                 )
 
         sys.stdout.write(result_str)
+        return result_str
 

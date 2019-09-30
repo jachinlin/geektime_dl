@@ -50,13 +50,15 @@ class GkApiClient(metaclass=Singleton):
         'User-Agent': random.choice(_ua)
     }
 
-    def __init__(self, account: str, password: str, area: str = '86'):
+    def __init__(self, account: str, password: str, area: str = '86',
+                 no_login: bool = False):
         self._cookies = None
         self._lock = threading.Lock()
         self._account = account
         self._password = password
         self._area = area
-        self.reset_session()
+        if not no_login:
+            self.reset_session()
 
     def _post(self, url: str, data: dict = None, **kwargs) -> requests.Response:
 

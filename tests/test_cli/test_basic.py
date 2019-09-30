@@ -1,7 +1,5 @@
 # coding=utf8
 
-import os
-
 import pytest
 
 from geektime_dl.cli import command

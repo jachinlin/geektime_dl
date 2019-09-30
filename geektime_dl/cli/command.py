@@ -126,6 +126,8 @@ class Command(metaclass=CommandType):
         parser.add_argument("-o", "--output-folder", dest="output_folder",
                             default=cwd, help="specify the output folder")
 
+        parser.add_argument("--no-login", dest="no_login", action='store_true',
+                            default=False, help="no login, just for test")
         for args, kwargs in getattr(self.run, 'arguments', []):
             parser.add_argument(*args, **kwargs)
         self._parser = parser

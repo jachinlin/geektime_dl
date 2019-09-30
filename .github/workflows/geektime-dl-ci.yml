@@ -33,5 +33,5 @@ jobs:
         account: ${{ secrets.account }}
         password: ${{ secrets.password }}
       run: |
-        pip install pytest
+        pip install -r requirements/dev.txt
         python -m pytest

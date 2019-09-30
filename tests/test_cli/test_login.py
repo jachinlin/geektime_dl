@@ -24,12 +24,12 @@ def test_login(tmp_path, mocker):
             lg.work(args=['--config', str(cfg_file)])
 
         # succ
-        lg.work(args=[
-            '--config', str(cfg_file),
-            '-a={}'.format(os.getenv('account')),
-            '-p={}'.format(os.getenv('password'))
-        ])
-        cfg = lg.load_cfg(str(cfg_file))
-        assert 'account' in cfg and cfg['account'] == os.getenv('account')
+        if os.getenv('account'):
+            lg.work(args=[
+                '--config', str(cfg_file),
+                '-a={}'.format(os.getenv('account')),
+                '-p={}'.format(os.getenv('password'))
+            ])
+            cfg = lg.load_cfg(str(cfg_file))
+            assert 'account' in cfg and cfg['account'] == os.getenv('account')
 
-    cfg_file.unlink()

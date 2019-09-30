@@ -13,9 +13,7 @@ from geektime_dl.utils.ebook import Render
 
 @pytest.fixture
 def gk() -> GkApiClient:
-    account = os.getenv('account')
-    password = os.getenv('password')
-    return GkApiClient(account=account, password=password)
+    return GkApiClient(None, None, no_login=True)
 
 
 class FakeGk(GkApiClient):
@@ -70,3 +68,18 @@ def db_file() -> str:
         os.remove(path)
     yield path
     os.remove(path)
+
+
+@pytest.fixture(scope='session')
+def column_id():
+    return 49
+
+
+@pytest.fixture(scope='session')
+def article_id():
+    return 780
+
+
+@pytest.fixture(scope='session')
+def video_course_id():
+    return 66

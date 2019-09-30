@@ -3,7 +3,6 @@
 [![travis](https://travis-ci.org/jachinlin/geektime_dl.svg?branch=master)](https://travis-ci.org/jachinlin/geektime_dl)
 [![codecov](https://codecov.io/gh/jachinlin/geektime_dl/branch/master/graph/badge.svg)](https://codecov.io/gh/jachinlin/geektime_dl)
 [![Python versions](https://img.shields.io/pypi/pyversions/geektime-dl.svg)](https://pypi.org/project/geektime-dl/)
-[![PyPI - Downloads](https://img.shields.io/pypi/dd/geektime-dl.svg)](https://pypi.org/project/geektime-dl/)
 [![PyPI](https://img.shields.io/pypi/v/geektime-dl.svg)](https://pypi.org/project/geektime-dl/)
 [![Actions Status](https://github.com/jachinlin/geektime_dl/workflows/Python%20package/badge.svg)](https://github.com/jachinlin/geektime_dl/actions)
 
@@ -23,27 +22,22 @@
 
 ## 一、项目结构
 
-<p align="center" style="margin:70px">
-    <img src="https://github.com/jachinlin/jachinlin.github.io/blob/master/img/gk-chart.png?raw=true" alt="流程图">
-</p>
 
-（图有点老了，没更新）
+项目主要包括下边这几个部分：
 
-这个项目主要包括下边这几个部分
+- kindle_maker: 一个 mobi 电子书制作工具。用户只需要提供制作电子书的 html 文件，和一个包含目录信息的 toc.md 文件，kindle_maker 即可制作出一本精美的 kindle 电子书。这部分已拎出来放在单独的项目里，具体使用方式见该项目文档 [kindle_maker](https://github.com/jachinlin/kindle_maker)
 
-- kindle_maker: 一个mobi电子书制作工具。用户只需要提供制作电子书的html文件，和一个包含目录信息的toc.md文件，kindle_maker即可制作出一本精美的kindle电子书。这部分已拎出来放在单独的项目里，具体使用方式见该项目文档[kindle_maker](https://github.com/jachinlin/kindle_maker)
-
-- utils: 提供了mp3/mp4下载、邮件发送、电子书源材料制作等功能
+- utils: 提供了 mp3/mp4 下载、邮件发送、html 文件生成等功能
 
 - gk_apis: 封装了极客时间的若干 api
 
 - store_client: 存储极客时间专栏数据至本地 json 文件
 
-- cli: 提供若干cmd命令(subcmd)，将上面这几个部分连接在一起，最后使用 kindle_maker 制作电子书，或者使用下载器下载相关音视频
+- cli: 提供若干cmd 命令，将上面这几个部分连接在一起，最后使用 kindle_maker 制作电子书，或者使用下载器下载相关音视频
 
 
 
-## 二、依赖
+## 二、主要依赖
 
 - [requests](http://www.python-requests.org/en/master/): 网络请求
 
@@ -51,21 +45,18 @@
 
 - [kindle_maker](https://github.com/jachinlin/kindle_maker): 制作kindle电子书
 
-- [Kindlegen](https://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000765211): kindle_maker核心依赖
-
-
 
 ## 三、安装
 
 **虚拟环境 virtualenv**
 
-```
+```bash
 virtualenv -p python3 ~/venv3 && source ~/venv3/bin/activate
 ```
 
 **代码**
 
-```
+```bash
 pip install -U geektime_dl
 
 # 或者安装最新代码

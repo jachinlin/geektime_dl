@@ -143,7 +143,9 @@ def get_data_client(cfg: dict) -> DataClient:
     gk = GkApiClient(
         account=cfg['account'],
         password=cfg['password'],
-        area=cfg['area']
+        area=cfg['area'],
+        no_login=cfg['no_login']
+
     )
     f = os.path.expanduser(
         os.path.join(cfg['output_folder'], 'geektime-localstorage.json'))

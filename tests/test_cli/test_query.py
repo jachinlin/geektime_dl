@@ -9,11 +9,18 @@ def test_query(tmp_path, mocker):
     cfg_file = tmp_path / 'test.cfg'
     qr = query.Query()
 
-    qr.work(args=[
-        '--config', str(cfg_file),
-        '-a={}'.format(os.getenv('account')),
-        '-p={}'.format(os.getenv('password'))
-    ])
+    if not os.getenv('account'):
+        res = qr.work(args=[
+            '--config', str(cfg_file),
+            '-a={}'.format(os.getenv('account')),
+            '-p={}'.format(os.getenv('password')),
+            '--no-login'
+        ])
+    else:
+        res = qr.work(args=[
+            '--config', str(cfg_file),
+            '-a={}'.format(os.getenv('account')),
+            '-p={}'.format(os.getenv('password'))
+        ])
 
-    # assert stub
-    cfg_file.unlink()
+    assert res
