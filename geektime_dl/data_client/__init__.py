@@ -125,7 +125,8 @@ class DataClient:
         data = self._gk.get_post_content(video_id)
         return data
 
-    def get_video_collection_content(self, collection_id: int, force: bool = False,
+    def get_video_collection_content(self, collection_id: int,
+                                     force: bool = False,
                                      pbar=True, pbar_desc='') -> list:
         """
         获取每日一课合辑ID 为 collection_id 的所有视频内容
