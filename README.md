@@ -1,15 +1,14 @@
-# 把极客时间装进Kindle
+<p align="center">
+    <img  width="80%" src="https://raw.githubusercontent.com/jachinlin/jachinlin.github.io/master/img/gk-mp4.gif" alt="左耳听风">
+</p>
+
+# 把极客时间装进 Kindle
 
 [![travis](https://travis-ci.org/jachinlin/geektime_dl.svg?branch=master)](https://travis-ci.org/jachinlin/geektime_dl)
 [![codecov](https://codecov.io/gh/jachinlin/geektime_dl/branch/master/graph/badge.svg)](https://codecov.io/gh/jachinlin/geektime_dl)
 [![Python versions](https://img.shields.io/pypi/pyversions/geektime-dl.svg)](https://pypi.org/project/geektime-dl/)
 [![PyPI](https://img.shields.io/pypi/v/geektime-dl.svg)](https://pypi.org/project/geektime-dl/)
 [![Actions Status](https://github.com/jachinlin/geektime_dl/workflows/Python%20package/badge.svg)](https://github.com/jachinlin/geektime_dl/actions)
-
-
-<p align="center" style="margin:70px">
-    <img src="https://raw.githubusercontent.com/jachinlin/jachinlin.github.io/master/img/gk-mp4.gif" alt="左耳听风">
-</p>
 
 极客时间专栏文章的质量都是非常高的，比如耗子哥的《左耳听风》、朱赟的《朱赟的技术管理课》和王天一的《人工智能基础课》，都是我非常喜欢的专栏。这些专栏深入浅出，将知识和经验传授于读者，都是值得多次阅读的。
 

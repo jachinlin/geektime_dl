@@ -12,7 +12,7 @@ from tinydb.storages import JSONStorage
 from tqdm import tqdm
 
 from geektime_dl.data_client.gk_apis import GkApiClient
-from geektime_dl.utils import Singleton, synchronized
+from geektime_dl.utils import synchronized
 
 
 def _local_storage(table: str):
@@ -40,12 +40,16 @@ def _local_storage(table: str):
     return decorator
 
 
-class DataClient(metaclass=Singleton):
+class DataClient:
 
     def __init__(self, gk: GkApiClient, db: TinyDB):
         self._gk = gk
         self.db = db
         self._lock = threading.Lock()  # tinydb 线程不安全
+
+    @property
+    def gk(self):
+        return self._gk
 
     def get_course_list(self, **kwargs) -> dict:
         """
@@ -103,6 +107,39 @@ class DataClient(metaclass=Singleton):
         """
         return self._gk.get_video_collection_list()
 
+    @synchronized()
+    @_local_storage('video-collection')
+    def get_video_collection_intro(self, collection_id: int, **kwargs) -> dict:
+        """
+        获取每日一课合辑简介
+        """
+        data = self._gk.get_video_collection_intro(collection_id)
+        return data
+
+    @synchronized()
+    @_local_storage('daily')
+    def get_daily_content(self, video_id: int, **kwargs) -> dict:
+        """
+        获取每日一课内容
+        """
+        data = self._gk.get_post_content(video_id)
+        return data
+
+    def get_video_collection_content(self, collection_id: int, force: bool = False,
+                                     pbar=True, pbar_desc='') -> list:
+        """
+        获取每日一课合辑ID 为 collection_id 的所有视频内容
+        """
+        data = []
+        v_ids = self._gk.get_video_list_of(collection_id)
+        if pbar:
+            v_ids = tqdm(v_ids)
+            v_ids.set_description(pbar_desc)
+        for v_id in v_ids:
+            v = self.get_daily_content(v_id['article_id'], force=force)
+            data.append(v)
+        return data
+
 
 class _JSONStorage(JSONStorage):
     """
@@ -139,7 +176,14 @@ class _JSONStorage(JSONStorage):
         pass
 
 
+dc_global = None
+
+
 def get_data_client(cfg: dict) -> DataClient:
+    global dc_global
+    if dc_global is not None:
+        return dc_global
+
     gk = GkApiClient(
         account=cfg['account'],
         password=cfg['password'],
@@ -150,7 +194,7 @@ def get_data_client(cfg: dict) -> DataClient:
     f = os.path.expanduser(
         os.path.join(cfg['output_folder'], 'geektime-localstorage.json'))
     db = TinyDB(f, storage=_JSONStorage)
-
     dc = DataClient(gk, db)
+    dc_global = dc
 
     return dc

@@ -16,7 +16,7 @@ def gk() -> GkApiClient:
     return GkApiClient(None, None, no_login=True)
 
 
-class FakeGk(GkApiClient):
+class FakeGk:
     def __init__(self):
         self._access_count = 0
 

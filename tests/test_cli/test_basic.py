@@ -78,6 +78,6 @@ def test_parse_course_ids():
     ids = '1'
     ids2 = '1-3'
     ids3 = '3,6-8'
-    assert command.Command.parse_course_ids(ids) == [1]
-    assert command.Command.parse_course_ids(ids2) == [1, 2, 3]
-    assert command.Command.parse_course_ids(ids3) == [3, 6, 7, 8]
+    assert command.Command().parse_course_ids(ids, None) == [1]
+    assert command.Command().parse_course_ids(ids2, None) == [1, 2, 3]
+    assert command.Command().parse_course_ids(ids3, None) == [3, 6, 7, 8]

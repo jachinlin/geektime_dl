@@ -2,6 +2,7 @@
 
 import os
 import sys
+from typing import List
 
 from termcolor import colored
 
@@ -14,6 +15,21 @@ from geektime_dl.cli import Command, add_argument
 class Mp3(Command):
     """保存专栏音频"""
 
+    def get_all_course_ids(self, dc, type_: str) -> List[int]:
+
+        cid_list = []
+        data = dc.get_course_list()
+        for c in data['1']['list']:
+            if type_ == 'all':
+                cid_list.append(int(c['id']))
+            elif type_ == 'all-sub' and c['had_sub']:
+                cid_list.append(int(c['id']))
+            elif (type_ == 'all-done' and c['had_sub'] and
+                  self.is_course_finished(c)):
+                cid_list.append(int(c['id']))
+
+        return cid_list
+
     @add_argument("course_ids", type=str,
                   help="specify the target course ids")
     @add_argument("--url-only", dest="url_only", action='store_true',
@@ -22,10 +38,10 @@ class Mp3(Command):
                   help="specify the number of threads to download mp3/mp4")
     def run(self, cfg: dict):
 
-        course_ids = self.parse_course_ids(cfg['course_ids'])
+        dc = self.get_data_client(cfg)
+        course_ids = self.parse_course_ids(cfg['course_ids'], dc)
         output_folder = self._format_out_folder(cfg)
 
-        dc = self.get_data_client(cfg)
         dl = Downloader(output_folder, workers=cfg['workers'])
 
         for course_id in course_ids:

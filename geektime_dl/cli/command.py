@@ -6,6 +6,7 @@ import traceback
 import configparser
 import argparse
 import functools
+from typing import List
 
 from geektime_dl.utils.log import logger
 from geektime_dl.data_client import get_data_client, DataClient
@@ -87,8 +88,14 @@ class Command(metaclass=CommandType):
                 "Use '{} login --help' for  help.\n".format(
                     sys.argv[0].split(os.path.sep)[-1]))
 
-    @staticmethod
-    def parse_course_ids(ids_str: str) -> list:
+    def get_all_course_ids(self, dc: DataClient, type_: str) -> List[int]:
+        raise NotImplementedError
+
+    def parse_course_ids(self, ids_str: str, dc: DataClient) -> List[int]:
+
+        if ids_str.startswith('all'):
+            return self.get_all_course_ids(dc, type_=ids_str)
+
         def _int(num):
             try:
                 return int(num)

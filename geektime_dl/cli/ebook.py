@@ -4,6 +4,7 @@ import os
 import sys
 import json
 import datetime
+from typing import List
 
 from termcolor import colored
 from kindle_maker import make_mobi
@@ -13,6 +14,7 @@ from geektime_dl.cli import Command, add_argument
 from geektime_dl.utils.ebook import Render
 from geektime_dl.utils.mail import send_to_kindle
 from geektime_dl.data_client.gk_apis import GkApiError
+from geektime_dl.data_client import DataClient
 
 
 class EBook(Command):
@@ -73,6 +75,20 @@ class EBook(Command):
                 continue
             render.render_article_html(title, article['article_content'])
 
+    def get_all_course_ids(self, dc: DataClient, type_: str) -> List[int]:
+
+        cid_list = []
+        data = dc.get_course_list()
+        for c in data['1']['list'] + data['2']['list']:
+            if type_ == 'all':
+                cid_list.append(int(c['id']))
+            elif type_ == 'all-sub' and c['had_sub']:
+                cid_list.append(int(c['id']))
+            elif (type_ == 'all-done' and c['had_sub'] and
+                  self.is_course_finished(c)):
+                cid_list.append(int(c['id']))
+        return cid_list
+
     @add_argument("course_ids", type=str,
                   help="specify the target course ids")
     @add_argument("--force", dest="force", action='store_true', default=False,
@@ -96,10 +112,9 @@ class EBook(Command):
                   help="specify the kindle receiver email")
     def run(self, cfg: dict) -> None:
 
-        course_ids = self.parse_course_ids(cfg['course_ids'])
-        output_folder = self._format_output_folder(cfg)
-
         dc = self.get_data_client(cfg)
+        course_ids = self.parse_course_ids(cfg['course_ids'], dc)
+        output_folder = self._format_output_folder(cfg)
 
         for course_id in course_ids:
             try:
