@@ -208,7 +208,7 @@ class GkApiClient(metaclass=Singleton):
         """每日一课合辑列表"""
         # 没分析出接口
         ids = list(range(3, 82)) + list(range(104, 141))
-        return [{'collection_id': id_ for id_ in ids}]
+        return [{'collection_id': id_} for id_ in ids]
 
     @_retry
     def get_video_list_of(self, collection_id: int) -> list:
