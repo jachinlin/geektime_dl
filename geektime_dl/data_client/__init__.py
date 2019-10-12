@@ -40,7 +40,7 @@ def _local_storage(table: str):
     return decorator
 
 
-class DataClient(metaclass=Singleton):
+class DataClient:
 
     def __init__(self, gk: GkApiClient, db: TinyDB):
         self._gk = gk
@@ -139,7 +139,14 @@ class _JSONStorage(JSONStorage):
         pass
 
 
+dc_global = None
+
+
 def get_data_client(cfg: dict) -> DataClient:
+    global dc_global
+    if dc_global is not None:
+        return dc_global
+
     gk = GkApiClient(
         account=cfg['account'],
         password=cfg['password'],
@@ -150,7 +157,7 @@ def get_data_client(cfg: dict) -> DataClient:
     f = os.path.expanduser(
         os.path.join(cfg['output_folder'], 'geektime-localstorage.json'))
     db = TinyDB(f, storage=_JSONStorage)
-
     dc = DataClient(gk, db)
+    dc_global = dc
 
     return dc
