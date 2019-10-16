@@ -1,12 +1,16 @@
 # coding=utf8
 
 import os
-import uuid
 import re
+import time
 import contextlib
+import pathlib
+from urllib.parse import urlparse
+import io
 
 import requests
 from jinja2 import Environment, FileSystemLoader
+from PIL import Image
 
 
 class Render:
@@ -35,11 +39,11 @@ class Render:
             headers = ['# {}'.format(h) for h in headers]
             f.writelines('\n'.join([title] + headers))
 
-    def render_article_html(self, title: str, content: str) -> None:
+    def render_article_html(self, title: str, content: str, **kwargs) -> None:
         """
         生成 html 文件
         """
-        content = self._parse_image(content)
+        content = self._parse_image(content, **kwargs)
         self._render_file(
             'article.html',
             {'title': title, 'content': content},
@@ -56,7 +60,7 @@ class Render:
             with open(cover, 'wb') as f:
                 f.write(r.content)
 
-    def _parse_image(self, content: str) -> str:
+    def _parse_image(self, content: str, **kwargs) -> str:
         """
         下载 content(html text) 中的 image
         """
@@ -68,16 +72,50 @@ class Render:
 
         p = r'img\s+src="(.*?)"'
         img_url_list = re.findall(p, content)
+
         for url in img_url_list:
             with contextlib.suppress(Exception):
-                url_local = str(uuid.uuid4()) + '.jpg'
+                url_local = self._format_url_path(url)
                 r = requests.get(url, timeout=20)
-                img = os.path.join(self._output_folder, url_local)
-                with open(img, 'wb') as f:
-                    f.write(r.content)
+                img_fn = os.path.join(self._output_folder, url_local)
+                self._save_img(
+                    r.content, img_fn,
+                    min_width=kwargs.get('image_min_width'),
+                    min_height=kwargs.get('image_min_height'),
+                    ratio=kwargs.get('image_ratio')
+                )
                 content = content.replace(url, url_local)
 
         return content
+
+    @staticmethod
+    def _save_img(content: bytes, filename: str,
+                  min_width: int = None, min_height: int = None,
+                  ratio: float = None) -> None:
+        min_width = min_width or 500
+        min_height = min_height or 500
+        ratio = ratio or 0.5
+
+        img = Image.open(io.BytesIO(content))
+        w, h = img.size
+        if w <= min_width or h <= min_height:
+            img.save(filename, img.format)
+            return
+
+        rw, rh = int(w * ratio), int(h * ratio)
+        if rw < min_width:
+            rw, rh = min_width, int(rh * min_width / rw)
+        if rh < min_height:
+            rw, rh = int(rw * min_height / rh), min_height
+        img.thumbnail((rw, rh))
+        img.save(filename, img.format)
+
+    @staticmethod
+    def _format_url_path(url: str) -> str:
+        o = urlparse(url)
+        u = pathlib.Path(o.path)
+        stem, suffix = u.stem, u.suffix
+        return '{}-{}{}'.format(stem, int(time.time()), suffix)
 
     @staticmethod
     def format_file_name(path: str) -> str:

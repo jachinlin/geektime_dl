@@ -4,7 +4,7 @@
 import os
 from setuptools import setup, find_packages
 
-version = '1.0.0'
+version = '1.1.0'
 
 
 def read(fname):
@@ -39,6 +39,7 @@ setup(
         'tinydb',
         'termcolor',
         'tqdm',
+        'pillow'
     ],
     entry_points={
         'console_scripts': [
