@@ -3,3 +3,4 @@ requests
 tinydb
 termcolor
 tqdm
+pillow

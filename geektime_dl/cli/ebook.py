@@ -33,7 +33,8 @@ class EBook(Command):
         return t
 
     def _render_source_files(self, course_intro: dict, course_content: list,
-                             out_dir: str, force: bool = False) -> None:
+                             out_dir: str, force: bool = False,
+                             **kwargs) -> None:
         """
         下载课程源文件
         """
@@ -48,7 +49,8 @@ class EBook(Command):
         if not force and os.path.isfile(os.path.join(_out_dir, '简介.html')):
             sys.stdout.write('{}简介 exists\n'.format(column_title))
         else:
-            render.render_article_html('简介', course_intro['column_intro'])
+            render.render_article_html(
+                '简介', course_intro['column_intro'], **kwargs)
             sys.stdout.write('下载{}简介 done\n'.format(column_title))
         # cover
         if not force and os.path.isfile(os.path.join(_out_dir, 'cover.jpg')):
@@ -73,7 +75,8 @@ class EBook(Command):
             fn = os.path.join(_out_dir, '{}.html'.format(title))
             if not force and os.path.isfile(fn):
                 continue
-            render.render_article_html(title, article['article_content'])
+            render.render_article_html(
+                title, article['article_content'], **kwargs)
 
     def get_all_course_ids(self, dc: DataClient, type_: str) -> List[int]:
 
@@ -110,6 +113,12 @@ class EBook(Command):
                   help="specify the smtp password")
     @add_argument("--email-to", dest="email_to", type=str, save=True,
                   help="specify the kindle receiver email")
+    @add_argument("--image-min-width", dest="image_min_width", type=int,
+                  save=True, help="image min width")
+    @add_argument("--image-min-height", dest="image_min_height", type=int,
+                  save=True, help="image min height")
+    @add_argument("--image-ratio", dest="image_ratio", type=float, save=True,
+                  help="image ratio")
     def run(self, cfg: dict) -> None:
 
         dc = self.get_data_client(cfg)
@@ -141,8 +150,7 @@ class EBook(Command):
                         post['comments'], cfg['comments_count'])
 
             # source file
-            self._render_source_files(
-                course_intro, data, output_folder, force=cfg['force'])
+            self._render_source_files(course_intro, data, output_folder, **cfg)
 
             # ebook 未完结或者 force 都会重新制作电子书
             ebook_name = self._format_title(course_intro)

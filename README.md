@@ -203,13 +203,13 @@ docker build https://github.com/jachinlin/geektime_dl.git -t geektime
 docker run -v `pwd`:/output -it --rm geektime login
 
 # 下载
-docker run -v `pwd`:/output -it --rm geektime ebookbatch --all --enable-comments
-docker run -v `pwd`:/output --rm geektime mp4batch --all --url-only
-docker run -v `pwd`:/output --rm geektime mp3batch --all --url-only
+docker run -v `pwd`:/output -it --rm geektime ebook all
+docker run -v `pwd`:/output --rm geektime mp4 al
+docker run -v `pwd`:/output --rm geektime mp3 all
 ```
 
 
-## 五、Todo list
+## 六、Todo list
 
 - [X] MP3 and MP4
 - [X] comments
