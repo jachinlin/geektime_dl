@@ -124,12 +124,4 @@ class Render:
         """
         return path.replace('/', '').replace(' ', '').\
             replace('+', '-').replace('"', '').replace('\\', '').\
-            replace(':', '-').replace('|', '-')
-
-
-
-
-
-
-
-
+            replace(':', '-').replace('|', '-').replace('>','-')
