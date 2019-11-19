@@ -70,6 +70,11 @@ class Render:
         for style in fucking_styles:
             content = content.replace(style, '')
 
+        p = r'</?img>'
+        empty_imgs = re.findall(p, content)
+        for empty_img in empty_imgs:
+            content = content.replace(empty_img, '')
+
         p = r'img\s+src="(.*?)"'
         img_url_list = re.findall(p, content)
 
@@ -124,12 +129,4 @@ class Render:
         """
         return path.replace('/', '').replace(' ', '').\
             replace('+', '-').replace('"', '').replace('\\', '').\
-            replace(':', '-').replace('|', '-')
-
-
-
-
-
-
-
-
+            replace(':', '-').replace('|', '-').replace('>','-')
