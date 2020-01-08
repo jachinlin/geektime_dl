@@ -207,7 +207,7 @@ class Command(metaclass=CommandType):
     def work(self, args: list):
         if '--help' in args or '-h' in args:
             self.parser.parse_args(args)
-            return
+            return None
         cfg = self._parse_config(args)
         return self.run(cfg)
 
@@ -222,7 +222,7 @@ def main():
     command = Help.name
 
     # subcommand discovery
-    if len(args):
+    if args:
         command = args[0]
         args = args[1:]
 

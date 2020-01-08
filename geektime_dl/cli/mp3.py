@@ -102,4 +102,3 @@ class Mp3(Command):
                 post['audio_download_url']
             ) for post in course_data]))
         sys.stdout.write('音频链接下载完成：{}\n\n'.format(fn))
-

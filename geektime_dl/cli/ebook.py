@@ -6,9 +6,9 @@ import json
 import datetime
 from typing import List
 
+from tqdm import tqdm
 from termcolor import colored
 from kindle_maker import make_mobi
-from tqdm import tqdm
 
 from geektime_dl.cli import Command, add_argument
 from geektime_dl.utils.ebook import Render
