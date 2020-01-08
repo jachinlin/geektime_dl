@@ -190,6 +190,12 @@ geektime ebook -c 42 --push --smtp-host=smtp.qq.com --smtp-port=465 --smtp-encry
 至于邮箱smtp配置和kindle邮箱配置就自行google吧。
 
 
+**注意**
+
+
+切勿使用并发或多线程运行geektime，因为基于tinydb存储天然不支持多并发，在多并发或多线程情况下会导致存储报错。[Issue](https://github.com/msiemens/tinydb/issues/176) [tinyrecord](https://github.com/eugene-eeo/tinyrecord/)
+
+
 ## 五、Docker
 
 如果你对 Python 不是很了解，我们还提供了 docker 版本，只要安装好 docker ，依次复制下边指令并执行，
@@ -217,6 +223,7 @@ docker run -v `pwd`:/output --rm geektime mp3 all
 - [X] docker
 - [X] push to kindle
 - [ ] support mathjax
+- [ ] support tinyrecord
 - [ ] ...
 
 
