@@ -1,6 +1,4 @@
-<p align="center">
-    <img  width="80%" src="https://raw.githubusercontent.com/jachinlin/jachinlin.github.io/master/img/gk-mp4.gif" alt="左耳听风">
-</p>
+
 
 # 把极客时间装进 Kindle
 
@@ -8,7 +6,20 @@
 [![codecov](https://codecov.io/gh/jachinlin/geektime_dl/branch/master/graph/badge.svg)](https://codecov.io/gh/jachinlin/geektime_dl)
 [![Python versions](https://img.shields.io/pypi/pyversions/geektime-dl.svg)](https://pypi.org/project/geektime-dl/)
 [![PyPI](https://img.shields.io/pypi/v/geektime-dl.svg)](https://pypi.org/project/geektime-dl/)
-[![Actions Status](https://github.com/jachinlin/geektime_dl/workflows/Python%20package/badge.svg)](https://github.com/jachinlin/geektime_dl/actions)
+[![CI & CD](https://github.com/jachinlin/geektime_dl/workflows/CI%20&%20CD/badge.svg)](https://github.com/jachinlin/geektime_dl/actions)
+
+
+<p align="center">
+    <img  width="80%" src="https://raw.githubusercontent.com/jachinlin/geektime_dl/master/docs/.vuepress/public/geektime.gif" alt="左耳听风">
+</p>
+
+**重要**
+
+
+1. **查看 [使用文档](https://jachinlin.github.io/geektime_dl/) 获取最新使用信息**，本 README.md 不再更新。
+2. **快手 [内推](https://jachinlin.github.io/geektime_dl/recruit.html) 直达部门负责人！**
+
+<br/><br/>
 
 极客时间专栏文章的质量都是非常高的，比如耗子哥的《左耳听风》、朱赟的《朱赟的技术管理课》和王天一的《人工智能基础课》，都是我非常喜欢的专栏。这些专栏深入浅出，将知识和经验传授于读者，都是值得多次阅读的。
 
@@ -103,8 +114,8 @@ geektime login  [--account=<account>] [--password=<password>] [--area=<area>]
 geektime query
 ```
 
-执行该命令后，我们可以看到专栏、视频、微课等课程的课程标题、订阅情况、更新频率还有课程ID，这个**课程ID**很重要，咱们下边的操作就是基于这个ID进行的。
 
+执行该命令后，我们可以看到专栏、视频、微课等课程的课程标题、订阅情况、更新频率还有课程ID，这个**课程ID**很重要，咱们下边的操作就是基于这个ID进行的。
 ```
 专栏
         课程ID        已订阅       课程标题             更新频率/课时·时长

@@ -11,7 +11,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        python-version: [3.5, 3.6, 3.7]
+        python-version: [3.7]
 
     steps:
     - uses: actions/checkout@v1
@@ -35,7 +35,7 @@ jobs:
         pip install -r requirements/dev.txt
         python -m pytest
 
-  deploy:
+  docs:
     runs-on: ubuntu-latest
 
     steps:
@@ -51,7 +51,7 @@ jobs:
 
       - name: Build project
         run: |
-          npm install -g vuepress
+          npm install -g vuepress vuepress-plugin-baidu-tongji
           vuepress build docs
 
       - name: Upload gh-pages
