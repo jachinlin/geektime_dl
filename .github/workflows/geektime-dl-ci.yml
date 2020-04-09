@@ -1,4 +1,4 @@
-name: Python package
+name: CI & CD
 
 on:
   push:
@@ -6,8 +6,7 @@ on:
     - master
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 1
@@ -35,3 +34,29 @@ jobs:
       run: |
         pip install -r requirements/dev.txt
         python -m pytest
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v2
+        with:
+          ref: master
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "10.x"
+
+      - name: Build project
+        run: |
+          npm install -g vuepress
+          vuepress build docs
+
+      - name: Upload gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/.vuepress/dist
+
