@@ -72,7 +72,6 @@ Available commands:
     help   Display the list of available commands
     login  登录极客时间，保存账号密码至配置文件
     mp3    保存专栏音频
-    mp4    保存视频课程视频
     query  查看课程列表
 
 Use 'geektime <command> --help' for individual command help.

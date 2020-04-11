@@ -3,5 +3,5 @@
 
 from geektime_dl.cli.command import Command, main, add_argument
 from geektime_dl.cli import (
-    login, query, mp4, mp3, ebook, dailylesson
+    login, query, mp3, ebook, dailylesson
 )

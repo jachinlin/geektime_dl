@@ -4,7 +4,7 @@
 import os
 from setuptools import setup, find_packages
 
-version = '1.1.0'
+version = '1.1.1'
 
 
 def read(fname):
@@ -16,9 +16,9 @@ setup(
     name='geektime_dl',
     version=version,
     author='jachinlin',
-    author_email='linjx1000@gmail.com',
-    url='https://github.com/jachinlin/geektime_dl',
-    description='把极客时间装进Kindle',
+    author_email='linjx1000+github@gmail.com',
+    url='https://jachinlin.github.io/geektime_dl',
+    description='把极客时间装进 Kindle',
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
     license='MIT',

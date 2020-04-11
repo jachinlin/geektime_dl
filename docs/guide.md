@@ -133,7 +133,7 @@ geektime ebook --help
 
 ## 下载音频
 
-`geektime-dl` 除了可以制作 Kindle 电子书，把极客时间装进 Kindle，还提供了课程音频下载、视频下载等附加功能，先来看下怎么保存课程视频吧。
+`geektime-dl` 除了可以制作 Kindle 电子书，把极客时间装进 Kindle，还提供了下载课程音频的附加功能，来看一下怎么使用吧。
 
 
 > 执行该命令前，请确保账号密码已经保存在 `$(pwd)/geektime.cfg`。
@@ -153,20 +153,3 @@ geektime mp3 <course_id> [--url-only]
 geektime mp3 --help
 ```
 
-## 下载视频
-
-> 执行该命令前，请确保账号密码已经保存在 `$(pwd)/geektime.cfg`。
->
-> 如果没有，请执行 `geektime login` 进行账号密码验证和保存。
-
-```bash
-geektime mp4 <course_id> [--url-only] [--hd-only]
-```
-
-`geektime mp4` 会下载课程视频到 `$(pwd)/mp4/<课程名称>/` 中，开启 `--hd-only` 则会下载高清视频。开启 `--url-only`，则只会保存视频链接到 `$(pwd)/mp4/<课程名称>/<课程名称>.mp4.txt`，不会下载视频文件。
-
-您也可以通过以下命令获取更多帮助信息。
-
-```bash
-geektime mp4 --help
-```

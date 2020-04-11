@@ -11,7 +11,7 @@ module.exports = {
     }
   },
   themeConfig: {
-    lastUpdated: '更新于',
+    lastUpdated: '上次更新',
     repo: 'jachinlin/geektime_dl',
     repoLabel: 'GitHub',
     docsDir: 'docs',

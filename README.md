@@ -1,4 +1,16 @@
 
+:sparkles: 重要 :sparkles:
+
+1. **查看 [使用文档](https://jachinlin.github.io/geektime_dl/) 获取最新使用信息。**
+2. **[快手内推直达部门负责人！](https://jachinlin.github.io/geektime_dl/recruit.html)**
+
+<br/><br/>
+
+本 README.md 不再更新！:point_down:
+
+<p align="center">
+    <img  width="80%" src="https://raw.githubusercontent.com/jachinlin/geektime_dl/master/docs/.vuepress/public/geektime.gif" alt="左耳听风">
+</p>
 
 # 把极客时间装进 Kindle
 
@@ -8,26 +20,13 @@
 [![PyPI](https://img.shields.io/pypi/v/geektime-dl.svg)](https://pypi.org/project/geektime-dl/)
 [![CI & CD](https://github.com/jachinlin/geektime_dl/workflows/CI%20&%20CD/badge.svg)](https://github.com/jachinlin/geektime_dl/actions)
 
-
-<p align="center">
-    <img  width="80%" src="https://raw.githubusercontent.com/jachinlin/geektime_dl/master/docs/.vuepress/public/geektime.gif" alt="左耳听风">
-</p>
-
-**重要**
-
-
-1. **查看 [使用文档](https://jachinlin.github.io/geektime_dl/) 获取最新使用信息**，本 README.md 不再更新。
-2. **快手 [内推](https://jachinlin.github.io/geektime_dl/recruit.html) 直达部门负责人！**
-
-<br/><br/>
-
 极客时间专栏文章的质量都是非常高的，比如耗子哥的《左耳听风》、朱赟的《朱赟的技术管理课》和王天一的《人工智能基础课》，都是我非常喜欢的专栏。这些专栏深入浅出，将知识和经验传授于读者，都是值得多次阅读的。
 
 然而，每当空闲时间时，都需要掏出手机才能阅读专栏文章，这在某种情况下是很不便的，尤其坐地铁且没有网络时。作为一个kindle党，最好的解决方案就是kindle电子书。于是有了这个项目
 
 >[把极客时间装进Kindle](https://github.com/jachinlin/geektime_dl)
 
-现在，这个项目除了将专栏制作成`kindle`电子书，还提供了下载`mp3`和`mp4`等功能，具体见下使用方法。
+现在，这个项目除了将专栏制作成 `kindle` 电子书，还提供了下载专栏音频的附加功能，具体使用方法见下。
 
 
 ## 一、项目结构
@@ -39,11 +38,11 @@
 
 - utils: 提供了 mp3/mp4 下载、邮件发送、html 文件生成等功能
 
-- gk_apis: 封装了极客时间的若干 api
+- gk_apis: 封装极客时间 api
 
-- store_client: 存储极客时间专栏数据至本地 json 文件
+- store_client: 缓存极客时间专栏数据至本地 json 文件
 
-- cli: 提供若干cmd 命令，将上面这几个部分连接在一起，最后使用 kindle_maker 制作电子书，或者使用下载器下载相关音视频
+- cli: 提供若干 cmd 命令，将上面这几个部分连接在一起，最后使用 kindle_maker 制作电子书，或者使用下载器下载相关音频
 
 
 
@@ -163,19 +162,6 @@ geektime mp3 <course_id> [--url-only] [--output-folder=<output_folder>]
 
 notice: 此 subcmd 需要先执行 login subcmd
 
-**下载mp4**
-
-```
-geektime mp4 <course_id> [--url-only] [--hd-only] [--output-folder=<output_folder>]
-```
-
-- course_id: 课程ID，可以从 query subcmd 查看
-- --url-only: 只保存视频url
-- --hd-only：下载高清视频，默认下载标清视频
-- output_folder: 视频存放目录，默认`./mp4/`
-
-notice： 此 subcmd 需要先执行 login subcmd； 推荐开启`--url-only`，只保存 mp4 url
-
 
 **推送到kindle**
 
@@ -204,7 +190,7 @@ geektime ebook -c 42 --push --smtp-host=smtp.qq.com --smtp-port=465 --smtp-encry
 ## 五、Docker
 
 如果你对 Python 不是很了解，我们还提供了 docker 版本，只要安装好 docker ，依次复制下边指令并执行，
-就能下载全部已购买专栏文章、mp3、mp4，如果专栏更新完毕的话，我们还会把该专栏做成kindle电子书。
+就能下载全部已购买专栏文章、mp3，如果专栏更新完毕的话，我们还会把该专栏做成 kindle 电子书。
 
 ```
 # 构建
@@ -215,19 +201,18 @@ docker run -v `pwd`:/output -it --rm geektime login
 
 # 下载
 docker run -v `pwd`:/output -it --rm geektime ebook all
-docker run -v `pwd`:/output --rm geektime mp4 al
 docker run -v `pwd`:/output --rm geektime mp3 all
 ```
 
 
 ## 六、Todo list
 
-- [X] MP3 and MP4
-- [X] comments
-- [X] batch download
+- [X] 课程音频
+- [X] 评论
+- [X] 批量下载
 - [X] docker
-- [X] push to kindle
-- [ ] support mathjax
+- [X] 推送到 Kindle
+- [ ] 支持 mathjax 数学公式
 - [ ] ...
 
 
