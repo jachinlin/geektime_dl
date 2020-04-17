@@ -1,0 +1,20 @@
+{
+  "name": "geektime-dl",
+  "version": "1.1.2",
+  "description": "把极客时间装进 Kindle",
+  "scripts": {
+    "docs:dev": "vuepress dev .",
+    "docs:build": "vuepress build ."
+  },
+  "author": "linjx1000+github@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "core-js": "^2.6.11",
+    "element-ui": "^2.13.1",
+    "vue-feather-icons": "^5.0.0"
+  },
+  "devDependencies": {
+    "vuepress": "^1.4.1",
+    "vuepress-plugin-baidu-tongji": "^1.0.1"
+  }
+}

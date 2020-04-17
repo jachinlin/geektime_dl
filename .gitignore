@@ -35,6 +35,7 @@ nosetests.xml
 # Virtual environment
 .venv
 .venv3
+venv
 
 # Environment files
 .idea
