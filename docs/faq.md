@@ -24,7 +24,7 @@
 
 当使用 geektime 触发图形验证码时，请稍等会再重新 [geektime login](/guide.html#登录) 就能登上了。
 
-如果哪位同学对图形验证这一块比较擅长或者感性却，欢迎 [pr](https://github.com/jachinlin/geektime_dl/compare)。
+如果哪位同学对图形验证这一块比较擅长或者感兴趣，欢迎 [pr](https://github.com/jachinlin/geektime_dl/compare)。
 
 ## 其他疑问
 
