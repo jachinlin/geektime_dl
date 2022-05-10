@@ -2,7 +2,7 @@
 
 import os
 
-from geektime_dl.utils.ebook import Render
+from geektime_dl.ebook.ebook import Render
 
 
 def test_render_article_html(render: Render, output_folder: str):
@@ -35,8 +35,3 @@ def test_render_toc_md(render: Render, output_folder: str):
 
     os.remove(fn)
 
-
-def test_format_path(render: Render):
-    fn = 'hell\\'
-    formated_fn = render.format_file_name(fn)
-    assert formated_fn == 'hell'

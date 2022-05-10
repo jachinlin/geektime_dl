@@ -1,6 +1,6 @@
 # coding=utf8
 
-from geektime_dl.data_client.gk_apis import GkApiClient
+from geektime_dl.gt_apis import GkApiClient
 
 course_keys_needed = {
     'id', 'column_title', 'had_sub', 'is_finish', 'update_frequency'

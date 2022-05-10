@@ -10,7 +10,7 @@ def setup_function(func):
 
 
 def test_ebook(tmp_path, mocker, column_id):
-    stub = mocker.stub(name='sys.stdout.write')
+    mocker.stub(name='sys.stdout.write')
     cfg_file = tmp_path / 'test.cfg'
     cmd = ebook.EBook()
 

@@ -121,12 +121,3 @@ class Render:
         u = pathlib.Path(o.path)
         stem, suffix = u.stem, u.suffix
         return '{}-{}{}'.format(stem, int(time.time()), suffix)
-
-    @staticmethod
-    def format_file_name(path: str) -> str:
-        """
-        去掉path中的不规则字符
-        """
-        return path.replace('/', '').replace(' ', '').\
-            replace('+', '-').replace('"', '').replace('\\', '').\
-            replace(':', '-').replace('|', '-').replace('>', '-')

@@ -2,7 +2,7 @@
 
 import sys
 
-from geektime_dl.data_client.gk_apis import GkApiClient, GkApiError
+from geektime_dl.gt_apis import GkApiClient, GkApiError
 from geektime_dl.cli import Command
 
 
@@ -34,7 +34,9 @@ class Login(Command):
                 Command.save_cfg(new_cfg, args['config'])
 
         except GkApiError as e:
-            sys.stdout.write("{}\nEnter again\n".format(e))
+            sys.stdout.write(
+                "login fail, error message:{}\nEnter again\n".format(e)
+            )
             area = input("enter country code: enter for 86 ") or '86'
             account = input("enter your registered account(phone): ")
             password = input("account: +{} {}\n"

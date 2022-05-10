@@ -1,7 +1,10 @@
 [flake8]
 count = True
-exit-zero = True
 max-complexity = 10
 max-line-length = 80
 statistics = True
 ignore = W391, W503, W504
+exclude =
+    __pycache__
+    venv
+    .venv

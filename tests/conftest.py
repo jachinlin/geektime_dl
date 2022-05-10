@@ -6,9 +6,9 @@ import pytest
 from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
 
-from geektime_dl.data_client.gk_apis import GkApiClient
+from geektime_dl.gt_apis import GkApiClient
 from geektime_dl.data_client import DataClient
-from geektime_dl.utils.ebook import Render
+from geektime_dl.ebook.ebook import Render
 
 
 @pytest.fixture

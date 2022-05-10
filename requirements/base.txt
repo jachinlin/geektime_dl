@@ -1,6 +1,7 @@
-kindle_maker
+git+ssh://git@github.com/jachinlin/ebook-py.git
 requests
-tinydb
 termcolor
 tqdm
 pillow
+jinja2
+peewee

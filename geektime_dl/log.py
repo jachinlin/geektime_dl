@@ -3,13 +3,14 @@
 import os
 import logging
 
-LOG_PATH = './geektime.log'
+from geektime_dl.utils import get_working_folder
+
+LOG_PATH = str(get_working_folder() / 'geektime.log')
 LOG_FORMAT = '\t'.join([
     'log_time=%(asctime)s',
     'levelname=%(levelname)s',
-    'process=%(process)d',
     '%(message)s',
-    'location=%(pathname)s:%(lineno)d\n'])
+    'location=%(pathname)s:%(lineno)d'])
 
 level = logging.DEBUG if os.getenv('DEBUG') == '1' else logging.INFO
 logger = logging.getLogger('geektime')

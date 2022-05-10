@@ -5,7 +5,7 @@ import os
 import pytest
 
 from geektime_dl.cli import login
-from geektime_dl.data_client.gk_apis import GkApiError
+from geektime_dl.gt_apis import GkApiError
 from geektime_dl.utils import Singleton
 
 

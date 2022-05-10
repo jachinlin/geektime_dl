@@ -1,5 +1,6 @@
 *.py[cod]
 *.log
+.DS_Store
 
 .cache
 .pytest_cache

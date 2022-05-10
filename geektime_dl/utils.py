@@ -1,7 +1,16 @@
 # coding=utf8
-
-from functools import wraps
+import contextlib
 import threading
+import pathlib
+from functools import wraps
+
+
+_working_folder = pathlib.Path.home() / '.geektime_dl'
+_working_folder.mkdir(exist_ok=True)
+
+
+def get_working_folder():
+    return _working_folder
 
 
 def synchronized(lock_attr='_lock'):
@@ -33,4 +42,21 @@ class Singleton(type):
     def clear_singletons(cls):
         return cls._instances.clear()
 
+
+def read_cookies_from_file(file_path: pathlib.Path) -> dict:
+    cookies = {}
+    with open(file_path, 'r') as f:
+        for line in f.read().split(';'):
+            n, v = line.split('=', 1)
+            with contextlib.suppress(Exception):
+                _ = v.strip().encode('latin-1')
+                cookies[n.strip()] = v.strip()
+    return cookies
+
+
+def read_local_cookies() -> dict:
+    fn = get_working_folder() / 'cookies'
+    if not fn.exists():
+        return {}
+    return read_cookies_from_file(fn)
 

@@ -5,10 +5,13 @@ import threading
 import functools
 import time
 import random
+import contextlib
+from typing import Optional
 
 import requests
 
-from geektime_dl.utils import Singleton, synchronized
+from geektime_dl.utils import synchronized, Singleton
+from geektime_dl.log import logger
 
 _ua = [
     "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Mobile Safari/537.36"  # noqa: E501
@@ -35,7 +38,7 @@ def _retry(func):
         except GkApiError:
             raise
         except Exception as e:
-            raise GkApiError("gk api error") from e
+            raise GkApiError("geektime api error") from e
 
     return wrap
 
@@ -51,16 +54,29 @@ class GkApiClient(metaclass=Singleton):
     }
 
     def __init__(self, account: str, password: str, area: str = '86',
-                 no_login: bool = False):
+                 no_login: bool = False, lazy_login: bool = True,
+                 cookies: Optional[dict] = None):
         self._cookies = None
         self._lock = threading.Lock()
         self._account = account
         self._password = password
         self._area = area
-        if not no_login:
-            self.reset_session()
+        self._no_login = no_login
+
+        if cookies:
+            self._cookies = cookies
+            return
+
+        if lazy_login or no_login:
+            return
+        self.reset_session()
 
     def _post(self, url: str, data: dict = None, **kwargs) -> requests.Response:
+        with contextlib.suppress(Exception):
+            for k in ['cellphone', 'password']:
+                if data and k in data:
+                    data[k] = 'xxx'
+            logger.info("request geektime api, {}, {}".format(url, data))
 
         headers = kwargs.setdefault('headers', {})
         headers.update(self._headers_tmpl)
@@ -68,18 +84,16 @@ class GkApiClient(metaclass=Singleton):
         resp.raise_for_status()
 
         if resp.json().get('code') != 0:
-            raise GkApiError('gk api fail:' + resp.json()['error']['msg'])
+            raise GkApiError('geektime api fail:' + resp.json()['error']['msg'])
+
         return resp
 
-    def reset_session(self) -> None:
-        self._headers_tmpl['User-Agent'] = random.choice(_ua)
-        self._login()
-
     @synchronized()
-    def _login(self) -> None:
+    def reset_session(self) -> None:
         """登录"""
         url = 'https://account.geekbang.org/account/ticket/login'
 
+        self._headers_tmpl['User-Agent'] = random.choice(_ua)
         headers = {
             'Accept': 'application/json, text/plain, */*',
             'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',  # noqa: E501
@@ -116,6 +130,8 @@ class GkApiClient(metaclass=Singleton):
         headers = {
             'Referer': 'https://time.geekbang.org/paid-content',
         }
+        if not self._cookies and not self._no_login:
+            self.reset_session()
 
         resp = self._post(url, headers=headers, cookies=self._cookies)
         return resp.json()['data']
@@ -131,6 +147,9 @@ class GkApiClient(metaclass=Singleton):
             'Referer': 'https://time.geekbang.org/column/{}'.format(course_id),
         }
 
+        if not self._cookies and not self._no_login:
+            self.reset_session()
+
         resp = self._post(url, data, headers=headers, cookies=self._cookies)
 
         if not resp.json()['data']:
@@ -145,6 +164,9 @@ class GkApiClient(metaclass=Singleton):
         headers = {
             'Referer': 'https://time.geekbang.org/column/{}'.format(course_id),
         }
+
+        if not self._cookies and not self._no_login:
+            self.reset_session()
 
         resp = self._post(
             url, {'cid': str(course_id)}, headers=headers, cookies=self._cookies
@@ -164,6 +186,9 @@ class GkApiClient(metaclass=Singleton):
                 post_id)
         }
 
+        if not self._cookies and not self._no_login:
+            self.reset_session()
+
         resp = self._post(
             url, {'id': post_id}, headers=headers, cookies=self._cookies
         )
@@ -178,6 +203,9 @@ class GkApiClient(metaclass=Singleton):
             'Referer': 'https://time.geekbang.org/column/article/{}'.format(
                 post_id)
         }
+
+        if not self._cookies and not self._no_login:
+            self.reset_session()
 
         resp = self._post(
             url, {"aid": str(post_id), "prev": 0},
@@ -194,6 +222,9 @@ class GkApiClient(metaclass=Singleton):
             'Referer': 'https://time.geekbang.org/dailylesson/collection/{}'.format(  # noqa: E501
                 collection_id)
         }
+
+        if not self._cookies and not self._no_login:
+            self.reset_session()
 
         resp = self._post(
             url, {'id': str(collection_id)},
@@ -213,11 +244,15 @@ class GkApiClient(metaclass=Singleton):
     @_retry
     def get_video_list_of(self, collection_id: int) -> list:
         """每日一课合辑视频列表"""
+
         url = 'https://time.geekbang.org/serv/v2/video/GetListByType'
         headers = {
             'Referer': 'https://time.geekbang.org/dailylesson/collection/{}'.format(  # noqa: E501
                 collection_id)
         }
+
+        if not self._cookies and not self._no_login:
+            self.reset_session()
 
         resp = self._post(
             url, {"id": str(collection_id), "size": 50},

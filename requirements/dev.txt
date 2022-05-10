@@ -1,5 +1,6 @@
 -r base.txt
 pytest
+flake8
 codecov
 pytest-cov
 pytest-mock
