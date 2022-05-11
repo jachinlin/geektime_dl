@@ -104,7 +104,7 @@ def get_user_agents() -> list:
         with open(fp) as f:
             uas = list()
             for ua in f.readlines():
-                uas.append(ua)
+                uas.append(ua.strip())
             _ua_list = uas
     return _ua_list
 
