@@ -81,6 +81,8 @@ class TempKV(BaseModel):
         return super(TempKV, self).save(*args, **kwargs)
 
     def is_expired(self) -> bool:
+        if self.expire <= 0:
+            return False
         now = datetime.datetime.now()
         return (now - self.modified).seconds > self.expire
 
@@ -135,7 +137,7 @@ class EmptyCache(GeektimeCache):
         return
 
     def get(self, key: str) -> dict:
-        return ''
+        return {}
 
     def set(self, key: str, value: dict, expire: int) -> None:
         pass
@@ -243,16 +245,16 @@ class SqliteCache(GeektimeCache):
         except Exception:
             logger.error('ERROR: {}'.format(traceback.format_exc()))
 
-    def get(self, key: str) -> str:
+    def get(self, key: str) -> dict:
         try:
             try:
                 kv: TempKV = TempKV.get(TempKV.key == key)
             except DoesNotExist:
-                return ''
+                return {}
 
             if kv.is_expired():
                 logger.info("get kv expired, key={}".format(key))
-                return ''
+                return {}
             val_dict = json.loads(str(kv.value))
             logger.info("get kv, key={}, value= {}".format(
                 key, kv.value[:100]
@@ -260,7 +262,7 @@ class SqliteCache(GeektimeCache):
             return val_dict
         except Exception:
             logger.error('ERROR: {}'.format(traceback.format_exc()))
-            return ''
+            return {}
 
     def set(self, key: str, value: dict, expire: int) -> None:
         try:

@@ -4,18 +4,17 @@
 import threading
 import functools
 import time
-import random
 import contextlib
 from typing import Optional
 
 import requests
 
-from geektime_dl.utils import synchronized, Singleton
+from geektime_dl.utils import (
+    synchronized,
+    Singleton,
+    get_random_user_agent
+)
 from geektime_dl.log import logger
-
-_ua = [
-    "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Mobile Safari/537.36"  # noqa: E501
-]
 
 
 class GkApiError(Exception):
@@ -48,10 +47,6 @@ class GkApiClient(metaclass=Singleton):
     一个课程，包括专栏、视频、微课等，称作 `course` 或者 `column`
     课程下的章节，包括文章、者视频等，称作 `post` 或者 `article`
     """
-    _headers_tmpl = {
-        'Content-Type': 'application/json',
-        'User-Agent': random.choice(_ua)
-    }
 
     def __init__(self, account: str, password: str, area: str = '86',
                  no_login: bool = False, lazy_login: bool = True,
@@ -62,6 +57,7 @@ class GkApiClient(metaclass=Singleton):
         self._password = password
         self._area = area
         self._no_login = no_login
+        self._ua = get_random_user_agent()
 
         if cookies:
             self._cookies = cookies
@@ -79,7 +75,10 @@ class GkApiClient(metaclass=Singleton):
             logger.info("request geektime api, {}, {}".format(url, data))
 
         headers = kwargs.setdefault('headers', {})
-        headers.update(self._headers_tmpl)
+        headers.update({
+            'Content-Type': 'application/json',
+            'User-Agent': self._ua
+        })
         resp = requests.post(url, json=data, timeout=10, **kwargs)
         resp.raise_for_status()
 
@@ -93,7 +92,7 @@ class GkApiClient(metaclass=Singleton):
         """登录"""
         url = 'https://account.geekbang.org/account/ticket/login'
 
-        self._headers_tmpl['User-Agent'] = random.choice(_ua)
+        self._ua = get_random_user_agent()
         headers = {
             'Accept': 'application/json, text/plain, */*',
             'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',  # noqa: E501

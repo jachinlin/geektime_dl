@@ -94,63 +94,65 @@ class EBook(Command):
     @add_argument("--format", dest="format", type=str, save=True,
                   default='mobi', help="ebook format")
     def run(self, cfg: dict) -> None:
-
-        dc = self.get_data_client(cfg)
         course_ids = parse_column_ids(cfg['course_ids'])
+
+        for course_id in course_ids:
+            self._run_once(course_id, cfg)
+
+    def _run_once(self, course_id: int, cfg: dict):
+        dc = self.get_data_client(cfg)
         output_folder = self._make_output_folder(cfg['output_folder'])
         no_cache = cfg['no_cache']
         wf = get_working_folder()
+        try:
+            course_intro = dc.get_column_intro(course_id, no_cache=no_cache)
+        except GkApiError as e:
+            sys.stderr.write('{}\n\n'.format(e))
+            return
+        if int(course_intro['column_type']) not in (1, 2):
+            sys.stderr.write("ERROR: 该课程不提供文本:{}".format(
+                course_intro['column_title']))
+            return
 
-        for course_id in course_ids:
-            try:
-                course_intro = dc.get_column_intro(course_id, no_cache=no_cache)
-            except GkApiError as e:
-                sys.stderr.write('{}\n\n'.format(e))
-                continue
-            if int(course_intro['column_type']) not in (1, 2):
-                sys.stderr.write("ERROR: 该课程不提供文本:{}".format(
-                    course_intro['column_title']))
-                continue
+        # fetch raw data
+        print(colored('开始制作电子书:{}-{}'.format(
+            course_id, course_intro['column_title']), 'green'))
+        pbar_desc = '数据爬取中:{}'.format(course_intro['column_title'][:10])
+        article_ids = course_intro['articles']
+        article_ids = tqdm(article_ids)
+        article_ids.set_description(pbar_desc)
+        articles = list()
+        for a in article_ids:
+            aid = a['id']
+            article = dc.get_article_content(aid, no_cache=no_cache)
+            if cfg['comments_count'] > 0:
+                article['article_content'] += self._render_comment_html(
+                    article['comments'],
+                    cfg['comments_count']
+                )
+            articles.append(article)
+        # source file
+        source_folder = wf / format_file_name(course_intro['column_title'])
+        source_folder.mkdir(exist_ok=True)
+        self._generate_source_files(
+            course_intro, articles, str(source_folder), **cfg
+        )
 
-            # fetch raw data
-            print(colored('开始制作电子书:{}-{}'.format(
-                course_id, course_intro['column_title']), 'green'))
-            pbar_desc = '数据爬取中:{}'.format(course_intro['column_title'][:10])
-            article_ids = course_intro['articles']
-            article_ids = tqdm(article_ids)
-            article_ids.set_description(pbar_desc)
-            articles = list()
-            for a in article_ids:
-                aid = a['id']
-                article = dc.get_article_content(aid, no_cache=no_cache)
-                if cfg['comments_count'] > 0:
-                    article['article_content'] += self._render_comment_html(
-                        article['comments'],
-                        cfg['comments_count']
-                    )
-                articles.append(article)
-            # source file
-            source_folder = wf / format_file_name(course_intro['column_title'])
-            source_folder.mkdir(exist_ok=True)
-            self._generate_source_files(
-                course_intro, articles, str(source_folder), **cfg
-            )
+        # ebook 未完结或者 no_cahce 都会重新制作电子书
+        # ebook_name = self._format_title(course_intro)
+        # fn = os.path.join(output_folder, ebook_name) + '.mobi'
+        # if (not no_cache and self.is_course_finished(course_intro) and
+        #         os.path.isfile(fn)):
+        #     sys.stdout.write("{} exists\n".format(ebook_name))
+        # else:
 
-            # ebook 未完结或者 no_cahce 都会重新制作电子书
-            # ebook_name = self._format_title(course_intro)
-            # fn = os.path.join(output_folder, ebook_name) + '.mobi'
-            # if (not no_cache and self.is_course_finished(course_intro) and
-            #         os.path.isfile(fn)):
-            #     sys.stdout.write("{} exists\n".format(ebook_name))
-            # else:
-
-            make_ebook(
-                source_dir=str(source_folder),
-                output_dir=output_folder,
-                format=cfg['format']
-            )
-            print(colored('制作电子书完成:{}-{}'.format(
-                course_id, course_intro['column_title']), 'green'))
+        make_ebook(
+            source_dir=str(source_folder),
+            output_dir=output_folder,
+            format=cfg['format']
+        )
+        print(colored('制作电子书完成:{}-{}'.format(
+            course_id, course_intro['column_title']), 'green'))
 
     @staticmethod
     def _make_output_folder(output_folder: str):

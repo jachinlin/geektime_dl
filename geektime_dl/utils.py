@@ -1,5 +1,6 @@
 # coding=utf8
 import contextlib
+import random
 import threading
 import pathlib
 from functools import wraps
@@ -78,3 +79,35 @@ def parse_column_ids(ids_str: str) -> List[int]:
     res = list(set(res))
     res.sort()
     return res
+
+
+_default_ua_list = [
+    "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Mobile Safari/537.36",  # noqa: E501
+]
+
+_ua_list = list()
+_ua_list_lock = threading.Lock()
+
+
+def get_user_agents() -> list:
+    global _ua_list
+    if _ua_list:
+        return _ua_list
+
+    with _ua_list_lock:
+        if _ua_list:
+            return _ua_list
+        fp = get_working_folder() / 'user-agents.txt'
+        if not fp.exists():
+            _ua_list = _default_ua_list
+            return _ua_list
+        with open(fp) as f:
+            uas = list()
+            for ua in f.readlines():
+                uas.append(ua)
+            _ua_list = uas
+    return _ua_list
+
+
+def get_random_user_agent() -> str:
+    return random.choice(get_user_agents())
