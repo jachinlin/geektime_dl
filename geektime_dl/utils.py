@@ -3,7 +3,7 @@ import contextlib
 import threading
 import pathlib
 from functools import wraps
-
+from typing import List
 
 _working_folder = pathlib.Path.home() / '.geektime_dl'
 _working_folder.mkdir(exist_ok=True)
@@ -60,3 +60,21 @@ def read_local_cookies() -> dict:
         return {}
     return read_cookies_from_file(fn)
 
+
+def parse_column_ids(ids_str: str) -> List[int]:
+    def _int(num):
+        try:
+            return int(num)
+        except Exception:
+            raise ValueError('illegal column ids: {}'.format(ids_str))
+    res = list()
+    segments = ids_str.split(',')
+    for seg in segments:
+        if '-' in seg:
+            s, e = seg.split('-', 1)
+            res.extend(range(_int(s), _int(e) + 1))
+        else:
+            res.append(_int(seg))
+    res = list(set(res))
+    res.sort()
+    return res

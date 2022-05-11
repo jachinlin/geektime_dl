@@ -3,17 +3,14 @@
 import os
 
 import pytest
-from tinydb import TinyDB
-from tinydb.storages import MemoryStorage
 
 from geektime_dl.gt_apis import GkApiClient
-from geektime_dl.data_client import DataClient
 from geektime_dl.ebook.ebook import Render
 
 
 @pytest.fixture
 def gk() -> GkApiClient:
-    return GkApiClient(None, None, no_login=True)
+    return GkApiClient('', '', no_login=True)
 
 
 class FakeGk:
@@ -38,16 +35,6 @@ class FakeGk:
 
     def get_post_comments(self, post_id: int):
         return []
-
-
-@pytest.fixture
-def dc() -> DataClient:
-    db = TinyDB(storage=MemoryStorage)
-    _gk = FakeGk()
-    _dc = DataClient(_gk, db)
-    yield _dc
-
-    _dc.db.close()
 
 
 @pytest.fixture

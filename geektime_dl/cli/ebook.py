@@ -4,7 +4,6 @@ import os
 import sys
 import json
 import datetime
-from typing import List
 
 from termcolor import colored
 from ebook import make_ebook
@@ -14,7 +13,10 @@ from tqdm import tqdm
 from geektime_dl.cli import Command, add_argument
 from geektime_dl.ebook.ebook import Render
 from geektime_dl.gt_apis import GkApiError
-from geektime_dl.utils import get_working_folder
+from geektime_dl.utils import (
+    get_working_folder,
+    parse_column_ids
+)
 
 
 class EBook(Command):
@@ -76,25 +78,6 @@ class EBook(Command):
             render.render_article_html(
                 file_basename, article['article_content'], **kwargs)
 
-    @staticmethod
-    def _parse_course_ids(ids_str: str) -> List[int]:
-        def _int(num):
-            try:
-                return int(num)
-            except Exception:
-                raise ValueError('illegal course ids: {}'.format(ids_str))
-        res = list()
-        segments = ids_str.split(',')
-        for seg in segments:
-            if '-' in seg:
-                s, e = seg.split('-', 1)
-                res.extend(range(_int(s), _int(e) + 1))
-            else:
-                res.append(_int(seg))
-        res = list(set(res))
-        res.sort()
-        return res
-
     @add_argument("course_ids", type=str,
                   help="specify the target course ids")
     @add_argument("--no-cache", dest="no_cache", action='store_true',
@@ -113,7 +96,7 @@ class EBook(Command):
     def run(self, cfg: dict) -> None:
 
         dc = self.get_data_client(cfg)
-        course_ids = self._parse_course_ids(cfg['course_ids'])
+        course_ids = parse_column_ids(cfg['course_ids'])
         output_folder = self._make_output_folder(cfg['output_folder'])
         no_cache = cfg['no_cache']
         wf = get_working_folder()

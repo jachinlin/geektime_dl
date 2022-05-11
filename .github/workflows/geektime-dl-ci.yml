@@ -34,6 +34,13 @@ jobs:
       run: |
         pip install -r requirements/dev.txt
         python -m pytest
+    - name: Coverage
+      run: |
+        pip install coverage coveralls
+        coverage run --source=geektime_dl -m pytest tests/
+        coveralls --service=github
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   docs:
     runs-on: ubuntu-latest

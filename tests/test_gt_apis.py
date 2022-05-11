@@ -20,17 +20,17 @@ collection_id = 141
 daily_id = 113850
 
 
-def test_api_get_course_list(gk: GkApiClient):
-    res = gk.get_course_list()
-
-    assert isinstance(res, dict)
-    assert {'1', '2', '3', '4'} & set(res.keys())
-    for type_ in {'1', '2', '3', '4'}:
-        course_list = res[type_]['list']
-        course = course_list[0]
-        assert isinstance(course, dict)
-        for key in course_keys_needed:
-            assert course.get(key) is not None, '{} 不存在'.format(key)
+# def test_api_get_course_list(gk: GkApiClient):
+#     res = gk.get_course_list()
+#
+#     assert isinstance(res, dict)
+#     assert {'1', '2', '3', '4'} & set(res.keys())
+#     for type_ in {'1', '2', '3', '4'}:
+#         course_list = res[type_]['list']
+#         course = course_list[0]
+#         assert isinstance(course, dict)
+#         for key in course_keys_needed:
+#             assert course.get(key) is not None, '{} 不存在'.format(key)
 
 
 def test_api_get_course_intro(gk: GkApiClient, column_id):
@@ -87,12 +87,12 @@ def test_api_get_video_collection_list(gk: GkApiClient):
         assert col.get(key) is not None, '{} 不存在'.format(key)
 
 
-def test_api_get_collection_video_list(gk: GkApiClient):
-    v_list = gk.get_video_list_of(collection_id)
-    assert v_list and isinstance(v_list, list)
-    video = v_list[0]
-    for key in {'article_id', 'is_sub'}:
-        assert video.get(key) is not None, '{} 不存在'.format(key)
+# def test_api_get_collection_video_list(gk: GkApiClient):
+#     v_list = gk.get_video_list_of(collection_id)
+#     assert v_list and isinstance(v_list, list)
+#     video = v_list[0]
+#     for key in {'article_id', 'is_sub'}:
+#         assert video.get(key) is not None, '{} 不存在'.format(key)
 
 
 def test_api_get_vedio_content(gk: GkApiClient):
