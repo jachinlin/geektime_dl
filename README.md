@@ -15,6 +15,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/geektime-dl.svg)](https://pypi.org/project/geektime-dl/)
 [![CI & CD](https://github.com/jachinlin/geektime_dl/workflows/CI%20&%20CD/badge.svg)](https://github.com/jachinlin/geektime_dl/actions)
+[![Coverage Status](https://coveralls.io/repos/github/jachinlin/geektime_dl/badge.svg?branch=master)](https://coveralls.io/github/jachinlin/geektime_dl?branch=master)
 
 极客时间专栏文章的质量都是非常高的，比如耗子哥的《左耳听风》、朱赟的《朱赟的技术管理课》和王天一的《人工智能基础课》，都是我非常喜欢的专栏。这些专栏深入浅出，将知识和经验传授于读者，都是值得多次阅读的。
 
