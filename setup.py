@@ -34,7 +34,7 @@ setup(
     packages=find_packages(exclude=['examples', 'tests']),
     package_data={'geektime_dl': ['ebook/templates/*']},
     install_requires=[
-        'git+ssh://git@github.com/jachinlin/ebook-py.git',
+        'git+https://github.com/jachinlin/ebook-py.git',
         'requests',
         'termcolor',
         'tqdm',
