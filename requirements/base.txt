@@ -1,7 +1,8 @@
-git+https://github.com/jachinlin/ebook-py.git
 requests
 termcolor
 tqdm
 pillow
 jinja2
 peewee
+click
+EbookLib

@@ -1,72 +1,69 @@
 # coding=utf8
-
-import os
+"""
+Pytest 配置文件
+"""
 
 import pytest
-
-from geektime_dl.gt_apis import GkApiClient
-from geektime_dl.ebook.ebook import Render
-
-
-@pytest.fixture
-def gk() -> GkApiClient:
-    return GkApiClient('', '', no_login=True)
-
-
-class FakeGk:
-    def __init__(self):
-        self._access_count = 0
-
-    def get_course_intro(self, course_id: int):
-        self._access_count += 1
-        return {'id': course_id, 'access_count': self._access_count}
-
-    def get_course_list(self):
-        return {
-            '1': {'list': []}, '2': {'list': []},
-            '3': {'list': []}, '4': {'list': []}
-        }
-
-    def get_post_content(self, post_id: int):
-        return {'id': post_id}
-
-    def get_post_list_of(self, course_id: int):
-        return [{'id': 123}, {'id': 456}]
-
-    def get_post_comments(self, post_id: int):
-        return []
+import tempfile
+from pathlib import Path
 
 
 @pytest.fixture
-def output_folder() -> str:
-    return '/tmp'
+def temp_output_folder():
+    """临时输出目录"""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        yield Path(tmpdir)
 
 
 @pytest.fixture
-def render(output_folder) -> Render:
-    r = Render(output_folder)
-    return r
+def temp_working_folder(monkeypatch):
+    """临时工作目录"""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+        monkeypatch.setattr("geektime_dl.utils._working_folder", tmp_path)
+        yield tmp_path
 
 
 @pytest.fixture
-def db_file() -> str:
-    path = '/tmp/test.json'
-    if os.path.exists(path):
-        os.remove(path)
-    yield path
-    os.remove(path)
+def mock_api_client():
+    """Mock API 客户端"""
+    from unittest.mock import MagicMock
+
+    mock = MagicMock()
+    mock.login.return_value = {"session_id": "test123"}
+    mock.get_course_list.return_value = {
+        "1": {"list": [
+            {"id": 1, "column_title": "测试课程", "had_sub": True, "is_finish": True}
+        ]}
+    }
+    mock.get_course_intro.return_value = {
+        "id": 1,
+        "column_title": "测试课程",
+        "author_name": "测试作者",
+        "column_intro": "课程简介",
+        "column_cover": "https://example.com/cover.jpg",
+        "column_type": 1,
+        "update_frequency": "已完结",
+        "is_finish": True,
+        "had_sub": True,
+    }
+    mock.get_post_list_of.return_value = [
+        {"id": 101, "article_title": "文章1"},
+        {"id": 102, "article_title": "文章2"},
+    ]
+    mock.get_post_content.return_value = {
+        "id": 101,
+        "article_title": "文章1",
+        "article_content": "文章内容",
+        "audio_download_url": "https://example.com/audio.mp3",
+    }
+    mock.get_post_comments.return_value = []
+
+    return mock
 
 
-@pytest.fixture(scope='session')
-def column_id():
-    return 49
+@pytest.fixture
+def output_folder(temp_output_folder) -> str:
+    return str(temp_output_folder)
 
 
-@pytest.fixture(scope='session')
-def article_id():
-    return 780
-
-
-@pytest.fixture(scope='session')
-def video_course_id():
-    return 66

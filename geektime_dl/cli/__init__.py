@@ -1,7 +1,8 @@
 # coding=utf8
-# flake8: noqa
+"""
+Geektime CLI - 基于 Click 重构的命令行界面
+"""
 
-from geektime_dl.cli.command import Command, main, add_argument
-from geektime_dl.cli import (
-    login, query, ebook
-)
+from .main import cli, main
+
+__all__ = ['cli', 'main']

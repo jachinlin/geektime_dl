@@ -44,3 +44,9 @@ venv
 # tmp files
 geektime.cfg
 htmlcov
+
+# Worktrees
+.worktrees/
+
+# Superpowers docs
+docs/superpowers/

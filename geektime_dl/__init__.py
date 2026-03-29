@@ -1,11 +1,7 @@
 # coding=utf8
+"""
+极客时间下载工具 - 把极客时间装进 Kindle
+"""
 
-
-def main():
-    from geektime_dl import cli
-    cli.main()
-
-
-geektime = main
-
+__version__ = '2.0.0'
 

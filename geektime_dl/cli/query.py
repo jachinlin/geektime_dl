@@ -1,38 +1,67 @@
 # coding=utf8
+"""
+query 命令 - 查询课程列表
+"""
 
-import sys
+import click
 
-from geektime_dl.cli import Command, add_argument
+from geektime_dl.services import CourseService
+from geektime_dl.api import AuthenticationError
+from .main import cli, common_options
+
 
 _COLUMN_INDEX = "1"
 
 
-class Query(Command):
-    """查看专栏列表"""
+@cli.command()
+@common_options
+def query(account, password, area):
+    """
+    查询课程列表
 
-    @add_argument("--no-cache", dest="no_cache", action='store_true',
-                  default=False, help="do not use the cache data")
-    def run(self, cfg: dict):
+    显示用户已订阅的课程列表。
 
-        dc = self.get_data_client(cfg)
+    示例:
+      geektime query -a myaccount -p mypassword
+    """
 
-        data = dc.get_column_list(no_cache=cfg['no_cache'])
+    # 验证必需参数
+    if not account or not password:
+        click.secho('错误: 需要提供账号和密码', fg='red', err=True)
+        click.echo('使用 -a/--account 和 -p/--password 参数')
+        raise click.Abort()
 
-        result_str = ''
+    try:
+        service = CourseService(account, password, area)
+        service.login() 
+
+        click.echo('正在获取课程列表...')
+        data = service.get_course_list()
+
+        if _COLUMN_INDEX not in data:
+            click.echo('未找到课程数据')
+            return
+
         columns = data[_COLUMN_INDEX]['list']
-        result_str += '专栏\n'
-        result_str += "\t{:<12}{}\t{}\t{:<10}\n".format(
-            '课程ID', '已订阅', '已完结', '课程标题')
-        for c in columns:
-            is_finished = self.is_course_finished(c)
-            result_str += "\t{:<15}{}\t{}\t{:<10}\n".format(
-                str(c['id']),
-                '是' if c['had_sub'] else '否',
-                '是' if is_finished else '否',
-                c['column_title'],
 
+        result = '专栏\n'
+        result += "\t{:<12}{}\t{}\t{}\n".format(
+            '课程ID', '已订阅', '已完结', '课程标题')
+
+        for c in columns:
+            is_finished = c.get('update_frequency') in ['全集', '已完结'] or c.get('is_finish')
+            result += "\t{:<15}{}\t{}\t{}\n".format(
+                str(c['id']),
+                '是' if c.get('had_sub') else '否',
+                '是' if is_finished else '否',
+                c.get('column_title', ''),
             )
 
-        sys.stdout.write(result_str)
-        return result_str
+        click.echo(result)
 
+    except AuthenticationError as e:
+        click.secho(f'认证失败: {e}', fg='red', err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.secho(f'错误: {e}', fg='red', err=True)
+        raise click.Abort()

@@ -4,7 +4,7 @@
 import os
 from setuptools import setup, find_packages
 
-version = '1.2.0'
+version = '2.0.0'
 
 
 def read(fname):
@@ -16,7 +16,7 @@ setup(
     name='geektime_dl',
     version=version,
     author='jachinlin',
-    author_email='linjx1000+github@gmail.com',
+    author_email='linjx1000+github@hotamil.com',
     url='https://jachinlin.github.io/geektime_dl',
     description='把极客时间装进 Kindle',
     long_description=read('README.md'),
@@ -32,16 +32,17 @@ setup(
     ],
     keywords='kindle ebook mobi geektime',
     packages=find_packages(exclude=['examples', 'tests']),
-    package_data={'geektime_dl': ['ebook/templates/*']},
+    package_data={'geektime_dl': []},
     install_requires=[
         'wheel',
-        'git+https://github.com/jachinlin/ebook-py.git',
+        'EbookLib',
         'requests',
         'termcolor',
         'tqdm',
         'pillow',
         'jinja2',
-        'peewee'
+        'peewee',
+        'click'
     ],
     entry_points={
         'console_scripts': [
